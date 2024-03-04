@@ -1,0 +1,11 @@
+[package]
+name = "pandemist_vehicle_elements"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lotus-script = "0.2.2"
+rand = "0.8.5"
+glam = "0.25.0"

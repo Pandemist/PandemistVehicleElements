@@ -1,0 +1,9 @@
+pub mod bogie;
+pub mod doors;
+pub mod electrics;
+pub mod elements;
+pub mod mocks;
+pub mod structs;
+pub mod train_control;
+pub mod vehicle_components;
+pub mod vehicle_structure;
