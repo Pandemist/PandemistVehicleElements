@@ -1,11 +1,11 @@
 #[derive(Default, Debug)]
 pub struct Bogie {
     _name_id: String,
-    _index: u32,
+    _index: usize,
 }
 
 impl Bogie {
-    pub fn new(name: String, new_index: u32) -> Self {
+    pub fn new(name: String, new_index: usize) -> Self {
         Bogie {
             _name_id: name,
             _index: new_index,

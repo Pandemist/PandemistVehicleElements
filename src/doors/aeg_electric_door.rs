@@ -5,7 +5,7 @@ use rand::Rng;
 
 use crate::{
     elements::tech_elements::warnrelais::Blinkrelais,
-    mocks::{animation::Animation, sound::Sound},
+    mocks::{animation::Animation, sound::Sound, vehicle_door::VehicleDoor},
     structs::{
         internal_enums::{DoorState, DoorTarget, SoundTarget},
         traits::PassengerDoor,
@@ -82,12 +82,14 @@ pub struct AegElectricDoor {
     snd_close_end_2: Sound,
     snd_door_close_2: Sound,
 
+    pass_door: VehicleDoor,
+
     snd_door_warn: Sound,
     _snd_door_warn_pitch: f32,
 }
 
 impl AegElectricDoor {
-    pub fn new(name: String, new_serie_1: bool) -> Self {
+    pub fn new(name: String, door_index: usize, new_serie_1: bool) -> Self {
         let mut rng = rand::thread_rng();
 
         let mut door = AegElectricDoor {
@@ -120,6 +122,8 @@ impl AegElectricDoor {
             snd_close_start_2: Sound::new(format!("snd_{}_close_Start_2", name)),
             snd_close_end_2: Sound::new(format!("snd_{}_close_end_2", name)),
             snd_door_close_2: Sound::new(format!("snd_{}_close_2", name)),
+
+            pass_door: VehicleDoor::new(door_index, true, true),
 
             ..Default::default()
         };
@@ -432,8 +436,12 @@ impl AegElectricDoor {
             self.state = DoorState::Other;
         }
 
-        self.door_mode_last = modus;
+        self.door_mode_last = modus.clone();
         self.door_1_last = door_1_btn;
+
+        self.pass_door.update_open(self.state == DoorState::Open);
+        self.pass_door
+            .update_released(modus == DoorTarget::Freigabe);
     }
 }
 

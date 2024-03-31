@@ -4,7 +4,7 @@ use lotus_script::delta;
 
 use crate::{
     elements::std_elements::piecewise_linear_function::PiecewiseLinearFunction,
-    mocks::{animation::Animation, sound::Sound},
+    mocks::{animation::Animation, sound::Sound, vehicle_door::VehicleDoor},
     structs::{
         internal_enums::{DoorState, DoorTarget, SoundTarget},
         traits::PassengerDoor,
@@ -61,6 +61,9 @@ pub struct DueWagFalttuer {
     snd_reverse: Sound,
     snd_hand: Sound,
 
+    pass_door_1: VehicleDoor,
+    pass_door_2: VehicleDoor,
+
     grabbing_aa: bool,
     grabbing_ab: bool,
     grabbing_ba: bool,
@@ -68,7 +71,7 @@ pub struct DueWagFalttuer {
 }
 
 impl DueWagFalttuer {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: String, door_index_1: usize, door_index_2: usize) -> Self {
         //let mut rng = rand::thread_rng();
 
         let mut tuer = DueWagFalttuer {
@@ -87,6 +90,9 @@ impl DueWagFalttuer {
             snd_close: Sound::new(format!("snd_{}_close", name)),
             snd_reverse: Sound::new(format!("snd_{}_reverse", name)),
             snd_hand: Sound::new(format!("snd_{}_hand", name)),
+
+            pass_door_1: VehicleDoor::new(door_index_1, true, true),
+            pass_door_2: VehicleDoor::new(door_index_2, true, true),
 
             fluegel_a_endlage_zu: true,
             fluegel_b_endlage_zu: true,
@@ -331,6 +337,14 @@ impl DueWagFalttuer {
         } else {
             DoorState::Other
         };
+
+        self.pass_door_1.update_open(self.state == DoorState::Open);
+        self.pass_door_2.update_open(self.state == DoorState::Open);
+
+        self.pass_door_1
+            .update_released(ansteuerung == DoorTarget::Freigabe);
+        self.pass_door_2
+            .update_released(ansteuerung == DoorTarget::Freigabe);
     }
 }
 
