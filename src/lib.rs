@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 pub mod bogie;
 pub mod doors;
 pub mod electrics;
