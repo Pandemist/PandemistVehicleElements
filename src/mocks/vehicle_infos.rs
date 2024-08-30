@@ -1,36 +1,30 @@
-use glam::Vec3;
+use glam::{f32::Vec3, vec3};
+use lotus_script::var::VariableType;
 
-// Entspricht der Variable veh_number
 pub fn veh_number() -> String {
-    todo!()
+    String::get("veh_number")
 }
 
-// Entspricht der Variable veh_number
 pub fn set_veh_number(value: String) {
-    todo!()
+    value.set("veh_number");
 }
 
-// Entspricht der Variable veh_registration
 pub fn veh_registration() -> String {
-    todo!()
+    String::get("veh_registration")
 }
 
-// Entspricht der Variable veh_registration
 pub fn set_veh_registration(value: String) {
-    todo!()
+    value.set("veh_registration");
 }
 
-// Entspricht der Variable v_ground
 pub fn v_ground() -> f32 {
-    todo!()
+    f32::get("v_ground")
 }
 
-// Entspricht der Variable a_ground
 pub fn a_ground() -> f32 {
-    todo!()
+    f32::get("a_ground")
 }
 
-// Entspricht den Variablen acc_x, acc_y, acc_z
 pub fn acceleration_vec() -> Vec3 {
-    todo!()
+    vec3(f32::get("acc_x"), f32::get("acc_y"), f32::get("acc_z"))
 }

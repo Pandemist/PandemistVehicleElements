@@ -1,11 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
-pub mod bogie;
-pub mod doors;
-pub mod electrics;
+pub mod components;
 pub mod elements;
 pub mod mocks;
 pub mod structs;
-pub mod train_control;
-pub mod vehicle_components;
-pub mod vehicle_structure;

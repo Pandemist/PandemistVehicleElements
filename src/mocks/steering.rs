@@ -1,3 +1,5 @@
+use lotus_script::var::VariableType;
+
 #[derive(Default, Debug)]
 pub struct Steering {
     _name_id: String,
@@ -11,13 +13,11 @@ impl Steering {
         }
     }
 
-    // Entspricht der Variable Steering
     pub fn steering(&self) -> f32 {
-        todo!()
+        f32::get("Steering")
     }
 
-    // Entspricht der Variable Steering
     pub fn set_steering(&mut self, value: f32) {
-        todo!()
+        value.set("Steering");
     }
 }

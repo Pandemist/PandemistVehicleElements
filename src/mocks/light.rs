@@ -1,26 +1,26 @@
 use glam::Vec3;
+use lotus_script::var::VariableType;
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 
 pub struct Light {
-    _name_id: String,
+    name_id: String,
 }
 
 impl Light {
     pub fn new(name: String) -> Self {
-        Light {
-            _name_id: name,
-            ..Default::default()
-        }
+        Light { name_id: name }
     }
 
     // Setzt die Helligkeit einer Lichtquelle
-    pub fn update_light_level(&mut self, new_level: f32) {
-        todo!()
+    pub fn update_light_level(&self, new_level: f32) {
+        new_level.set(&self.name_id);
     }
 
     // Setzt die Farbe einer Lichtquelle
-    pub fn update_color(&mut self, new_color: Vec3) {
-        todo!()
+    pub fn update_color(&self, new_color: Vec3) {
+        new_color.x.set(&format!("{}_r", self.name_id));
+        new_color.y.set(&format!("{}_g", self.name_id));
+        new_color.z.set(&format!("{}_b", self.name_id));
     }
 }

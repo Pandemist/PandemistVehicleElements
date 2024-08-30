@@ -1,6 +1,8 @@
+use lotus_script::var::VariableType;
+
 #[derive(Default, Debug)]
 pub struct VehicleDoor {
-    _id: usize,
+    id: usize,
     entry_available: bool,
     exit_available: bool,
     open_last: bool,
@@ -10,7 +12,7 @@ pub struct VehicleDoor {
 impl VehicleDoor {
     pub fn new(index: usize, entry_init: bool, exit_init: bool) -> Self {
         VehicleDoor {
-            _id: index,
+            id: index,
             entry_available: entry_init,
             exit_available: exit_init,
             ..Default::default()
@@ -19,7 +21,7 @@ impl VehicleDoor {
 
     // Entspricht der Variable DoorOpen_#
     pub fn set_open(&mut self, open: bool) {
-        todo!()
+        open.set(&format!("DoorOpen_{}", self.id));
     }
 
     pub fn update_open(&mut self, open: bool) {
@@ -32,23 +34,23 @@ impl VehicleDoor {
     // Entspricht der Variable DoorEntryAvailable_#
     pub fn set_entry_available(&mut self, state: bool) {
         self.entry_available = state;
-        todo!()
+        state.set(&format!("DoorEntryAvailable_{}", self.id));
     }
 
     // Entspricht der Variable DoorExitAvailable_#
     pub fn set_exit_available(&mut self, state: bool) {
         self.exit_available = state;
-        todo!()
+        state.set(&format!("DoorExitAvailable_{}", self.id));
     }
 
     // Entspricht der Variable DoorEntryReleased_#
     pub fn set_entry_released(&mut self, state: bool) {
-        todo!()
+        state.set(&format!("DoorEntryReleased_{}", self.id));
     }
 
     // Entspricht der Variable DoorExitReleased_#
     pub fn set_exit_released(&mut self, state: bool) {
-        todo!()
+        state.set(&format!("DoorExitReleased_{}", self.id));
     }
 
     pub fn update_released(&mut self, state: bool) {
@@ -61,16 +63,16 @@ impl VehicleDoor {
 
     // Entspricht der Variable DoorReqIn_#
     pub fn request_in(&self) -> bool {
-        todo!()
+        bool::get(&format!("DoorReqIn_{}", self.id))
     }
 
     // Entspricht der Variable DoorReqOut_#
     pub fn request_out(&self) -> bool {
-        todo!()
+        bool::get(&format!("DoorReqOut_{}", self.id))
     }
 
     // Entspricht der Variable DoorOccupied_#
     pub fn occupied(&self) -> bool {
-        todo!()
+        bool::get(&format!("DoorOccupied_{}", self.id))
     }
 }

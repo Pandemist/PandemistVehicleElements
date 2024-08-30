@@ -1,20 +1,16 @@
-#[derive(Default, Debug)]
+use lotus_script::var::VariableType;
+
+#[derive(Debug)]
 pub struct Bogie {
-    _name_id: String,
-    _index: usize,
+    id: usize,
 }
 
 impl Bogie {
-    pub fn new(name: String, new_index: usize) -> Self {
-        Bogie {
-            _name_id: name,
-            _index: new_index,
-            ..Default::default()
-        }
+    pub fn new(new_id: usize) -> Self {
+        Bogie { id: new_id }
     }
 
-    // Entspricht der Variable F_RailBrake_Bogie_N_{b}
     pub fn railbrake_force(&mut self, force: f32) {
-        todo!()
+        force.set(&format!("F_RailBrake_Bogie_N_{}", self.id));
     }
 }

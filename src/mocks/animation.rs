@@ -1,18 +1,16 @@
-#[derive(Default, Debug)]
+use lotus_script::var::VariableType;
+
+#[derive(Debug)]
 pub struct Animation {
-    _name_id: String,
+    name: String,
 }
 
 impl Animation {
     pub fn new(name: String) -> Self {
-        Animation {
-            _name_id: name,
-            ..Default::default()
-        }
+        Animation { name: name }
     }
 
-    // setzte die Position einer Variable
-    pub fn update_pos(&mut self, new_pos: f32) {
-        todo!()
+    pub fn set(&mut self, pos: f32) {
+        pos.set(&self.name);
     }
 }
