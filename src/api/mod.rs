@@ -1,0 +1,17 @@
+pub mod animation;
+pub mod axis;
+pub mod bogie;
+pub mod coupler;
+pub mod electrical_supply;
+pub mod general;
+pub mod key_event;
+pub mod light;
+pub mod mock_enums;
+//pub mod passenger_seat;
+pub mod simulation_settings;
+pub mod sound;
+//pub mod steering;
+pub mod variable;
+pub mod vehicle_door;
+pub mod vehicle_infos;
+pub mod visible_flag;
