@@ -73,7 +73,7 @@ checksum = "4a5f13b858c8d314ee3e8f639011f7ccefe71f97f96e50151fb991f267928e2c"
 [[package]]
 name = "lotus-bindgen-macros"
 version = "0.1.1"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting?branch=master#a38de3ce67d32476331b8e993037095b47719a88"
+source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -81,9 +81,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "lotus-extra"
+version = "0.1.0"
+source = "git+https://github.com/Oriolus-Software/lotus-extra.git#822c87e243eed66c0fb3ea57fd6eec4cc6febafb"
+dependencies = [
+ "lotus-script",
+ "serde",
+]
+
+[[package]]
 name = "lotus-script"
 version = "0.6.2"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting?branch=master#a38de3ce67d32476331b8e993037095b47719a88"
+source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
 dependencies = [
  "lotus-bindgen-macros",
  "lotus-script-sys",
@@ -98,7 +107,7 @@ dependencies = [
 [[package]]
 name = "lotus-script-sys"
 version = "0.3.0"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting?branch=master#a38de3ce67d32476331b8e993037095b47719a88"
+source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
 dependencies = [
  "lotus-bindgen-macros",
  "rmp-serde",
@@ -109,7 +118,7 @@ dependencies = [
 [[package]]
 name = "lotus-shared"
 version = "0.4.1"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting?branch=master#a38de3ce67d32476331b8e993037095b47719a88"
+source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
 dependencies = [
  "glam",
  "lotus-script-sys",
@@ -117,7 +126,6 @@ dependencies = [
  "serde_json",
  "serde_repr",
  "thiserror",
- "time",
 ]
 
 [[package]]
@@ -145,6 +153,7 @@ dependencies = [
 name = "pandemist_vehicle_elements"
 version = "0.1.0"
 dependencies = [
+ "lotus-extra",
  "lotus-script",
  "serde",
  "serde_json",

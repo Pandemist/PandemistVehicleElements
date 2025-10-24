@@ -6,10 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-#lotus-extra = { git = "https://github.com/Oriolus-Software/lotus-extra", branch = "master" }
-lotus-script = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting", branch = "master", features = [
-	"time",
-] } #lotus-script = "0.6"
+lotus-extra = { git = "https://github.com/Oriolus-Software/lotus-extra.git" }
+lotus-script = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git" }
+#lotus-script = "0.6"
 typedmap = "0.6.0"
 serde = "1"
 serde_json = "1"
