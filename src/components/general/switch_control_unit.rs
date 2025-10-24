@@ -6,9 +6,8 @@
 
 use std::collections::HashMap;
 
+use lotus_extra::messages::pis::{RoutingCode, RoutingDirection, RoutingRequest};
 use lotus_script::prelude::Message;
-
-use crate::messages::fis_messages::{RoutingCode, RoutingDirection, RoutingRequest};
 
 /// Identifies the source of a switch control request.
 ///

@@ -10,10 +10,9 @@
 
 use std::fmt;
 
+use lotus_extra::messages::std::PowerSignalCabin;
 use lotus_script::action::state;
 use serde::{Deserialize, Serialize};
-
-use crate::messages::std_messages::PowerSignalCabin;
 
 /// Represents the cabin side for key events in a dual-cabin system.
 ///

@@ -200,9 +200,9 @@ pub fn mouse_move() -> Vec2 {
 /// ```rust
 /// let state = signalstate();
 /// match state {
-///     0 => println!("Signal inactive"),
-///     1 => println!("Signal active"),
-///     2 => println!("Signal error"),
+///     0 => println!("Stop"),
+///     1 => println!("Go"),
+///     2 => println!("Slow"),
 ///     _ => println!("Unknown signal state: {}", state),
 /// }
 /// ```

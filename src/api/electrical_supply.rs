@@ -10,14 +10,7 @@
 //! - [`ApiThirdRailCollector`] - Third rail power collection systems
 //! - [`ApiTrolleyPantograph`] - Trolley/tram pantograph systems with angle control
 
-use lotus_script::{
-    var::{get_var, set_var},
-    vehicle::{Pantograph, VehicleError},
-};
-
-use crate::management::enums::general_enums::Side;
-
-use super::mock_enums::ThirdRailState;
+use lotus_script::vehicle::{Pantograph, VehicleError};
 
 //=========================================================================
 

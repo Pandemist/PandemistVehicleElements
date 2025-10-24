@@ -31,22 +31,11 @@ use lotus_script::time::delta;
 
 use crate::{
     api::{
-        animation::Animation,
-        electrical_supply::ApiPantograph,
-        key_event::KeyEventCab,
-        light::Light,
-        mock_enums::{ThirdRailState, VehicleInitState},
-        simulation_settings::{init_ready_state, realisitc_electric_supply},
-        sound::Sound,
-        visible_flag::Visiblility,
+        animation::Animation, electrical_supply::ApiPantograph, key_event::KeyEventCab,
+        simulation_settings::realisitc_electric_supply, sound::Sound, visible_flag::Visiblility,
     },
-    elements::{
-        std::{helper::gen_f32, piecewise_linear_function::PiecewiseLinearFunction},
-        tech::slider::Slider,
-    },
-    management::enums::{
-        general_enums::Side, state_enums::SwitchingState, target_enums::SwitchingTarget,
-    },
+    elements::{std::piecewise_linear_function::PiecewiseLinearFunction, tech::slider::Slider},
+    management::enums::{state_enums::SwitchingState, target_enums::SwitchingTarget},
 };
 
 /// Builder for creating an `ElectricPantograph` with customizable parameters.

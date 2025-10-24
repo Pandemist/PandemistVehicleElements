@@ -83,33 +83,6 @@ impl From<VehicleInitState> for i32 {
     }
 }
 
-/// Represents the connection status to the third rail power system.
-///
-/// In rail systems, the third rail provides electrical power to trains. This enum
-/// tracks the current connection state between the vehicle and the power rail.
-///
-/// # Examples
-///
-/// ```
-/// use your_crate_name::ThirdRailState;
-///
-/// let power_status = ThirdRailState::Connected;
-/// match power_status {
-///     ThirdRailState::Disconnnected => println!("No power available"),
-///     ThirdRailState::PartwiseConnected => println!("Partial power connection"),
-///     ThirdRailState::Connected => println!("Full power available"),
-/// }
-/// ```
-#[derive(Debug, Clone, PartialEq)]
-pub enum ThirdRailState {
-    /// No connection to the third rail power system
-    Disconnnected,
-    /// Partial or intermittent connection to the power system
-    PartwiseConnected,
-    /// Full connection established with the third rail power system
-    Connected,
-}
-
 /// Represents the initial position of the player/operator in the vehicle.
 ///
 /// This enum defines where the player or operator starts their session within
