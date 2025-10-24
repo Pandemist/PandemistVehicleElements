@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
 use lotus_script::{
-    log,
     message::Coupling,
     prelude::{message_type, send_message, Message, MessageTarget},
-    var::set_var,
 };
 use serde::{Deserialize, Serialize};
 
@@ -358,6 +356,52 @@ impl TrainBusManager {
         }
     }
 
+    fn find_adress(&mut self, id: &u32, kind: &PeripheryKind) -> u32 {
+        // Check whether an address is stored for the ID in my_address_map
+        if let Some(&adress) = self.my_adress_map.get(id) {
+            // Find the index of the conflicting element
+            let conflict_index = self.my_vehicle_config.periphery.iter().position(|elem| {
+                kind.is_same_kind(&elem.kind) && elem.counter == adress && elem.id != *id
+            });
+
+            if let Some(idx) = conflict_index {
+                // Conflict found - find a new address for the conflicting element
+                let mut new_adress = 1;
+                loop {
+                    let is_taken =
+                        self.my_vehicle_config.periphery.iter().any(|elem| {
+                            kind.is_same_kind(&elem.kind) && elem.counter == new_adress
+                        });
+
+                    if !is_taken {
+                        // Assign the new address to the conflicting element
+                        self.my_vehicle_config.periphery[idx].counter = new_adress;
+                        break;
+                    }
+                    new_adress += 1;
+                }
+            }
+
+            // Return the address from my_address_map
+            return adress;
+        }
+
+        // No address in my_address_map - find the first available address
+        let mut adress = 1;
+        loop {
+            let is_taken = self
+                .my_vehicle_config
+                .periphery
+                .iter()
+                .any(|elem| kind.is_same_kind(&elem.kind) && elem.counter == adress);
+
+            if !is_taken {
+                return adress;
+            }
+            adress += 1;
+        }
+    }
+
     fn update(&mut self) {
         let mut new_veh_config_front = Vec::new();
         new_veh_config_front.extend(self.veh_config_list_received.1.clone());
@@ -416,11 +460,7 @@ impl TrainBusManager {
             );
         }
 
-        log::info!("Test for Resend: {:?}", self.is_master_there());
-
         if self.is_master_there() && !self.master_pos_last_local {
-            log::info!("Resend Faults");
-
             let mut entries: Vec<_> = self.my_perifery_faults.iter().collect();
             entries.sort_by_key(|(&k, _)| k);
             for (key, fault) in entries {
@@ -431,15 +471,11 @@ impl TrainBusManager {
         }
 
         self.send_to_local();
-        self.update_train_bus_error();
+        //    self.update_train_bus_error();
     }
 
     fn send_to_local(&mut self) {
         // Has the VehNumberList changed? Determine value and propagate on change
-        /*let mut new_veh_config_list = Vec::new();
-        new_veh_config_list.extend(self.veh_config_list_received.1.clone());
-        new_veh_config_list.push(self.veh_number.clone());
-        new_veh_config_list.extend(self.veh_config_list_received.0.iter().rev().cloned());*/
 
         let new_veh_config_list = (
             self.veh_config_list_received
@@ -488,17 +524,6 @@ impl TrainBusManager {
             None
         };
 
-        set_var(
-            "AA_Masters",
-            format!(
-                "F: {:?} S: {:?} R: {:?} M: {:?}",
-                self.master_pos_received.0.is_some(),
-                self.am_i_master,
-                self.master_pos_received.1.is_some(),
-                self.is_master_there()
-            ),
-        );
-
         if self.is_master_there() != self.master_pos_last_local {
             send_message(
                 &(TrainBusMaster {
@@ -516,7 +541,6 @@ impl TrainBusManager {
 
     pub fn on_message(&mut self, msg: Message) {
         msg.handle::<InternTelegram>(|m| {
-            log::info!("{:?}", m);
             if let Some(coupler) = msg.source().coupling {
                 match coupler {
                     Coupling::Front => {
@@ -537,7 +561,6 @@ impl TrainBusManager {
         .expect("InternTelegram: message handle failed");
 
         msg.handle::<IbisState>(|m| {
-            log::info!("{:?}", m);
             self.am_i_master = m.is_master;
             self.update();
             Ok(())
@@ -574,30 +597,23 @@ impl TrainBusManager {
         .expect("EcouplerState: message handle failed");
 
         msg.handle::<PeripheryRegister>(|m| {
-            log::info!("{:?}", m);
             let id = m.id;
             let kind = m.kind;
-            let counter = self.my_vehicle_config.count_kind(&kind) + 1;
 
-            let p = PeripheryElement {
-                id,
-                kind,
-                counter: counter as u32,
-            };
+            // find counter state
+            // let counter = self.my_vehicle_config.count_kind(&kind) + 1;
 
-            set_var("Periphery Reg", format!("{:#?}", p));
+            let counter = self.find_adress(&id, &kind);
+
+            let p = PeripheryElement { id, kind, counter };
+
             self.my_vehicle_config.periphery.push(p);
             self.update();
-            set_var(
-                "PeripheryList",
-                format!("{:?}", self.my_vehicle_config.periphery),
-            );
             Ok(())
         })
         .expect("PeripheryRegister: message handle failed");
 
         msg.handle::<PeripheryFaultReport>(|m| {
-            log::info!("{:?}", m);
             if let Some(pe) = self.my_vehicle_config.find_by_id(m.id) {
                 self.my_perifery_faults.insert(m.id, m.kind.clone());
 
@@ -612,7 +628,6 @@ impl TrainBusManager {
         .expect("PeripheryFaultReport: message handle failed");
 
         msg.handle::<InternFaultReport>(|m| {
-            log::info!("{:?}", m);
             if let Some(side) = msg.source().coupling {
                 if self.am_i_master {
                     send_message(
@@ -737,7 +752,7 @@ impl TrainBusManager {
             > 0
     }
 
-    fn update_train_bus_error(&mut self) {
+    /*fn update_train_bus_error(&mut self) {
         let new_train_bus_error = [
             self.am_i_master,
             self.master_pos_received.0.is_some(),
@@ -752,7 +767,7 @@ impl TrainBusManager {
             self.train_bus_error = new_train_bus_error;
             // TODO: ZUGBUS Fehler
         }
-    }
+    }*/
 }
 
 //===================================================================
@@ -802,32 +817,3 @@ impl TrainBusPeriferie {
         }
     }
 }
-
-//===================================================================
-
-//
-/*
-
-BUS: TrainBus
-Öffnen und Schließen übernimmt der ZugBusHandler
-
-Zugbus ist im Fahrzeug
-Hält eine Liste an Periphery Fehlern im Wagen
-Teilt die Fehler dem Master mit, wenn sie auftreten während es einen Master gibt oder wenn ein neuer Master sich anmeldet
-
-
-Wenn ein IBIS erfährt, dass sich die Zugkonfiguration geändert hat, werden die FIS Daten erneut übertragen
-- Bei Fahrzeugen, die FIS Daten nicht über den Zugbus übertragen (Atron) kümmern sich eigenständig um die Inforierung des AFR19 im neu angekuppelten Wagen
-
-IBIS (bei Fzg ohne Ibis -> Das Fahrzeug) sendet Message (nur an eignes Fahrzeug) das es keinen Master mehr gibt
-- Anzeigen entscheiden, was sie tun
-
-
-Peripherymeldungen:
-- Anmeldung bei ZugBus bei Simulationsstart
-    -> Art des Perifieriegeräts (Enums?, String?) & Modulslotindex (zur nachträglichen Identifikation)
-
-
-
-
-*/
