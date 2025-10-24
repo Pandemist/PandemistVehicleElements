@@ -10,8 +10,6 @@ use lotus_script::{
     vehicle::{Axle, RailQuality, SurfaceType, VehicleError},
 };
 
-use crate::management::enums::general_enums::Side;
-
 /// API interface for managing railway vehicle axles.
 ///
 /// `ApiRailAxis` provides a high-level interface for controlling and monitoring
