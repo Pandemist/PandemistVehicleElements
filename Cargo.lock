@@ -181,7 +181,7 @@ dependencies = [
 [[package]]
 name = "lotus-extra"
 version = "0.1.0"
-source = "git+https://github.com/Oriolus-Software/lotus-extra.git#62e4c24bf1ef0810995fd65f78e7c4b14c5ad529"
+source = "git+https://github.com/Oriolus-Software/lotus-extra.git?branch=master#62e4c24bf1ef0810995fd65f78e7c4b14c5ad529"
 dependencies = [
  "lotus-script",
  "num-traits",
