@@ -4,16 +4,13 @@
 //! - `SimpleCoupler`: A basic coupler with mechanical and electrical connection
 //! - `HandCoupler`: A manual coupler with realistic physics and user interaction
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::{message::Coupling, rand::gen_f64, time::delta};
 
 use crate::{
     api::{
-        animation::Animation,
-        coupler::ApiCoupler,
-        general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
-        mock_enums::CouplingState,
-        visible_flag::Visiblility,
+        animation::Animation, coupler::ApiCoupler, general::mouse_move, key_event::KeyEvent,
+        mock_enums::CouplingState, visible_flag::Visiblility,
     },
     elements::tech::{buttons::PushButton, switches::Switch},
     messages::gt6n_coupling_messages::send_bag,
@@ -29,10 +26,10 @@ use crate::{
 ///
 /// ```
 /// use lotus_script::message::Coupling;
-/// use crate::api::key_event::KeyEventCab;
+/// use lotus_extra::vehicle::CockpitSide;
 ///
 /// let coupler = SimpleCoupler::new(
-///     KeyEventCab::A,
+///     CockpitSide::A,
 ///     Coupling::Front,
 ///     "electric_parts_anim"
 /// );
@@ -124,11 +121,11 @@ impl SimpleCoupler {
 ///
 /// ```
 /// use lotus_script::message::Coupling;
-/// use crate::api::key_event::KeyEventCab;
+/// use lotus_extra::vehicle::CockpitSide;
 ///
 /// let mut coupler = HandCoupler::new(
 ///     0,                      // ID
-///     Some(KeyEventCab::A),   // Cab side
+///     Some(CockpitSide::A),   // Cab side
 ///     Coupling::Front,        // Coupling type
 ///     0.02,                   // Friction coefficient
 ///     0.01                    // Mouse sensitivity
@@ -170,7 +167,7 @@ pub struct HandCoupler {
     /// Key event for bag visibility control
     key_bag: KeyEvent,
     /// Associated cab side for key events
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Visibility controller for cab components
     cab_vis: Visiblility,
@@ -211,7 +208,7 @@ impl HandCoupler {
     #[must_use]
     pub fn new(
         id: usize,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         coupler: Coupling,
         friction: f32,
         mouse_factor: f32,

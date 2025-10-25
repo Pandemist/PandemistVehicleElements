@@ -16,19 +16,19 @@
 //!
 //! ```rust
 //! use slider::{Slider, Rollo};
-//! use lotus_script::api::key_event::KeyEventCab;
+//! use lotus_extra::vehicle::CockpitSide;
 //!
 //! // Create a horizontal slider
 //! let mut slider = Slider::builder()
 //!     .min(0.0)
 //!     .max(100.0)
 //!     .axis_x()
-//!     .key_event("slider_grab", Some(KeyEventCab::ACab))
+//!     .key_event("slider_grab", Some(CockpitSide::A))
 //!     .animation("slider_animation")
 //!     .build();
 //!
 //! // Create a rollo component
-//! let mut rollo = Rollo::builder("rollo_animation", "rollo_draw", Some(KeyEventCab::ACab))
+//! let mut rollo = Rollo::builder("rollo_animation", "rollo_draw", Some(CockpitSide::A))
 //!     .mouse_factor(2.0)
 //!     .snd_pull("pull_loop_sound")
 //!     .snd_reset("reset_sound")
@@ -41,17 +41,10 @@
 
 use std::rc::Rc;
 
+use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::{math::Vec2, time::delta};
 
-use crate::{
-    api::{
-        animation::Animation,
-        general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
-        sound::Sound,
-    },
-    elements::std::piecewise_linear_function::PiecewiseLinearFunction,
-};
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound};
 
 /// Builder for creating a [`Slider`] component with customizable properties.
 ///
@@ -69,7 +62,7 @@ use crate::{
 ///     .friction(5.0)
 ///     .upper_bump_factor(0.8)
 ///     .lower_bump_factor(0.8)
-///     .key_event("grab_slider", Some(KeyEventCab::ACab))
+///     .key_event("grab_slider", Some(CockpitSide::A))
 ///     .animation("slider_pos")
 ///     .build();
 /// ```
@@ -138,13 +131,13 @@ impl SliderBuilder {
     ///
     /// ```rust
     /// let slider = Slider::builder()
-    ///     .key_event("slider_grab", Some(KeyEventCab::Left))
+    ///     .key_event("slider_grab", Some(CockpitSide::Left))
     ///     .build();
     /// ```
     pub fn key_event(
         mut self,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> Self {
         self.key_grab = KeyEvent::new(Some(&event_name.into()), cab_side);
         self
@@ -531,7 +524,8 @@ impl Slider {
         }
 
         if self.pos > self.max {
-            self.snd_open_end.update_volume((self.snd_open_end_vol_curve)(self.speed));
+            self.snd_open_end
+                .update_volume((self.snd_open_end_vol_curve)(self.speed));
             self.snd_open_end.start();
 
             self.pos = self.max;
@@ -543,7 +537,8 @@ impl Slider {
         }
 
         if self.pos < self.min {
-            self.snd_close_end.update_volume((self.snd_close_end_vol_curve)(self.speed));
+            self.snd_close_end
+                .update_volume((self.snd_close_end_vol_curve)(self.speed));
             self.snd_close_end.start();
 
             self.pos = self.min;
@@ -582,7 +577,7 @@ impl Slider {
 /// # Example
 ///
 /// ```rust
-/// let rollo = Rollo::builder("curtain_animation", "pull_curtain", Some(KeyEventCab::ACab))
+/// let rollo = Rollo::builder("curtain_animation", "pull_curtain", Some(CockpitSide::A))
 ///     .mouse_factor(1.5)
 ///     .snd_pull("curtain_pull")
 ///     .snd_reset("curtain_reset")
@@ -590,7 +585,7 @@ impl Slider {
 ///     .build();
 /// ```
 pub struct RolloBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos_rollo: f32,
 
@@ -714,7 +709,7 @@ impl RolloBuilder {
 /// rollo.tick();
 /// ```
 pub struct Rollo {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos_rollo: f32,
 
@@ -748,12 +743,12 @@ impl Rollo {
     /// # Example
     ///
     /// ```rust
-    /// let builder = Rollo::builder("rollo_animation", "pull_event", Some(KeyEventCab::ACab));
+    /// let builder = Rollo::builder("rollo_animation", "pull_event", Some(CockpitSide::A));
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
         event_name: &str,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> RolloBuilder {
         RolloBuilder {
             cab_side,

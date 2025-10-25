@@ -23,7 +23,7 @@ use lotus_script::vehicle::{Pantograph, VehicleError};
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::electrical_supply::ApiPantograph;
+/// use pandemist_vehicle_elements::electrical_supply::ApiPantograph;
 ///
 /// let pantograph = ApiPantograph::new(1);
 /// let voltage = pantograph.voltage();

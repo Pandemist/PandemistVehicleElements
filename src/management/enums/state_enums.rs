@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::SwitchingState;
+/// use pandemist_vehicle_elements::SwitchingState;
 ///
 /// let state = SwitchingState::default();
 /// assert_eq!(state, SwitchingState::Neutral);
@@ -56,7 +56,7 @@ impl From<i32> for SwitchingState {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::SwitchingState;
+    /// use pandemist_vehicle_elements::SwitchingState;
     ///
     /// assert_eq!(SwitchingState::from(-1), SwitchingState::Off);
     /// assert_eq!(SwitchingState::from(1), SwitchingState::On);
@@ -92,7 +92,7 @@ impl From<i32> for SwitchingState {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::ChangedState;
+/// use pandemist_vehicle_elements::ChangedState;
 ///
 /// let state = ChangedState::default();
 /// assert_eq!(state, ChangedState::On);
@@ -153,7 +153,7 @@ impl ChangedState {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::ChangedState;
+    /// use pandemist_vehicle_elements::ChangedState;
     ///
     /// // No change, remained off
     /// assert_eq!(ChangedState::to_changed(false, false), ChangedState::Off);

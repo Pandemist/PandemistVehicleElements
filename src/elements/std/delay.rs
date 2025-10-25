@@ -14,7 +14,7 @@ use lotus_script::time::delta;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::Delay;
+/// use pandemist_vehicle_elements::Delay;
 ///
 /// // Create a delay with 1.0 second delay time, initial value false
 /// let mut delay = Delay::new(1.0, false);
@@ -55,7 +55,7 @@ impl<T: PartialEq + Clone> Delay<T> {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::Delay;
+    /// use pandemist_vehicle_elements::Delay;
     ///
     /// // Create a 0.5 second delay for boolean values
     /// let delay = Delay::new(0.5, false);
@@ -94,7 +94,7 @@ impl<T: PartialEq + Clone> Delay<T> {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::Delay;
+    /// use pandemist_vehicle_elements::Delay;
     ///
     /// let mut delay = Delay::new(1.0, 0);
     ///

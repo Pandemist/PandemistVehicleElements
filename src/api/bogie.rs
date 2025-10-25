@@ -12,7 +12,7 @@ use crate::api::variable::get_var;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::ApiBogie;
+/// use pandemist_vehicle_elements::ApiBogie;
 ///
 /// let mut bogie = ApiBogie::new(0);
 /// bogie.railbrake_force(1000.0); // Apply 1000N of braking force
@@ -39,7 +39,7 @@ impl ApiBogie {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::ApiBogie;
+    /// use pandemist_vehicle_elements::ApiBogie;
     ///
     /// let bogie = ApiBogie::new(0); // Create wrapper for bogie ID 0
     /// ```
@@ -65,7 +65,7 @@ impl ApiBogie {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::ApiBogie;
+    /// use pandemist_vehicle_elements::ApiBogie;
     ///
     /// let mut bogie = ApiBogie::new(0);
     /// bogie.railbrake_force(1500.0); // Apply 1500N braking force
@@ -96,7 +96,7 @@ impl ApiBogie {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::invradius_abs_max;
+/// use pandemist_vehicle_elements::invradius_abs_max;
 ///
 /// let max_inv_radius = invradius_abs_max();
 /// println!("Maximum inverse radius: {}", max_inv_radius);

@@ -31,8 +31,8 @@ pub enum SwitchSender {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::SwitchControlUnit;
-/// use your_crate::SwitchSender;
+/// use pandemist_vehicle_elements::SwitchControlUnit;
+/// use pandemist_vehicle_elements::SwitchSender;
 ///
 /// // Create a control unit with priority order: Vehicle first, then Module 1
 /// let priorities = vec![SwitchSender::Vehicle, SwitchSender::Modul(1)];
@@ -83,7 +83,7 @@ impl SwtichControlUnit {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::{SwitchControlUnit, SwitchSender};
+    /// use pandemist_vehicle_elements::{SwitchControlUnit, SwitchSender};
     ///
     /// let priorities = vec![
     ///     SwitchSender::Vehicle,
@@ -124,7 +124,7 @@ impl SwtichControlUnit {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::SwitchControlUnit;
+    /// # use pandemist_vehicle_elements::SwitchControlUnit;
     /// # let mut control_unit = SwitchControlUnit::new(vec![], 1);
     /// // Update with current system state
     /// control_unit.tick(true, false, true);
@@ -182,7 +182,7 @@ impl SwtichControlUnit {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::SwitchControlUnit;
+    /// # use pandemist_vehicle_elements::SwitchControlUnit;
     /// # use lotus_script::prelude::Message;
     /// # let mut control_unit = SwitchControlUnit::new(vec![], 1);
     /// # let msg = Message::new(); // This would be a real message in practice
@@ -223,7 +223,7 @@ impl SwtichControlUnit {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::SwitchControlUnit;
+    /// # use pandemist_vehicle_elements::SwitchControlUnit;
     /// # let mut control_unit = SwitchControlUnit::new(vec![], 42);
     /// // Vehicle enters the trigger zone for sensor 42
     /// control_unit.on_trigger(42, true);

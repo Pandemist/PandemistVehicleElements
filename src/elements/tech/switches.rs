@@ -21,9 +21,9 @@
 //!
 //! ```rust
 //! use crate::switches::Switch;
-//! use crate::api::key_event::KeyEventCab;
+//! use lotus_extra::vehicle::CockpitSide;
 //!
-//! let mut power_switch = Switch::builder("power_anim", Some(KeyEventCab::CabA))
+//! let mut power_switch = Switch::builder("power_anim", Some(CockpitSide::CabA))
 //!     .init(false)
 //!     .event_toggle("SPACE")
 //!     .snd_toggle("click_sound")
@@ -66,11 +66,9 @@
 
 use std::collections::HashMap;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use lotus_extra::vehicle::CockpitSide;
+
+use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
 
 //=================================================================
 // Switch
@@ -81,7 +79,7 @@ use crate::api::{
 /// The builder pattern allows for flexible construction of switch components
 /// with various key bindings, sounds, and initial states.
 pub struct SwitchBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     value: bool,
@@ -231,7 +229,7 @@ impl SwitchBuilder {
 /// updated each frame by calling [`tick()`](Switch::tick).
 #[derive(Debug)]
 pub struct Switch {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     value: bool,
@@ -266,14 +264,14 @@ impl Switch {
     /// # Example
     ///
     /// ```rust
-    /// let switch = Switch::builder("power_button_anim", Some(KeyEventCab::ACab))
+    /// let switch = Switch::builder("power_button_anim", Some(CockpitSide::A))
     ///     .init(false)
     ///     .event_toggle("P")
     ///     .build();
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> SwitchBuilder {
         SwitchBuilder {
             cab_side,
@@ -416,7 +414,7 @@ pub enum SwitchEventAction {
 /// The step switch builder allows for complex configurations including
 /// custom ranges, spring behavior, and animation mappings.
 pub struct StepSwitchBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     max: i32,
     min: i32,
@@ -641,7 +639,7 @@ impl StepSwitchBuilder {
 /// - Rotary switch simulation
 #[derive(Debug)]
 pub struct StepSwitch {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// The maximum allowed position
     pub max: i32,
@@ -696,7 +694,7 @@ impl StepSwitch {
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> StepSwitchBuilder {
         StepSwitchBuilder {
             cab_side,

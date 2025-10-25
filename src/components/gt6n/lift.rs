@@ -1,13 +1,10 @@
+use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
-use crate::{
-    api::{
-        animation::{Animation, MappedAnimation},
-        key_event::KeyEventCab,
-        light::{BlinkRelais, Light},
-        sound::{Sound, SoundTarget},
-    },
-    elements::std::piecewise_linear_function::PiecewiseLinearFunction,
+use crate::api::{
+    animation::{Animation, MappedAnimation},
+    light::{BlinkRelais, Light},
+    sound::{Sound, SoundTarget},
 };
 
 const LIFT_HIGHT_SO: f32 = 1.0;
@@ -61,7 +58,7 @@ pub struct Hublift {
 
 impl Hublift {
     #[must_use]
-    pub fn new(cab_side: KeyEventCab) -> Self {
+    pub fn new(cab_side: CockpitSide) -> Self {
         Self {
             height_pos: 0.0,
             height_anim: Animation::new(Some(&format!(

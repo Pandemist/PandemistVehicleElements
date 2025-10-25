@@ -14,7 +14,7 @@ use lotus_script::var::{get_var, set_var};
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::VehicleDoor;
+/// use pandemist_vehicle_elements::VehicleDoor;
 ///
 /// // Create a new door with ID 1, entry enabled, exit disabled
 /// let mut door = VehicleDoor::new(1, true, false);

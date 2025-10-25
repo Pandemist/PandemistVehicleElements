@@ -9,7 +9,7 @@ use crate::management::enums::general_enums::CabActivState;
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::FourDirections;
+/// use pandemist_vehicle_elements_name::FourDirections;
 ///
 /// // Create a new instance allowing movement up and right
 /// let directions = FourDirections::new(true, false, true, false);
@@ -51,7 +51,7 @@ impl FourDirections {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::FourDirections;
+    /// use pandemist_vehicle_elements_name::FourDirections;
     ///
     /// let directions = FourDirections::new(true, false, true, false);
     /// assert!(directions.up && directions.right);
@@ -76,7 +76,7 @@ impl FourDirections {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::FourDirections;
+    /// use pandemist_vehicle_elements_name::FourDirections;
     ///
     /// let some_directions = FourDirections::new(true, false, false, false);
     /// assert!(some_directions.is_one());
@@ -104,7 +104,7 @@ impl FourDirections {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::FourDirections;
+    /// use pandemist_vehicle_elements_name::FourDirections;
     ///
     /// let directions = FourDirections::new(true, true, false, false);
     ///

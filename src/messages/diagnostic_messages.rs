@@ -22,6 +22,7 @@
 
 use std::collections::HashMap;
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::{
     message::{send_message, MessageTarget},
     prelude::message_type,
@@ -29,7 +30,7 @@ use lotus_script::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::{key_event::KeyEventCab, vehicle_infos::veh_number},
+    api::vehicle_infos::veh_number,
     management::enums::{door_enums::DoorTarget, state_enums::SwitchingState},
 };
 
@@ -263,7 +264,7 @@ pub struct DiagnosticMessage {
     /// Vehicle identification number
     pub veh_number: String,
     /// Optional cabin identifier where the fault occurred
-    pub cabin: Option<KeyEventCab>,
+    pub cabin: Option<CockpitSide>,
     /// Type of diagnostic fault
     pub kind: DiagnosticFaultKind,
     /// Current state of the fault (true = active, false = cleared)
@@ -333,7 +334,7 @@ impl DiagnosticMessageSender {
     /// let mut sender = DiagnosticMessageSender::new();
     /// sender.send(DiagnosticFaultKind::BlinkerAusfall, true, None);
     /// ```
-    pub fn send(&mut self, kind: DiagnosticFaultKind, state: bool, cabin: Option<KeyEventCab>) {
+    pub fn send(&mut self, kind: DiagnosticFaultKind, state: bool, cabin: Option<CockpitSide>) {
         let last_value = self.value_last.get(&kind).unwrap_or(&false);
         if state != *last_value {
             send_message(

@@ -10,9 +10,11 @@
 
 use std::collections::HashMap;
 
+use lotus_extra::vehicle::CockpitSide;
+
 use crate::api::{
     animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
+    key_event::KeyEvent,
     sound::Sound,
     variable::{get_var, set_var},
     visible_flag::Visiblility,
@@ -27,7 +29,7 @@ use crate::api::{
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::KeyDepot;
+/// use pandemist_vehicle_elements::KeyDepot;
 ///
 /// let depot = KeyDepot::new("engine_key_inventory");
 ///
@@ -119,7 +121,7 @@ impl KeyDepot {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::{KeySwitch, KeyDepot};
+/// use pandemist_vehicle_elements::{KeySwitch, KeyDepot};
 ///
 /// let depot = KeyDepot::new("ignition_key");
 /// let switch = KeySwitch::builder(depot, "ignition_anim", "ignition_vis", None)
@@ -134,7 +136,7 @@ impl KeyDepot {
 /// ```
 pub struct KeySwitchBuilder {
     /// Optional cab side specification for events
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Key depot for managing key availability
     key_depot: KeyDepot,
@@ -406,7 +408,7 @@ impl KeySwitchBuilder {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::{KeySwitch, KeyDepot};
+/// use pandemist_vehicle_elements::{KeySwitch, KeyDepot};
 ///
 /// // Create an ignition switch
 /// let depot = KeyDepot::new("ignition_key_depot");
@@ -437,7 +439,7 @@ impl KeySwitchBuilder {
 #[expect(clippy::struct_excessive_bools)]
 pub struct KeySwitch {
     /// Optional cab side specification for events
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Key depot for managing key availability
     key_depot: KeyDepot,
@@ -511,14 +513,14 @@ impl KeySwitch {
     ///     depot,
     ///     "starter_key_anim",
     ///     "starter_key_visible",
-    ///     Some(KeyEventCab::ACab)
+    ///     Some(CockpitSide::A)
     /// );
     /// ```
     pub fn builder(
         key_depot: KeyDepot,
         animation_name: impl Into<String>,
         visibility_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> KeySwitchBuilder {
         KeySwitchBuilder {
             cab_side,

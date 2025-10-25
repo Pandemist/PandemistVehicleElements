@@ -11,7 +11,7 @@
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::CouplingState;
+/// use pandemist_vehicle_elements_name::CouplingState;
 ///
 /// let coupling = CouplingState::Ready;
 /// match coupling {
@@ -39,7 +39,7 @@ pub enum CouplingState {
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::VehicleInitState;
+/// use pandemist_vehicle_elements_name::VehicleInitState;
 ///
 /// let current_state = VehicleInitState::Setuped;
 /// let target_state = VehicleInitState::ReadyToDrive;
@@ -68,7 +68,7 @@ impl From<VehicleInitState> for i32 {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::VehicleInitState;
+    /// use pandemist_vehicle_elements_name::VehicleInitState;
     ///
     /// let state = VehicleInitState::ReadyToDrive;
     /// let code: i32 = state.into();
@@ -91,7 +91,7 @@ impl From<VehicleInitState> for i32 {
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::PlayerInitPos;
+/// use pandemist_vehicle_elements_name::PlayerInitPos;
 ///
 /// let start_position = PlayerInitPos::CabFront;
 /// match start_position {

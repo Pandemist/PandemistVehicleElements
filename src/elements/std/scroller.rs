@@ -16,7 +16,7 @@ use crate::api::animation::Animation;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::Scroller;
+/// use pandemist_vehicle_elements::Scroller;
 ///
 /// let mut scroller = Scroller::new(0.0, 100.0, "scroll_animation");
 ///
@@ -103,7 +103,7 @@ impl Scroller {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::Pointer;
+/// use pandemist_vehicle_elements::Pointer;
 ///
 /// // Higher force = more responsive, higher friction = less bouncy
 /// let mut pointer = Pointer::new(5.0, 0.8, "cursor_follow");

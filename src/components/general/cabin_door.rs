@@ -9,14 +9,10 @@
 
 use std::rc::Rc;
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    general::mouse_move,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound};
 
 #[derive(PartialEq, Eq)]
 pub enum HandDoorLockingMode {
@@ -29,7 +25,7 @@ pub struct HandDoorWithLeverBuilder {
 
     reflect_close: f32,
 
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
     pub pos: f32,
     speed: f32,
     friction: f32,
@@ -188,7 +184,7 @@ pub struct HandDoorWithLever {
 
     reflect_close: f32,
 
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
     pub pos: f32,
     pub speed: f32,
     friction: f32,
@@ -232,7 +228,7 @@ impl HandDoorWithLever {
         event_grab_b_name: &str,
         event_handle_a_name: &str,
         event_handle_b_name: &str,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> HandDoorWithLeverBuilder {
         HandDoorWithLeverBuilder {
             mode: HandDoorLockingMode::Latch,

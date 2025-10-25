@@ -103,7 +103,7 @@ pub trait MessageLine<T: PartialEq + Clone> {
 /// # Examples
 ///
 /// ```rust,ignore
-/// use your_crate::coupling_handler::{UniversalCouplingLine, MessageLine};
+/// use pandemist_vehicle_elements::coupling_handler::{UniversalCouplingLine, MessageLine};
 ///
 /// // Create a coupling line with front coupling allowed, rear disabled
 /// let coupling_line = UniversalCouplingLine::new(

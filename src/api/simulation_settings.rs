@@ -21,7 +21,7 @@ use super::mock_enums::{PlayerInitPos, VehicleInitState};
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::realisitc_electric_supply;
+/// use pandemist_vehicle_elements::simulation_settings::realisitc_electric_supply;
 ///
 /// if realisitc_electric_supply() {
 ///     println!("Realistic electric supply is enabled");
@@ -57,8 +57,8 @@ pub fn realisitc_electric_supply() -> bool {
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::init_ready_state;
-/// use your_crate::mock_enums::VehicleInitState;
+/// use pandemist_vehicle_elements::simulation_settings::init_ready_state;
+/// use pandemist_vehicle_elements::mock_enums::VehicleInitState;
 ///
 /// match init_ready_state() {
 ///     VehicleInitState::ReadyToDrive => println!("Vehicle is ready to go!"),
@@ -97,7 +97,7 @@ pub fn init_ready_state() -> VehicleInitState {
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::init_pos_in_train;
+/// use pandemist_vehicle_elements::simulation_settings::init_pos_in_train;
 ///
 /// let position = init_pos_in_train();
 /// if position == 0 {
@@ -130,7 +130,7 @@ pub fn init_pos_in_train() -> usize {
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::init_car_is_reversed;
+/// use pandemist_vehicle_elements::simulation_settings::init_car_is_reversed;
 ///
 /// if init_car_is_reversed() {
 ///     println!("Car is reversed - controls may be mirrored");
@@ -166,8 +166,8 @@ pub fn init_car_is_reversed() -> bool {
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::init_user_placed;
-/// use your_crate::mock_enums::PlayerInitPos;
+/// use pandemist_vehicle_elements::simulation_settings::init_user_placed;
+/// use pandemist_vehicle_elements::mock_enums::PlayerInitPos;
 ///
 /// match init_user_placed() {
 ///     PlayerInitPos::CabFront => println!("Player starts in front cab"),
@@ -201,7 +201,7 @@ pub fn init_user_placed() -> PlayerInitPos {
 /// # Examples
 ///
 /// ```
-/// use your_crate::simulation_settings::deadmans_switch;
+/// use pandemist_vehicle_elements::simulation_settings::deadmans_switch;
 ///
 /// if deadmans_switch() {
 ///     println!("Dead man's switch is active - remember to hold the pedal!");

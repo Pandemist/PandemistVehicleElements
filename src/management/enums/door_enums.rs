@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```
-/// use your_crate::DoorSideTarget;
+/// use pandemist_vehicle_elements::DoorSideTarget;
 ///
 /// let target = DoorSideTarget::Left;
 /// assert_eq!(target, DoorSideTarget::Left);
@@ -42,7 +42,7 @@ pub enum DoorSideTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DoorStepTarget;
+/// use pandemist_vehicle_elements::DoorStepTarget;
 ///
 /// let step = DoorStepTarget::Street;
 /// ```
@@ -69,7 +69,7 @@ pub enum DoorStepTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DoorTarget;
+/// use pandemist_vehicle_elements::DoorTarget;
 ///
 /// let command = DoorTarget::Open;
 /// let flipped = command.flip();
@@ -99,7 +99,7 @@ impl DoorTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DoorTarget;
+    /// use pandemist_vehicle_elements::DoorTarget;
     ///
     /// assert_eq!(DoorTarget::Open.flip(), DoorTarget::Close);
     /// assert_eq!(DoorTarget::Close.flip(), DoorTarget::Open);
@@ -141,7 +141,7 @@ impl DoorTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DoorTarget;
+    /// use pandemist_vehicle_elements::DoorTarget;
     ///
     /// let close = DoorTarget::Close;
     /// let open = DoorTarget::Open;
@@ -183,7 +183,7 @@ impl DoorTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DoorState;
+/// use pandemist_vehicle_elements::DoorState;
 ///
 /// let state = DoorState::Open;
 /// match state {

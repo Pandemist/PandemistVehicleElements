@@ -8,7 +8,7 @@ use super::communications::{fuses::FuseManager, local_value_manager::LocalValueM
 /// # Examples
 ///
 /// ```
-/// use your_crate::Com;
+/// use pandemist_vehicle_elements::Com;
 ///
 /// let mut com = Com::new();
 /// com.tick();
@@ -33,7 +33,7 @@ impl Com {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Com;
+    /// use pandemist_vehicle_elements::Com;
     ///
     /// let com = Com::new();
     /// ```
@@ -53,7 +53,7 @@ impl Com {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Com;
+    /// use pandemist_vehicle_elements::Com;
     ///
     /// let mut com = Com::new();
     ///
@@ -77,7 +77,7 @@ impl Default for Com {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Com;
+    /// use pandemist_vehicle_elements::Com;
     ///
     /// let com = Com::default();
     /// // or

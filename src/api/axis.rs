@@ -19,7 +19,7 @@ use lotus_script::{
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::axis::ApiRailAxis;
+/// use pandemist_vehicle_elements::axis::ApiRailAxis;
 ///
 /// // Create an axle interface for the first axle on the first bogie
 /// let axle = ApiRailAxis::new(0, 0);

@@ -13,10 +13,9 @@
 //! # Example
 //!
 //! ```rust
-//! use your_crate::DecadeSwitch;
-//! use your_crate::api::key_event::KeyEventCab;
+//! use pandemist_vehicle_elements::DecadeSwitch;
 //!
-//! let mut switch = DecadeSwitch::builder(10, "rotation_anim", Some(KeyEventCab::ACab))
+//! let mut switch = DecadeSwitch::builder(10, "rotation_anim", Some(CockpitSide::A))
 //!     .rotation_speed(2.0)
 //!     .button_events("increment", "decrement")
 //!     .init_value(5.0)
@@ -29,12 +28,10 @@
 //! }
 //! ```
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-};
+use crate::api::{animation::Animation, key_event::KeyEvent};
 
 /// Builder for creating a `DecadeSwitch` with custom configuration.
 ///
@@ -52,7 +49,7 @@ use crate::api::{
 ///     .build();
 /// ```
 pub struct DecadeSwitchBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     target: f32,
@@ -188,7 +185,7 @@ impl DecadeSwitchBuilder {
 /// - `key_minus`: Key event handler for decrement operations
 #[derive(Debug)]
 pub struct DecadeSwitch {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pub pos: f32,
     pub target: f32,
@@ -219,7 +216,7 @@ impl DecadeSwitch {
     pub fn builder(
         max_value: u8,
         animation_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> DecadeSwitchBuilder {
         DecadeSwitchBuilder {
             cab_side,

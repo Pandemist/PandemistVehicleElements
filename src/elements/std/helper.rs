@@ -33,7 +33,7 @@ use std::ops::{Bound, RangeBounds};
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::exponential_approach_two_speed;
+/// # use pandemist_vehicle_elements::helper::exponential_approach_two_speed;
 /// // Smooth movement with faster upward motion
 /// let current = 10.0;
 /// let new_value = exponential_approach_two_speed(current, 0.1, 0.05, 20.0);
@@ -74,7 +74,7 @@ pub fn exponential_approach_two_speed(
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::enhance_string;
+/// # use pandemist_vehicle_elements::helper::enhance_string;
 /// let result = enhance_string("hello".to_string(), 10, '*');
 /// assert_eq!(result, "hello*****");
 ///
@@ -109,7 +109,7 @@ pub fn enhance_string(mut s: String, length: usize, filler: char) -> String {
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::get_random_element;
+/// # use pandemist_vehicle_elements::helper::get_random_element;
 /// let items = vec!["apple", "banana", "cherry"];
 /// let random_fruit = get_random_element(&items);
 /// assert!(items.contains(random_fruit));
@@ -130,7 +130,7 @@ pub fn get_random_element<T>(vec: &[T]) -> &T {
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::gen_bool;
+/// # use pandemist_vehicle_elements::helper::gen_bool;
 /// let random_decision = gen_bool();
 /// // random_decision is either true or false
 /// ```
@@ -155,7 +155,7 @@ pub fn gen_bool() -> bool {
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::gen_f32;
+/// # use pandemist_vehicle_elements::helper::gen_f32;
 /// // Generate between 0.0 and 1.0 (exclusive)
 /// let value1 = gen_f32(0.0..1.0);
 /// assert!(value1 >= 0.0 && value1 < 1.0);
@@ -199,7 +199,7 @@ pub fn gen_f32(range: impl RangeBounds<f32>) -> f32 {
 /// # Examples
 ///
 /// ```
-/// # use your_crate::helper::get_text_len;
+/// # use pandemist_vehicle_elements::helper::get_text_len;
 /// # use lotus_script::content::ContentId;
 /// // Measure text width with a specific font
 /// let font_id = ContentId::from("my_font");

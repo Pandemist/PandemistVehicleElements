@@ -4,15 +4,11 @@
 //! including both manual (mouse/keyboard) and electric control modes for mirror positioning
 //! and arm movement.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::{math::Vec2, time::delta};
 
 use crate::{
-    api::{
-        animation::Animation,
-        general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
-        sound::Sound,
-    },
+    api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound},
     management::structs::general_structs::FourDirections,
 };
 
@@ -40,7 +36,7 @@ use crate::{
 pub struct OutsideMirrorBuilder {
     // General ======================
     /// The cab side this mirror belongs to (left/right)
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     // Mirror arm ===================
     /// Current position of the mirror arm (0.0 = closed, 1.0 = open)
@@ -387,7 +383,7 @@ impl OutsideMirrorBuilder {
 pub struct OutsideMirror {
     // General ======================
     /// The cab side this mirror belongs to
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     // Mirror arm ===================
     /// Current position of the mirror arm (0.0 = closed, 1.0 = open)
@@ -471,12 +467,12 @@ impl OutsideMirror {
     /// # Example
     ///
     /// ```rust
-    /// let builder = OutsideMirror::builder("mirror_x", "mirror_y", Some(KeyEventCab::Left));
+    /// let builder = OutsideMirror::builder("mirror_x", "mirror_y", Some(CockpitSide::Left));
     /// ```
     pub fn builder(
         anim_x_name: impl Into<String>,
         anim_y_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> OutsideMirrorBuilder {
         OutsideMirrorBuilder {
             // General ======================

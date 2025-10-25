@@ -16,7 +16,7 @@ use crate::api::sound::Sound;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::converter::Converter;
+/// use pandemist_vehicle_elements::converter::Converter;
 ///
 /// // Create a converter with custom parameters
 /// let mut converter = Converter::new(

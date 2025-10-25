@@ -23,7 +23,7 @@ use lotus_script::{
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::get_horizontal_ad;
+/// use pandemist_vehicle_elements::get_horizontal_ad;
 ///
 /// let ad_id = get_horizontal_ad();
 /// println!("Horizontal ad ID: user {} sub {}", ad_id.user_id, ad_id.sub_id);
@@ -63,7 +63,7 @@ pub fn get_horizontal_ad() -> ContentId {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::get_vertical_ad;
+/// use pandemist_vehicle_elements::get_vertical_ad;
 ///
 /// let ad_id = get_vertical_ad();
 /// assert_eq!(ad_id.user_id, 1000);

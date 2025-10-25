@@ -8,7 +8,7 @@ use std::fmt;
 /// # Examples
 ///
 /// ```
-/// use your_crate::Side;
+/// use pandemist_vehicle_elements::Side;
 ///
 /// let left_side = Side::Left;
 /// let right_side = Side::Right;
@@ -44,7 +44,7 @@ impl fmt::Display for Side {
 /// # Examples
 ///
 /// ```
-/// use your_crate::WiperTarget;
+/// use pandemist_vehicle_elements::WiperTarget;
 ///
 /// let wiper_state = WiperTarget::Normal;
 ///
@@ -79,7 +79,7 @@ pub enum WiperTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate::CabActivState;
+/// use pandemist_vehicle_elements::CabActivState;
 ///
 /// let cab_state = CabActivState::VR;
 ///
@@ -109,7 +109,7 @@ pub enum CabActivState {
 /// # Examples
 ///
 /// ```
-/// use your_crate::TrainFormationSwitch;
+/// use pandemist_vehicle_elements::TrainFormationSwitch;
 ///
 /// let formation_role = TrainFormationSwitch::Leading;
 ///

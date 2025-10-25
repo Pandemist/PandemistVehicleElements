@@ -4,11 +4,10 @@
 //! needle and arrow animations. The speedometer uses force and friction parameters
 //! to create realistic movement dynamics.
 
+use lotus_extra::math::PiecewiseLinearFunction;
 use lotus_script::time::delta;
 
-use crate::{
-    api::animation::Animation, elements::std::piecewise_linear_function::PiecewiseLinearFunction,
-};
+use crate::api::animation::Animation;
 
 /// Builder for creating a `Speedometer` with customizable parameters.
 ///
@@ -18,8 +17,8 @@ use crate::{
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::speedometer::Speedometer;
-/// use your_crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
+/// use pandemist_vehicle_elements::speedometer::Speedometer;
+/// use pandemist_vehicle_elements::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
 ///
 /// let speedometer = Speedometer::builder("needle_animation")
 ///     .force(2.0)
@@ -133,7 +132,7 @@ impl SpeedometerBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
+    /// use pandemist_vehicle_elements::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
     ///
     /// let path = PiecewiseLinearFunction::new(/* path parameters */);
     /// let builder = Speedometer::builder("needle")
@@ -159,7 +158,7 @@ impl SpeedometerBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
+    /// use pandemist_vehicle_elements::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
     ///
     /// let path = PiecewiseLinearFunction::new(/* path parameters */);
     /// let builder = Speedometer::builder("needle")
@@ -223,7 +222,7 @@ impl SpeedometerBuilder {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::speedometer::Speedometer;
+/// use pandemist_vehicle_elements::speedometer::Speedometer;
 ///
 /// // Create a basic speedometer
 /// let mut speedometer = Speedometer::builder("needle_anim")

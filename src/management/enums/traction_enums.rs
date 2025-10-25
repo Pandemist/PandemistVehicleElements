@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```
-/// use your_crate::DirectionOfDriving;
+/// use pandemist_vehicle_elements::DirectionOfDriving;
 ///
 /// // Create a forward-only state
 /// let forward_only = DirectionOfDriving::new(true, false);
@@ -44,7 +44,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let state = DirectionOfDriving::new(true, false);
     /// assert!(state.forward);
@@ -61,7 +61,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let original = DirectionOfDriving::new(true, false);
     /// let flipped = original.flip();
@@ -88,7 +88,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let forward_only = DirectionOfDriving::new(true, false);
     /// let backward_only = DirectionOfDriving::new(false, true);
@@ -110,7 +110,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let none_state = DirectionOfDriving::new(false, false);
     /// assert!(none_state.is_none());
@@ -127,7 +127,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let forward_only = DirectionOfDriving::new(true, false);
     /// assert!(forward_only.is_one());
@@ -147,7 +147,7 @@ impl DirectionOfDriving {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::DirectionOfDriving;
+    /// use pandemist_vehicle_elements::DirectionOfDriving;
     ///
     /// let both = DirectionOfDriving::new(true, true);
     /// assert!(both.is_both());
@@ -169,7 +169,7 @@ impl DirectionOfDriving {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DirectionOfDriving;
+/// use pandemist_vehicle_elements::DirectionOfDriving;
 ///
 /// let forward_state: DirectionOfDriving = 1.5f32.into();
 /// assert!(forward_state.forward && !forward_state.backward);
@@ -198,7 +198,7 @@ impl From<f32> for DirectionOfDriving {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DirectionOfDriving;
+/// use pandemist_vehicle_elements::DirectionOfDriving;
 ///
 /// let forward_state: DirectionOfDriving = 5i32.into();
 /// assert!(forward_state.forward && !forward_state.backward);
@@ -227,7 +227,7 @@ impl From<i32> for DirectionOfDriving {
 /// # Examples
 ///
 /// ```
-/// use your_crate::DirectionOfDriving;
+/// use pandemist_vehicle_elements::DirectionOfDriving;
 ///
 /// let forward_state = DirectionOfDriving::new(true, false);
 /// let forward_val: f32 = forward_state.into();

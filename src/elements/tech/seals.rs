@@ -11,18 +11,18 @@
 //! # Examples
 //!
 //! ```rust
-//! use your_crate::seals::{SimpleSeal, SealedSwitch, CoveredKey};
-//! use your_crate::api::key_event::KeyEventCab;
-//! use your_crate::switches::Switch;
-//! use your_crate::elements::tech::key_switch::KeySwitch;
+//! use pandemist_vehicle_elements::seals::{SimpleSeal, SealedSwitch, CoveredKey};
+//! use lotus_extra::vehicle::CockpitSide;
+//! use pandemist_vehicle_elements::switches::Switch;
+//! use pandemist_vehicle_elements::elements::tech::key_switch::KeySwitch;
 //!
 //! // Create a simple seal
-//! let mut seal = SimpleSeal::new(Some(KeyEventCab::ACab), "seal_visibility", "remove_seal_key");
+//! let mut seal = SimpleSeal::new(Some(CockpitSide::A), "seal_visibility", "remove_seal_key");
 //!
 //! // Create a sealed switch
 //! let switch = Switch::new(); // See switch.rs
 //! let mut sealed_switch = SealedSwitch::new(
-//!     Some(KeyEventCab::ACab),
+//!     Some(CockpitSide::A),
 //!     "switch_seal_vis",
 //!     "seal_removal_key",
 //!     switch
@@ -34,20 +34,17 @@
 //!     "cover_animation",
 //!     "toggle_cover_key",
 //!     key_switch,
-//!     Some(KeyEventCab::ACab)
+//!     Some(CockpitSide::A)
 //! )
 //! .snd_on("cover_open_sound")
 //! .snd_off("cover_close_sound")
 //! .build();
 //! ```
 
+use lotus_extra::vehicle::CockpitSide;
+
 use crate::{
-    api::{
-        animation::Animation,
-        key_event::{KeyEvent, KeyEventCab},
-        sound::Sound,
-        visible_flag::Visiblility,
-    },
+    api::{animation::Animation, key_event::KeyEvent, sound::Sound, visible_flag::Visiblility},
     elements::tech::{key_switch::KeySwitch, switches::StepSwitch},
 };
 
@@ -66,11 +63,11 @@ use super::switches::Switch;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::seals::SimpleSeal;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use pandemist_vehicle_elements::seals::SimpleSeal;
+/// use lotus_extra::vehicle::CockpitSide;
 ///
 /// let mut seal = SimpleSeal::new(
-///     Some(KeyEventCab::ACab),
+///     Some(CockpitSide::A),
 ///     "emergency_seal_visibility",
 ///     "emergency_seal_key"
 /// );
@@ -99,7 +96,7 @@ impl SimpleSeal {
     /// # Returns
     ///
     /// A new `SimpleSeal` instance with the seal initially visible.
-    pub fn new(cab_side: Option<KeyEventCab>, vis: &str, key_off: &str) -> Self {
+    pub fn new(cab_side: Option<CockpitSide>, vis: &str, key_off: &str) -> Self {
         let mut s = Self {
             key_off: KeyEvent::new(Some(key_off), cab_side),
             visibility: Visiblility::new(vis),
@@ -121,7 +118,7 @@ impl SimpleSeal {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::seals::SimpleSeal;
+    /// # use pandemist_vehicle_elements::seals::SimpleSeal;
     /// # let mut seal = SimpleSeal::new(None, "test_vis", "test_key");
     /// if seal.tick() {
     ///     // Seal was just removed - trigger any necessary side effects
@@ -151,13 +148,13 @@ impl SimpleSeal {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::seals::SealedSwitch;
-/// use your_crate::switches::Switch;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use pandemist_vehicle_elements::seals::SealedSwitch;
+/// use pandemist_vehicle_elements::switches::Switch;
+/// use lotus_extra::vehicle::CockpitSide;
 ///
 /// let switch = Switch::new(); // See switch.rs
 /// let mut sealed_switch = SealedSwitch::new(
-///     Some(KeyEventCab::ACab),
+///     Some(CockpitSide::A),
 ///     "fire_suppression_seal",
 ///     "break_seal_key",
 ///     switch
@@ -188,7 +185,7 @@ impl SealedSwitch {
     /// # Returns
     ///
     /// A new `SealedSwitch` instance with the seal initially present (visible).
-    pub fn new(cab_side: Option<KeyEventCab>, vis: &str, key_off: &str, switch: Switch) -> Self {
+    pub fn new(cab_side: Option<CockpitSide>, vis: &str, key_off: &str, switch: Switch) -> Self {
         let mut s = Self {
             key_off: KeyEvent::new(Some(key_off), cab_side),
             visibility: Visiblility::new(vis),
@@ -231,7 +228,7 @@ pub struct SealedStepSwitch {
 
 impl SealedStepSwitch {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         vis: &str,
         key_off: &str,
         switch: StepSwitch,
@@ -331,16 +328,16 @@ impl CoveredKeyBuilder {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::seals::CoveredKey;
-/// use your_crate::elements::tech::key_switch::KeySwitch;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use pandemist_vehicle_elements::seals::CoveredKey;
+/// use pandemist_vehicle_elements::elements::tech::key_switch::KeySwitch;
+/// use lotus_extra::vehicle::CockpitSide;
 ///
 /// let key_switch = KeySwitch::new(); // See key_switch.rs
 /// let mut covered_key = CoveredKey::builder(
 ///     "master_arm_cover_anim",
 ///     "master_arm_cover_toggle",
 ///     key_switch,
-///     Some(KeyEventCab::ACab)
+///     Some(CockpitSide::A)
 /// )
 /// .snd_on("cover_lift_sound")
 /// .snd_off("cover_close_sound")
@@ -379,15 +376,15 @@ impl CoveredKey {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::seals::CoveredKey;
-    /// # use your_crate::elements::tech::key_switch::KeySwitch;
-    /// # use your_crate::api::key_event::KeyEventCab;
+    /// # use pandemist_vehicle_elements::seals::CoveredKey;
+    /// # use pandemist_vehicle_elements::elements::tech::key_switch::KeySwitch;
+    /// # use lotus_extra::vehicle::CockpitSide;
     /// # let key_switch = KeySwitch::new(); // See key_switch.rs
     /// let covered_key = CoveredKey::builder(
     ///     "emergency_cover_animation",
     ///     "emergency_cover_key",
     ///     key_switch,
-    ///     Some(KeyEventCab::ACab)
+    ///     Some(CockpitSide::A)
     /// )
     /// .snd_on("emergency_cover_open")
     /// .build();
@@ -396,7 +393,7 @@ impl CoveredKey {
         animation_name: impl Into<String>,
         key_event_name: impl Into<String>,
         key_switch: KeySwitch,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> CoveredKeyBuilder {
         CoveredKeyBuilder {
             key_toggle: KeyEvent::new(Some(&key_event_name.into()), cab_side),

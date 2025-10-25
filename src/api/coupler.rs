@@ -15,8 +15,8 @@ use super::mock_enums::CouplingState;
 ///
 /// ```rust
 /// use lotus_script::message::Coupling;
-/// use your_crate::ApiCoupler;
-/// use your_crate::CouplingState;
+/// use pandemist_vehicle_elements::ApiCoupler;
+/// use pandemist_vehicle_elements::CouplingState;
 ///
 /// let front_coupler = ApiCoupler::new(Coupling::Front);
 ///
@@ -49,7 +49,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::ApiCoupler;
+    /// use pandemist_vehicle_elements::ApiCoupler;
     ///
     /// let front_coupler = ApiCoupler::new(Coupling::Front);
     /// let rear_coupler = ApiCoupler::new(Coupling::Rear);
@@ -72,7 +72,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::ApiCoupler;
+    /// use pandemist_vehicle_elements::ApiCoupler;
     ///
     /// let coupler = ApiCoupler::new(Coupling::Front);
     /// if coupler.is_coupled() {
@@ -116,7 +116,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::{ApiCoupler, CouplingState};
+    /// use pandemist_vehicle_elements::{ApiCoupler, CouplingState};
     ///
     /// let coupler = ApiCoupler::new(Coupling::Front);
     /// match coupler.coupling_state() {
@@ -148,7 +148,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::{ApiCoupler, CouplingState};
+    /// use pandemist_vehicle_elements::{ApiCoupler, CouplingState};
     ///
     /// let coupler = ApiCoupler::new(Coupling::Front);
     ///
@@ -186,7 +186,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::ApiCoupler;
+    /// use pandemist_vehicle_elements::ApiCoupler;
     ///
     /// let coupler = ApiCoupler::new(Coupling::Rear);
     /// let offset = coupler.coupling_y_offset();
@@ -212,7 +212,7 @@ impl ApiCoupler {
     ///
     /// ```rust
     /// use lotus_script::message::Coupling;
-    /// use your_crate::ApiCoupler;
+    /// use pandemist_vehicle_elements::ApiCoupler;
     ///
     /// let mut coupler = ApiCoupler::new(Coupling::Front);
     ///

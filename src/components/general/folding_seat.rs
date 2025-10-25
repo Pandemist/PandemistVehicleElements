@@ -4,15 +4,11 @@
 //! mouse interaction, sound effects, and animation support. The seat can be configured
 //! to fold up, down, or in a random direction with customizable physics parameters.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::rand::gen_f64;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    general::mouse_move,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound};
 
 /// Builder for creating a `FoldingSeat` with customizable parameters.
 ///
@@ -22,7 +18,7 @@ use crate::api::{
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::FoldingSeat;
+/// use pandemist_vehicle_elements::FoldingSeat;
 ///
 /// let seat = FoldingSeat::builder("seat_animation", "grab_key", None)
 ///     .spring_up(5.0)
@@ -235,7 +231,7 @@ impl FoldingSeatBuilder {
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::FoldingSeat;
+/// use pandemist_vehicle_elements::FoldingSeat;
 ///
 /// // Create a seat that springs upward
 /// let mut seat = FoldingSeat::builder("seat_anim", "grab_key", None)
@@ -294,7 +290,7 @@ impl FoldingSeat {
     pub fn builder(
         animation_name: impl Into<String>,
         event_name: &str,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> FoldingSeatBuilder {
         FoldingSeatBuilder {
             pos: 0.0,

@@ -10,7 +10,7 @@ use lotus_script::var::{get_var, set_var};
 /// # Examples
 ///
 /// ```
-/// use your_crate::Visiblility;
+/// use pandemist_vehicle_elements::Visiblility;
 ///
 /// // Create a new visibility flag
 /// let mut flag = Visiblility::new("my_component");
@@ -46,7 +46,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let flag = Visiblility::new("main_panel");
     /// let flag2 = Visiblility::new(String::from("sidebar"));
@@ -73,7 +73,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let flag = Visiblility::new("status_bar");
     /// let is_visible = flag.check();
@@ -90,7 +90,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let mut flag = Visiblility::new("toolbar");
     /// flag.make_visible();
@@ -112,7 +112,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let mut flag = Visiblility::new("menu");
     /// flag.set_visbility(true);   // Make visible
@@ -130,7 +130,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let mut flag = Visiblility::new("notification");
     /// flag.make_invisible();
@@ -146,7 +146,7 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Visiblility;
+    /// use pandemist_vehicle_elements::Visiblility;
     ///
     /// let mut flag = Visiblility::new("notification");
     /// flag.toggle_visibility();

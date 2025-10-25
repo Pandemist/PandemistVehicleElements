@@ -11,8 +11,8 @@ use crate::elements::tech::switches::Switch;
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::FuseManager;
-/// use your_crate::elements::tech::switches::Switch;
+/// use pandemist_vehicle_elements::FuseManager;
+/// use pandemist_vehicle_elements::elements::tech::switches::Switch;
 ///
 /// let mut manager = FuseManager::new();
 /// let switch = Switch::new(); // Assuming Switch has a new() method
@@ -40,7 +40,7 @@ impl FuseManager {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::FuseManager;
+    /// use pandemist_vehicle_elements::FuseManager;
     ///
     /// let manager = FuseManager::new();
     /// ```
@@ -62,8 +62,8 @@ impl FuseManager {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::FuseManager;
-    /// use your_crate::elements::tech::switches::Switch;
+    /// use pandemist_vehicle_elements::FuseManager;
+    /// use pandemist_vehicle_elements::elements::tech::switches::Switch;
     ///
     /// let mut manager = FuseManager::new();
     /// let switch = Switch::new();
@@ -83,7 +83,7 @@ impl FuseManager {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::FuseManager;
+    /// use pandemist_vehicle_elements::FuseManager;
     ///
     /// let mut manager = FuseManager::new();
     /// // ... register some switches ...
@@ -115,8 +115,8 @@ impl FuseManager {
     /// # Examples
     ///
     /// ```rust
-    /// use your_crate::FuseManager;
-    /// use your_crate::elements::tech::switches::Switch;
+    /// use pandemist_vehicle_elements::FuseManager;
+    /// use pandemist_vehicle_elements::elements::tech::switches::Switch;
     ///
     /// let mut manager = FuseManager::new();
     ///

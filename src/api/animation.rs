@@ -1,6 +1,5 @@
+use lotus_extra::math::PiecewiseLinearFunction;
 use lotus_script::var::set_var;
-
-use crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
 
 /// An animation controller that manages animation state and position.
 ///
@@ -11,7 +10,7 @@ use crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
 /// # Examples
 ///
 /// ```
-/// use your_crate::Animation;
+/// use pandemist_vehicle_elements::Animation;
 ///
 /// // Create an animation with a name
 /// let mut anim = Animation::new(Some("fade_in"));
@@ -40,7 +39,7 @@ impl Animation {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Animation;
+    /// use pandemist_vehicle_elements::Animation;
     ///
     /// // Named animation
     /// let anim = Animation::new(Some("my_switch"));
@@ -65,7 +64,7 @@ impl Animation {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Animation;
+    /// use pandemist_vehicle_elements::Animation;
     ///
     /// let mut anim = Animation::new(Some("door_wing"));
     /// anim.set(0.75); // Sets animation to 75% and updates script variable
@@ -88,7 +87,7 @@ impl Animation {
 /// # Examples
 ///
 /// ```
-/// use your_crate::MappedAnimation;
+/// use pandemist_vehicle_elements::MappedAnimation;
 ///
 /// // Create an animation with a name
 /// let mut anim = MappedAnimation::new(
@@ -165,7 +164,7 @@ impl MappedAnimation {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::MappedAnimation;
+    /// use pandemist_vehicle_elements::MappedAnimation;
     ///
     /// let mut anim = MappedAnimation::new(Some("switch"));
     /// anim.set(0.75); // Sets animation to 75% and updates script variable

@@ -27,7 +27,7 @@ impl Light {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Light;
+    /// use pandemist_vehicle_elements::Light;
     ///
     /// let light = Light::new(Some("main_light"));
     /// let unnamed_light = Light::new(None);
@@ -50,7 +50,7 @@ impl Light {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::Light;
+    /// use pandemist_vehicle_elements::Light;
     ///
     /// let light = Light::new(Some("room_light"));
     /// light.set_brightness(0.8); // Set to 80% brightness
@@ -89,7 +89,7 @@ impl LightBulb {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::LightBulb;
+    /// use pandemist_vehicle_elements::LightBulb;
     ///
     /// let bulb = LightBulb::new("bedroom_light", 2.0);
     /// ```
@@ -114,7 +114,7 @@ impl LightBulb {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::LightBulb;
+    /// use pandemist_vehicle_elements::LightBulb;
     ///
     /// let mut bulb = LightBulb::new("living_room", 1.5);
     ///
@@ -161,7 +161,7 @@ impl BlinkRelais {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::BlinkRelais;
+    /// use pandemist_vehicle_elements::BlinkRelais;
     ///
     /// // Blink every 2 seconds, stay on for 0.5 seconds
     /// let mut relay = BlinkRelais::new(2.0, 0.5, 0.0);
@@ -190,7 +190,7 @@ impl BlinkRelais {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::BlinkRelais;
+    /// use pandemist_vehicle_elements::BlinkRelais;
     ///
     /// let mut relay = BlinkRelais::new(1.0, 0.3, 0.0);
     ///
@@ -229,7 +229,7 @@ impl BlinkRelais {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::BlinkRelais;
+    /// use pandemist_vehicle_elements::BlinkRelais;
     ///
     /// let mut relay = BlinkRelais::new(2.0, 0.5, 1.0);
     /// relay.reset(); // Timer set to 1.0, relay turned off
@@ -276,7 +276,7 @@ impl SimpleBlinker {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::SimpleBlinker;
+    /// use pandemist_vehicle_elements::SimpleBlinker;
     ///
     /// let mut blinker = SimpleBlinker::new(0.5, 0.3); // On for 0.5s, off for 0.3s
     /// blinker.target = true; // Enable blinking
@@ -304,7 +304,7 @@ impl SimpleBlinker {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::SimpleBlinker;
+    /// use pandemist_vehicle_elements::SimpleBlinker;
     ///
     /// let mut blinker = SimpleBlinker::new(1.0, 0.5);
     /// blinker.target = true;

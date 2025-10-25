@@ -1,5 +1,6 @@
 use std::f32::consts::PI;
 
+use lotus_extra::rand::gen_f32;
 use lotus_script::time::delta;
 
 use crate::{
@@ -10,7 +11,6 @@ use crate::{
         sound::Sound,
         vehicle_door::VehicleDoor,
     },
-    elements::std::helper::gen_f32,
     management::enums::door_enums::{DoorState, DoorTarget},
 };
 

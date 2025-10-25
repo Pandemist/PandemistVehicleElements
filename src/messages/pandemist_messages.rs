@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::HasGPM;
+/// use pandemist_vehicle_elements::HasGPM;
 ///
 /// let gpm_msg = HasGPM {};
 /// // Message will be sent via send_gpm_state() function
@@ -48,7 +48,7 @@ message_type!(HasGPM, "Pan", "hasGPM");
 /// # Examples
 ///
 /// ```rust
-/// use your_crate::send_gpm_state;
+/// use pandemist_vehicle_elements::send_gpm_state;
 ///
 /// // Notify all components about GPM availability
 /// send_gpm_state();

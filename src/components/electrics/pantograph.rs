@@ -15,8 +15,8 @@
 //! ## Example
 //!
 //! ```rust
-//! use your_crate::pantograph::ElectricPantograph;
-//! use your_crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
+//! use pandemist_vehicle_elements::pantograph::ElectricPantograph;
+//! use pandemist_vehicle_elements::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
 //!
 //! let curve = PiecewiseLinearFunction::new(vec![(0.0, 0.0), (1.0, 1.0)]);
 //! let pantograph = ElectricPantograph::builder("panto_anim", 0, curve)
@@ -27,14 +27,15 @@
 //!     .build();
 //! ```
 
+use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
 use crate::{
     api::{
-        animation::Animation, electrical_supply::ApiPantograph, key_event::KeyEventCab,
+        animation::Animation, electrical_supply::ApiPantograph,
         simulation_settings::realisitc_electric_supply, sound::Sound, visible_flag::Visiblility,
     },
-    elements::{std::piecewise_linear_function::PiecewiseLinearFunction, tech::slider::Slider},
+    elements::tech::slider::Slider,
     management::enums::{state_enums::SwitchingState, target_enums::SwitchingTarget},
 };
 
@@ -608,7 +609,7 @@ impl ManualPantograph {
         vis_rope_loss_name: impl Into<String>,
         vis_rope_knoted_name: impl Into<String>,
         curve: PiecewiseLinearFunction,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> ManualPantographBuilder {
         ManualPantographBuilder {
             height_curve: curve,

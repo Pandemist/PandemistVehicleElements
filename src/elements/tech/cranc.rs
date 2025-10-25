@@ -4,12 +4,10 @@
 //! rotary input controls with configurable limits, speed factors, and key bindings.
 //! The crank position is automatically animated and can be controlled via key events.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-};
+use crate::api::{animation::Animation, key_event::KeyEvent};
 
 /// Builder for creating a `Crank` instance with customizable parameters.
 ///
@@ -19,9 +17,9 @@ use crate::api::{
 /// # Examples
 ///
 /// ```rust
-/// # use your_crate::Crank;
-/// # use your_crate::api::key_event::KeyEventCab;
-/// let crank = Crank::builder("rotation_anim", Some(KeyEventCab::ACab))
+/// # use pandemist_vehicle_elements::Crank;
+/// # use lotus_extra::vehicle::CockpitSide;
+/// let crank = Crank::builder("rotation_anim", Some(CockpitSide::A))
 ///     .factor(2.0)
 ///     .min(-10.0)
 ///     .max(10.0)
@@ -30,7 +28,7 @@ use crate::api::{
 ///     .build();
 /// ```
 pub struct CrankBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     pos_last: f32,
@@ -58,7 +56,7 @@ impl CrankBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let crank = Crank::builder("anim", None)
     ///     .factor(2.5)  // Move 2.5 times faster
     ///     .build();
@@ -79,7 +77,7 @@ impl CrankBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let crank = Crank::builder("anim", None)
     ///     .max(100.0)  // Allow positions up to 100
     ///     .build();
@@ -100,7 +98,7 @@ impl CrankBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let crank = Crank::builder("anim", None)
     ///     .min(-50.0)  // Allow positions down to -50
     ///     .build();
@@ -122,7 +120,7 @@ impl CrankBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let crank = Crank::builder("anim", None)
     ///     .event_plus("rotate_right")
     ///     .build();
@@ -144,7 +142,7 @@ impl CrankBuilder {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let crank = Crank::builder("anim", None)
     ///     .event_minus("rotate_left")
     ///     .build();
@@ -198,7 +196,7 @@ impl CrankBuilder {
 /// to update the crank state based on input:
 ///
 /// ```rust
-/// # use your_crate::Crank;
+/// # use pandemist_vehicle_elements::Crank;
 /// let mut crank = Crank::builder("my_rotation", None)
 ///     .factor(1.5)
 ///     .min(-180.0)
@@ -213,7 +211,7 @@ impl CrankBuilder {
 /// ```
 #[derive(Debug)]
 pub struct Crank {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// The current position of the crank.
     ///
@@ -253,17 +251,17 @@ impl Crank {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
-    /// # use your_crate::api::key_event::KeyEventCab;
+    /// # use pandemist_vehicle_elements::Crank;
+    /// # use lotus_extra::vehicle::CockpitSide;
     /// // Basic crank with default settings
     /// let crank = Crank::builder("rotation", None).build();
     ///
     /// // Crank with cab-specific key events
-    /// let crank = Crank::builder("wheel", Some(KeyEventCab::ACab)).build();
+    /// let crank = Crank::builder("wheel", Some(CockpitSide::A)).build();
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> CrankBuilder {
         CrankBuilder {
             cab_side,
@@ -293,7 +291,7 @@ impl Crank {
     /// # Examples
     ///
     /// ```rust
-    /// # use your_crate::Crank;
+    /// # use pandemist_vehicle_elements::Crank;
     /// let mut crank = Crank::builder("my_crank", None)
     ///     .event_plus("right_key")
     ///     .event_minus("left_key")

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::SwitchingTarget;
+/// use pandemist_vehicle_elements_name::SwitchingTarget;
 ///
 /// // Create a turn-on target with intensity 0.8
 /// let target = SwitchingTarget::TurnOn(0.8);
@@ -50,7 +50,7 @@ impl SwitchingTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::SwitchingTarget;
+    /// use pandemist_vehicle_elements_name::SwitchingTarget;
     ///
     /// let turn_on = SwitchingTarget::new(1, 0.75);
     /// let turn_off = SwitchingTarget::new(-1, 0.25);
@@ -74,7 +74,7 @@ impl SwitchingTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::SwitchingTarget;
+    /// use pandemist_vehicle_elements_name::SwitchingTarget;
     ///
     /// let turn_on = SwitchingTarget::new_bool(true, 1.0);
     /// let turn_off = SwitchingTarget::new_bool(false, 0.5);
@@ -98,7 +98,7 @@ impl SwitchingTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::SwitchingTarget;
+    /// use pandemist_vehicle_elements_name::SwitchingTarget;
     ///
     /// let target = SwitchingTarget::TurnOn(0.8);
     /// let conditional = target.and(true);  // Returns TurnOn(0.8)
@@ -130,7 +130,7 @@ impl SwitchingTarget {
     /// # Examples
     ///
     /// ```
-    /// use your_crate_name::SwitchingTarget;
+    /// use pandemist_vehicle_elements_name::SwitchingTarget;
     ///
     /// let target1 = SwitchingTarget::TurnOn(0.6);
     /// let target2 = SwitchingTarget::TurnOn(0.8);
@@ -168,7 +168,7 @@ impl SwitchingTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::SwitchingTarget;
+/// use pandemist_vehicle_elements_name::SwitchingTarget;
 ///
 /// let turn_on: SwitchingTarget = 1.into();
 /// let turn_off: SwitchingTarget = (-1).into();
@@ -194,7 +194,7 @@ impl From<i32> for SwitchingTarget {
 /// # Examples
 ///
 /// ```
-/// use your_crate_name::SwitchingTarget;
+/// use pandemist_vehicle_elements_name::SwitchingTarget;
 ///
 /// let turn_on: SwitchingTarget = true.into();
 /// let turn_off: SwitchingTarget = false.into();

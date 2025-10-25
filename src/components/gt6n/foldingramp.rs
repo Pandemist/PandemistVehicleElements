@@ -1,12 +1,13 @@
 use std::f32::consts::PI;
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::{
     api::{
         animation::Animation,
         general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
+        key_event::KeyEvent,
         light::{BlinkRelais, Light},
     },
     elements::tech::{slider::Slider, switches::Switch},
@@ -39,7 +40,7 @@ pub struct Foldingramp {
 
 impl Foldingramp {
     #[must_use]
-    pub fn new(name: &str, cab_side: KeyEventCab) -> Self {
+    pub fn new(name: &str, cab_side: CockpitSide) -> Self {
         Foldingramp {
             lockpin: Switch::builder(
                 format!("AV_{}_Klapprampe_Lockpin", String::from(cab_side)),
