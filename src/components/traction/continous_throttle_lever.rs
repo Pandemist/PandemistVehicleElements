@@ -1,10 +1,7 @@
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
 
 #[derive(Debug, PartialEq)]
 pub enum ThrottleMode {
@@ -144,7 +141,7 @@ pub struct ContinuousThrottleLever {
 impl ContinuousThrottleLever {
     pub fn builder(
         anim_name: impl Into<String>,
-        cab_side: KeyEventCab,
+        cab_side: CockpitSide,
     ) -> ContinuousThrottleLeverBuilder {
         ContinuousThrottleLeverBuilder {
             speed: 0.0,

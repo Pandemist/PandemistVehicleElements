@@ -11,9 +11,9 @@
 //! Creating a folding window:
 //! ```rust
 //! use your_crate::windows::FoldingWindow;
-//! use your_crate::api::key_event::KeyEventCab;
+//! use your_crate::api::key_event::CockpitSide;
 //!
-//! let mut window = FoldingWindow::builder("fold_animation", "toggle_key", Some(KeyEventCab::Left))
+//! let mut window = FoldingWindow::builder("fold_animation", "toggle_key", Some(CockpitSide::Left))
 //!     .snd_open("window_open.wav")
 //!     .snd_close("window_close.wav")
 //!     .build();
@@ -22,9 +22,9 @@
 //! Creating a sliding window:
 //! ```rust
 //! use your_crate::windows::SlidingWindow;
-//! use your_crate::api::key_event::KeyEventCab;
+//! use your_crate::api::key_event::CockpitSide;
 //!
-//! let mut window = SlidingWindow::builder("slide_animation", "grab_key", Some(KeyEventCab::Right))
+//! let mut window = SlidingWindow::builder("slide_animation", "grab_key", Some(CockpitSide::Right))
 //!     .axis_x()
 //!     .mouse_factor(0.5)
 //!     .snd_handle_grab("grab.wav")
@@ -33,14 +33,10 @@
 
 use std::rc::Rc;
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::math::Vec2;
 
-use crate::api::{
-    animation::Animation,
-    general::mouse_move,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound};
 
 /// Builder for creating a [`FoldingWindow`].
 ///
@@ -124,9 +120,9 @@ impl FoldingWindowBuilder {
 ///
 /// ```rust
 /// use your_crate::windows::FoldingWindow;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use your_crate::api::key_event::CockpitSide;
 ///
-/// let mut window = FoldingWindow::builder("fold_animation", "space", Some(KeyEventCab::Left))
+/// let mut window = FoldingWindow::builder("fold_animation", "space", Some(CockpitSide::Left))
 ///     .snd_open("open.wav")
 ///     .snd_close("close.wav")
 ///     .build();
@@ -164,14 +160,14 @@ impl FoldingWindow {
     ///
     /// ```rust
     /// use your_crate::windows::FoldingWindow;
-    /// use your_crate::api::key_event::KeyEventCab;
+    /// use your_crate::api::key_event::CockpitSide;
     ///
-    /// let builder = FoldingWindow::builder("my_animation", "toggle_key", Some(KeyEventCab::Left));
+    /// let builder = FoldingWindow::builder("my_animation", "toggle_key", Some(CockpitSide::Left));
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
         event_name: &str,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> FoldingWindowBuilder {
         FoldingWindowBuilder {
             pos: 0.0,
@@ -414,9 +410,9 @@ impl SlidingWindowBuilder {
 ///
 /// ```rust
 /// use your_crate::windows::SlidingWindow;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use your_crate::api::key_event::CockpitSide;
 ///
-/// let mut window = SlidingWindow::builder("slide_anim", "ctrl", Some(KeyEventCab::Left))
+/// let mut window = SlidingWindow::builder("slide_anim", "ctrl", Some(CockpitSide::Left))
 ///     .axis_x()
 ///     .mouse_factor(0.8)
 ///     .snd_handle_grab("grab.wav")
@@ -467,14 +463,14 @@ impl SlidingWindow {
     ///
     /// ```rust
     /// use your_crate::windows::SlidingWindow;
-    /// use your_crate::api::key_event::KeyEventCab;
+    /// use your_crate::api::key_event::CockpitSide;
     ///
-    /// let builder = SlidingWindow::builder("my_slide_anim", "grab_key", Some(KeyEventCab::Right));
+    /// let builder = SlidingWindow::builder("my_slide_anim", "grab_key", Some(CockpitSide::Right));
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> SlidingWindowBuilder {
         SlidingWindowBuilder {
             pos: 0.0,

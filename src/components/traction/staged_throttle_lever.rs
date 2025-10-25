@@ -1,12 +1,9 @@
 use std::collections::HashMap;
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
 
 #[derive(Debug, PartialEq)]
 enum MovementMode {
@@ -178,7 +175,7 @@ pub struct StagedThrottleLever {
 impl StagedThrottleLever {
     pub fn builder(
         anim_name: impl Into<String>,
-        cab_side: KeyEventCab,
+        cab_side: CockpitSide,
     ) -> StagedThrottleLeverBuilder {
         StagedThrottleLeverBuilder {
             max_snappoint: 0,

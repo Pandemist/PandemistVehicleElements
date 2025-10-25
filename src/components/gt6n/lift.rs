@@ -1,9 +1,9 @@
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::{
     api::{
         animation::{Animation, MappedAnimation},
-        key_event::KeyEventCab,
         light::{BlinkRelais, Light},
         sound::{Sound, SoundTarget},
     },
@@ -61,7 +61,7 @@ pub struct Hublift {
 
 impl Hublift {
     #[must_use]
-    pub fn new(cab_side: KeyEventCab) -> Self {
+    pub fn new(cab_side: CockpitSide) -> Self {
         Self {
             height_pos: 0.0,
             height_anim: Animation::new(Some(&format!(

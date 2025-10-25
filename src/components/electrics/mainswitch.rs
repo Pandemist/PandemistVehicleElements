@@ -16,9 +16,9 @@
 //!
 //! ```rust
 //! use crate::mainswitch::MainSwitch;
-//! use crate::api::key_event::KeyEventCab;
+//! use crate::api::key_event::CockpitSide;
 //!
-//! let mut switch = MainSwitch::builder(Some(KeyEventCab::Left))
+//! let mut switch = MainSwitch::builder(Some(CockpitSide::Left))
 //!     .init(false)
 //!     .mouse_factor(0.5)
 //!     .handle_switch("slider_animation", "switch_key")
@@ -32,15 +32,11 @@
 //! println!("Switch output: {}V", switch.output);
 //! ```
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::{
-    api::{
-        animation::Animation,
-        general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
-        sound::Sound,
-    },
+    api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound},
     management::enums::target_enums::SwitchingTarget,
 };
 
@@ -52,7 +48,7 @@ use crate::{
 /// # Example
 ///
 /// ```rust
-/// let switch = MainSwitch::builder(Some(KeyEventCab::Left))
+/// let switch = MainSwitch::builder(Some(CockpitSide::Left))
 ///     .init(true)  // Start in ON state
 ///     .mouse_factor(0.8)
 ///     .handle_switch("my_slider", "my_key")
@@ -61,7 +57,7 @@ use crate::{
 ///     .build();
 /// ```
 pub struct MainSwitchBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
     state: bool,
     switching_timer: f32,
     switching_allowed: bool,
@@ -118,7 +114,7 @@ impl MainSwitchBuilder {
     /// # Example
     ///
     /// ```rust
-    /// let builder = MainSwitch::builder(Some(KeyEventCab::Right))
+    /// let builder = MainSwitch::builder(Some(CockpitSide::Right))
     ///     .handle_switch("handle_anim", "main_switch_key");
     /// ```
     pub fn handle_switch(mut self, animation_name: impl Into<String>, event_name: &str) -> Self {
@@ -343,7 +339,7 @@ impl MainSwitchBuilder {
 /// }
 /// ```
 pub struct MainSwitch {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Current state of the switch (true = ON, false = OFF)
     pub state: bool,
@@ -389,11 +385,11 @@ impl MainSwitch {
     /// # Example
     ///
     /// ```rust
-    /// use crate::api::key_event::KeyEventCab;
+    /// use crate::api::key_event::CockpitSide;
     ///
-    /// let builder = MainSwitch::builder(Some(KeyEventCab::Left));
+    /// let builder = MainSwitch::builder(Some(CockpitSide::Left));
     /// ```
-    pub fn builder(cab_side: Option<KeyEventCab>) -> MainSwitchBuilder {
+    pub fn builder(cab_side: Option<CockpitSide>) -> MainSwitchBuilder {
         MainSwitchBuilder {
             cab_side,
             state: false,

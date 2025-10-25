@@ -4,12 +4,10 @@
 //! rotary input controls with configurable limits, speed factors, and key bindings.
 //! The crank position is automatically animated and can be controlled via key events.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-};
+use crate::api::{animation::Animation, key_event::KeyEvent};
 
 /// Builder for creating a `Crank` instance with customizable parameters.
 ///
@@ -20,8 +18,8 @@ use crate::api::{
 ///
 /// ```rust
 /// # use your_crate::Crank;
-/// # use your_crate::api::key_event::KeyEventCab;
-/// let crank = Crank::builder("rotation_anim", Some(KeyEventCab::ACab))
+/// # use your_crate::api::key_event::CockpitSide;
+/// let crank = Crank::builder("rotation_anim", Some(CockpitSide::ACab))
 ///     .factor(2.0)
 ///     .min(-10.0)
 ///     .max(10.0)
@@ -30,7 +28,7 @@ use crate::api::{
 ///     .build();
 /// ```
 pub struct CrankBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     pos_last: f32,
@@ -213,7 +211,7 @@ impl CrankBuilder {
 /// ```
 #[derive(Debug)]
 pub struct Crank {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// The current position of the crank.
     ///
@@ -254,16 +252,16 @@ impl Crank {
     ///
     /// ```rust
     /// # use your_crate::Crank;
-    /// # use your_crate::api::key_event::KeyEventCab;
+    /// # use your_crate::api::key_event::CockpitSide;
     /// // Basic crank with default settings
     /// let crank = Crank::builder("rotation", None).build();
     ///
     /// // Crank with cab-specific key events
-    /// let crank = Crank::builder("wheel", Some(KeyEventCab::ACab)).build();
+    /// let crank = Crank::builder("wheel", Some(CockpitSide::ACab)).build();
     /// ```
     pub fn builder(
         animation_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> CrankBuilder {
         CrankBuilder {
             cab_side,

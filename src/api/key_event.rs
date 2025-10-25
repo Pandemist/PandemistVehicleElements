@@ -5,15 +5,12 @@
 //! both physical key events and programmatic injection of events.
 //!
 //! The main components are:
-//! - [`KeyEventCab`]: Represents which cabin (A or B) an event belongs to
 //! - [`KeyEvent`]: Handles key press/release state tracking with cabin awareness
 
-use std::fmt;
-
-use lotus_extra::messages::std::PowerSignalCabin;
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::action::state;
-use serde::{Deserialize, Serialize};
 
+/*
 /// Represents the cabin side for key events in a dual-cabin system.
 ///
 /// This enum is used to distinguish between cabin A and cabin B in systems
@@ -22,17 +19,17 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```
-/// use your_crate::KeyEventCab;
+/// use your_crate::CockpitSide;
 ///
-/// let cab_a = KeyEventCab::ACab;
-/// let cab_b = KeyEventCab::BCab;
+/// let cab_a = CockpitSide::ACab;
+/// let cab_b = CockpitSide::BCab;
 ///
 /// // Convert to multiplier for calculations
 /// assert_eq!(cab_a.to_mul(), 1.0);
 /// assert_eq!(cab_b.to_mul(), -1.0);
 /// ```
 #[derive(Default, Debug, Hash, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum KeyEventCab {
+pub enum CockpitSide {
     /// Cabin A (default cabin)
     #[default]
     ACab,
@@ -40,7 +37,7 @@ pub enum KeyEventCab {
     BCab,
 }
 
-impl KeyEventCab {
+impl CockpitSide {
     /// Converts the cabin identifier to a multiplier value.
     ///
     /// This is useful for mathematical operations where cabin A represents
@@ -54,86 +51,86 @@ impl KeyEventCab {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::KeyEventCab;
+    /// use your_crate::CockpitSide;
     ///
-    /// assert_eq!(KeyEventCab::ACab.to_mul(), 1.0);
-    /// assert_eq!(KeyEventCab::BCab.to_mul(), -1.0);
+    /// assert_eq!(CockpitSide::ACab.to_mul(), 1.0);
+    /// assert_eq!(CockpitSide::BCab.to_mul(), -1.0);
     /// ```
     pub fn to_mul(&self) -> f32 {
         match &self {
-            KeyEventCab::BCab => -1.0,
-            KeyEventCab::ACab => 1.0,
+            CockpitSide::BCab => -1.0,
+            CockpitSide::ACab => 1.0,
         }
     }
 }
 
-impl fmt::Display for KeyEventCab {
+impl fmt::Display for CockpitSide {
     /// Formats the cabin as a numeric string.
     ///
     /// * `ACab` displays as "0"
     /// * `BCab` displays as "1"
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            KeyEventCab::ACab => write!(f, "0"),
-            KeyEventCab::BCab => write!(f, "1"),
+            CockpitSide::ACab => write!(f, "0"),
+            CockpitSide::BCab => write!(f, "1"),
         }
     }
 }
 
-impl From<KeyEventCab> for PowerSignalCabin {
-    /// Converts a `KeyEventCab` to a `PowerSignalCabin`.
+impl From<CockpitSide> for PowerSignalCabin {
+    /// Converts a `CockpitSide` to a `PowerSignalCabin`.
     ///
     /// This conversion maintains the cabin association for power signal messages.
-    fn from(value: KeyEventCab) -> PowerSignalCabin {
+    fn from(value: CockpitSide) -> PowerSignalCabin {
         match value {
-            KeyEventCab::ACab => PowerSignalCabin::ACab,
-            KeyEventCab::BCab => PowerSignalCabin::BCab,
+            CockpitSide::ACab => PowerSignalCabin::ACab,
+            CockpitSide::BCab => PowerSignalCabin::BCab,
         }
     }
 }
 
-impl From<KeyEventCab> for String {
-    /// Converts a `KeyEventCab` to a letter string.
+impl From<CockpitSide> for String {
+    /// Converts a `CockpitSide` to a letter string.
     ///
     /// * `ACab` converts to "A"
     /// * `BCab` converts to "B"
-    fn from(value: KeyEventCab) -> String {
+    fn from(value: CockpitSide) -> String {
         match value {
-            KeyEventCab::ACab => "A".to_string(),
-            KeyEventCab::BCab => "B".to_string(),
+            CockpitSide::ACab => "A".to_string(),
+            CockpitSide::BCab => "B".to_string(),
         }
     }
 }
 
-impl From<KeyEventCab> for usize {
-    /// Converts a `KeyEventCab` to a `usize` index.
+impl From<CockpitSide> for usize {
+    /// Converts a `CockpitSide` to a `usize` index.
     ///
     /// * `ACab` converts to `0`
     /// * `BCab` converts to `1`
     ///
     /// This is useful for array indexing and similar operations.
-    fn from(value: KeyEventCab) -> usize {
+    fn from(value: CockpitSide) -> usize {
         match value {
-            KeyEventCab::ACab => 0,
-            KeyEventCab::BCab => 1,
+            CockpitSide::ACab => 0,
+            CockpitSide::BCab => 1,
         }
     }
 }
 
-impl From<KeyEventCab> for u8 {
-    /// Converts a `KeyEventCab` to a `u8` value.
+impl From<CockpitSide> for u8 {
+    /// Converts a `CockpitSide` to a `u8` value.
     ///
     /// * `ACab` converts to `0`
     /// * `BCab` converts to `1`
     ///
     /// This is useful for compact binary representations.
-    fn from(value: KeyEventCab) -> u8 {
+    fn from(value: CockpitSide) -> u8 {
         match value {
-            KeyEventCab::ACab => 0,
-            KeyEventCab::BCab => 1,
+            CockpitSide::ACab => 0,
+            CockpitSide::BCab => 1,
         }
     }
-}
+}*/
 
 //=========================================================================
 
@@ -150,10 +147,10 @@ impl From<KeyEventCab> for u8 {
 /// # Examples
 ///
 /// ```
-/// use your_crate::{KeyEvent, KeyEventCab};
+/// use your_crate::{KeyEvent, CockpitSide};
 ///
 /// // Create a key event for cabin A
-/// let mut key_event = KeyEvent::new(Some("thrust_lever"), Some(KeyEventCab::ACab));
+/// let mut key_event = KeyEvent::new(Some("thrust_lever"), Some(CockpitSide::ACab));
 ///
 /// // Check if the key was just pressed
 /// if key_event.is_just_pressed() {
@@ -169,7 +166,7 @@ pub struct KeyEvent {
     /// The name of the key event (corresponds to lotus_script state names)
     name: Option<String>,
     /// Which cabin this event is associated with
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
     /// Whether this event is currently being injected programmatically
     pub injection: bool,
     /// The previous state of the injection flag (used for edge detection)
@@ -187,18 +184,18 @@ impl KeyEvent {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::{KeyEvent, KeyEventCab};
+    /// use your_crate::{KeyEvent, CockpitSide};
     ///
     /// // Create an event with both name and cabin
-    /// let key_event = KeyEvent::new(Some("engine_start"), Some(KeyEventCab::ACab));
+    /// let key_event = KeyEvent::new(Some("engine_start"), Some(CockpitSide::ACab));
     ///
     /// // Create an event with just a name
     /// let key_event = KeyEvent::new(Some("master_alarm"), None);
     ///
     /// // Create an event for programmatic injection only
-    /// let key_event = KeyEvent::new(None, Some(KeyEventCab::BCab));
+    /// let key_event = KeyEvent::new(None, Some(CockpitSide::BCab));
     /// ```
-    pub fn new(name: Option<&str>, cab_side: Option<KeyEventCab>) -> Self {
+    pub fn new(name: Option<&str>, cab_side: Option<CockpitSide>) -> Self {
         Self {
             name: name.map(|s| s.into()),
             cab_side,
@@ -220,8 +217,8 @@ impl KeyEvent {
         match (self.cab_side, &self.name) {
             (Some(cab), Some(ev)) => {
                 if let Some(ev_side) = state(ev).cockpit_index {
-                    (cab == KeyEventCab::ACab && ev_side == 0)
-                        || (cab == KeyEventCab::BCab && ev_side == 1)
+                    (cab == CockpitSide::A && ev_side == 0)
+                        || (cab == CockpitSide::B && ev_side == 1)
                 } else {
                     // No Cabin Index found
                     false
@@ -246,9 +243,9 @@ impl KeyEvent {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::{KeyEvent, KeyEventCab};
+    /// use your_crate::{KeyEvent, CockpitSide};
     ///
-    /// let mut key_event = KeyEvent::new(Some("brake"), Some(KeyEventCab::ACab));
+    /// let mut key_event = KeyEvent::new(Some("brake"), Some(CockpitSide::ACab));
     ///
     /// // This would return true only on the frame when the brake is first pressed
     /// if key_event.is_just_pressed() {
@@ -286,9 +283,9 @@ impl KeyEvent {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::{KeyEvent, KeyEventCab};
+    /// use your_crate::{KeyEvent, CockpitSide};
     ///
-    /// let mut key_event = KeyEvent::new(Some("throttle"), Some(KeyEventCab::BCab));
+    /// let mut key_event = KeyEvent::new(Some("throttle"), Some(CockpitSide::BCab));
     ///
     /// // This would return true only on the frame when the throttle is released
     /// if key_event.is_just_released() {
@@ -326,9 +323,9 @@ impl KeyEvent {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::{KeyEvent, KeyEventCab};
+    /// use your_crate::{KeyEvent, CockpitSide};
     ///
-    /// let mut key_event = KeyEvent::new(Some("gear_lever"), Some(KeyEventCab::ACab));
+    /// let mut key_event = KeyEvent::new(Some("gear_lever"), Some(CockpitSide::ACab));
     ///
     /// // This returns true for as long as the gear lever is held down
     /// if key_event.is_pressed() {
@@ -365,9 +362,9 @@ impl KeyEvent {
     /// # Examples
     ///
     /// ```
-    /// use your_crate::{KeyEvent, KeyEventCab};
+    /// use your_crate::{KeyEvent, CockpitSide};
     ///
-    /// let mut key_event = KeyEvent::new(Some("flaps"), Some(KeyEventCab::BCab));
+    /// let mut key_event = KeyEvent::new(Some("flaps"), Some(CockpitSide::BCab));
     ///
     /// if key_event.is_released() {
     ///     println!("Flaps control is not being pressed");

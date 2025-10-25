@@ -4,13 +4,10 @@
 //! including regular buttons, toggle buttons, hold-to-activate buttons, and rotating buttons.
 //! Each button can be configured with animations, sounds, and different behavioral patterns.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
-    sound::Sound,
-};
+use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
 
 /// Defines the different operational modes for push buttons
 ///
@@ -35,7 +32,7 @@ pub enum PushButtonMode {
 /// This builder allows you to configure all aspects of a push button including its
 /// visual animations, sound effects, input handling, and operational mode.
 pub struct PushButtonBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     rot: f32,
@@ -166,7 +163,7 @@ impl PushButtonBuilder {
 /// ```
 #[derive(Debug)]
 pub struct PushButton {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos: f32,
     rot: f32,
@@ -209,7 +206,7 @@ impl PushButton {
     pub fn builder(
         animation_name: impl Into<String>,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         PushButton::builder_intern(animation_name, Some(&event_name.into()), cab_side)
     }
@@ -231,7 +228,7 @@ impl PushButton {
     pub fn builder_hold_mode(
         animation_name: impl Into<String>,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         let mut btn =
             PushButton::builder_intern(animation_name, Some(&event_name.into()), cab_side);
@@ -256,7 +253,7 @@ impl PushButton {
     pub fn builder_toggle_value_on_press(
         animation_name: impl Into<String>,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         let mut btn =
             PushButton::builder_intern(animation_name, Some(&event_name.into()), cab_side);
@@ -283,7 +280,7 @@ impl PushButton {
         time: f32,
         animation_name: impl Into<String>,
         event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         let mut btn =
             PushButton::builder_intern(animation_name, Some(&event_name.into()), cab_side);
@@ -310,7 +307,7 @@ impl PushButton {
         animation_name: impl Into<String>,
         rotation_animation_name: impl Into<String>,
         toggle_event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         let mut btn = PushButton::builder_intern(animation_name, None, cab_side);
         btn.mode = PushButtonMode::RotateReset;
@@ -339,7 +336,7 @@ impl PushButton {
         rotation_animation_name: impl Into<String>,
         press_event_name: impl Into<String>,
         release_event_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         let mut btn =
             PushButton::builder_intern(animation_name, Some(&press_event_name.into()), cab_side);
@@ -355,7 +352,7 @@ impl PushButton {
     fn builder_intern(
         animation_name: impl Into<String>,
         event_name: Option<&str>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> PushButtonBuilder {
         PushButtonBuilder {
             cab_side,

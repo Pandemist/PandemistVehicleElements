@@ -1,7 +1,8 @@
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::{prelude::Message, time::delta};
 
 use crate::{
-    api::{key_event::KeyEventCab, light::Light},
+    api::light::Light,
     elements::tech::{buttons::PushButton, dekaden::DecadeSwitch},
 };
 
@@ -150,7 +151,7 @@ impl LzbL90Device {
 
         snd_btn_name: impl Into<String>,
 
-        cab_side: KeyEventCab,
+        cab_side: CockpitSide,
     ) -> Self {
         let snd_btn_name: String = snd_btn_name.into();
 

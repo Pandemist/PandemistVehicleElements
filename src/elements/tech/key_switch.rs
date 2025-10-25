@@ -10,9 +10,11 @@
 
 use std::collections::HashMap;
 
+use lotus_extra::vehicle::CockpitSide;
+
 use crate::api::{
     animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
+    key_event::KeyEvent,
     sound::Sound,
     variable::{get_var, set_var},
     visible_flag::Visiblility,
@@ -134,7 +136,7 @@ impl KeyDepot {
 /// ```
 pub struct KeySwitchBuilder {
     /// Optional cab side specification for events
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Key depot for managing key availability
     key_depot: KeyDepot,
@@ -437,7 +439,7 @@ impl KeySwitchBuilder {
 #[expect(clippy::struct_excessive_bools)]
 pub struct KeySwitch {
     /// Optional cab side specification for events
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     /// Key depot for managing key availability
     key_depot: KeyDepot,
@@ -511,14 +513,14 @@ impl KeySwitch {
     ///     depot,
     ///     "starter_key_anim",
     ///     "starter_key_visible",
-    ///     Some(KeyEventCab::ACab)
+    ///     Some(CockpitSide::ACab)
     /// );
     /// ```
     pub fn builder(
         key_depot: KeyDepot,
         animation_name: impl Into<String>,
         visibility_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> KeySwitchBuilder {
         KeySwitchBuilder {
             cab_side,

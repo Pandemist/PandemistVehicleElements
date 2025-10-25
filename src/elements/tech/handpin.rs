@@ -4,14 +4,11 @@
 //! movement using either mouse input (when grabbed) or keyboard directional keys.
 //! The system supports both free movement and constrained single-axis movement.
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::{
-    api::{
-        animation::Animation,
-        general::mouse_move,
-        key_event::{KeyEvent, KeyEventCab},
-    },
+    api::{animation::Animation, general::mouse_move, key_event::KeyEvent},
     management::structs::general_structs::FourDirections,
 };
 
@@ -24,14 +21,14 @@ use crate::{
 /// # Examples
 ///
 /// ```rust
-/// let hand_pin = HandPin::builder("x_anim", "y_anim", Some(KeyEventCab::ACab))
+/// let hand_pin = HandPin::builder("x_anim", "y_anim", Some(CockpitSide::ACab))
 ///     .mouse_factor(2.0)
 ///     .event_grab("mouse_grab")
 ///     .only_one_direction()
 ///     .build();
 /// ```
 pub struct HandPinBuilder {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos_x: f32,
     pos_y: f32,
@@ -238,10 +235,10 @@ impl HandPinBuilder {
 ///
 /// ```rust
 /// use your_crate::HandPin;
-/// use your_crate::api::key_event::KeyEventCab;
+/// use your_crate::api::key_event::CockpitSide;
 ///
 /// // Create a HandPin with custom settings
-/// let mut hand_pin = HandPin::builder("x_movement", "y_movement", Some(KeyEventCab::ACab))
+/// let mut hand_pin = HandPin::builder("x_movement", "y_movement", Some(CockpitSide::ACab))
 ///     .mouse_factor(1.5)
 ///     .event_grab("left_mouse")
 ///     .event_override_n("w")
@@ -262,7 +259,7 @@ impl HandPinBuilder {
 /// ```
 #[derive(Debug)]
 pub struct HandPin {
-    cab_side: Option<KeyEventCab>,
+    cab_side: Option<CockpitSide>,
 
     pos_x: f32,
     pos_y: f32,
@@ -311,14 +308,14 @@ impl HandPin {
     ///
     /// ```rust
     /// use your_crate::HandPin;
-    /// use your_crate::api::key_event::KeyEventCab;
+    /// use your_crate::api::key_event::CockpitSide;
     ///
-    /// let builder = HandPin::builder("x_anim", "y_anim", Some(KeyEventCab::ACab));
+    /// let builder = HandPin::builder("x_anim", "y_anim", Some(CockpitSide::ACab));
     /// ```
     pub fn builder(
         animation_x_name: impl Into<String>,
         animation_y_name: impl Into<String>,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> HandPinBuilder {
         HandPinBuilder {
             cab_side,

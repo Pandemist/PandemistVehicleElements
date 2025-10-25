@@ -1,3 +1,4 @@
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::{
     prelude::{message_type, send_message, Message, MessageTarget},
     time::delta,
@@ -5,13 +6,13 @@ use lotus_script::{
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::{key_event::KeyEventCab, light::Light},
+    api::light::Light,
     elements::tech::{buttons::PushButton, dekaden::DecadeSwitch},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgIndusi600mIndusiAcitve {
-    pub side: KeyEventCab,
+    pub side: CockpitSide,
     pub value: bool,
 }
 
@@ -21,7 +22,7 @@ message_type!(MsgIndusi600mIndusiAcitve, "Indusi600m", "IndusiAcitve");
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgIndusi600mDeviceAcitve {
-    pub side: KeyEventCab,
+    pub side: CockpitSide,
     pub value: bool,
 }
 
@@ -31,7 +32,7 @@ message_type!(MsgIndusi600mDeviceAcitve, "Indusi600m", "DeviceAcitve");
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgIndusi600mOverride {
-    pub side: KeyEventCab,
+    pub side: CockpitSide,
     pub value: bool,
 }
 
@@ -41,7 +42,7 @@ message_type!(MsgIndusi600mOverride, "Indusi600m", "Override");
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgIndusi600mReset {
-    pub side: KeyEventCab,
+    pub side: CockpitSide,
 }
 
 message_type!(MsgIndusi600mReset, "Indusi600m", "Reset");
@@ -50,7 +51,7 @@ message_type!(MsgIndusi600mReset, "Indusi600m", "Reset");
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgIndusi600mForcedBrake {
-    pub side: KeyEventCab,
+    pub side: CockpitSide,
 }
 
 message_type!(MsgIndusi600mForcedBrake, "Indusi600m", "ForcedBrake");
@@ -58,14 +59,14 @@ message_type!(MsgIndusi600mForcedBrake, "Indusi600m", "ForcedBrake");
 //=====================================================
 
 struct Indusi600mVehicleUnitSide {
-    cab_side: KeyEventCab,
+    cab_side: CockpitSide,
     sensor_id: Vec<u32>,
     active_signal_last: bool,
     active_last: bool,
 }
 
 impl Indusi600mVehicleUnitSide {
-    pub fn new(sensor_id: Vec<u32>, cab_side: KeyEventCab) -> Option<Self> {
+    pub fn new(sensor_id: Vec<u32>, cab_side: CockpitSide) -> Option<Self> {
         if sensor_id.is_empty() {
             None
         } else {
@@ -156,8 +157,8 @@ pub struct Indusi600mVehicleUnit {
 impl Indusi600mVehicleUnit {
     pub fn new(side_a: Vec<u32>, side_b: Vec<u32>) -> Self {
         Self {
-            side_a: Indusi600mVehicleUnitSide::new(side_a, KeyEventCab::ACab),
-            side_b: Indusi600mVehicleUnitSide::new(side_b, KeyEventCab::BCab),
+            side_a: Indusi600mVehicleUnitSide::new(side_a, CockpitSide::A),
+            side_b: Indusi600mVehicleUnitSide::new(side_b, CockpitSide::B),
 
             active_signal_a_last: false,
             active_signal_b_last: false,
@@ -257,7 +258,7 @@ impl Indusi600mVehicleUnit {
 //--------------------------
 
 pub struct Indusi600mDeviceDecade {
-    cab_side: KeyEventCab,
+    cab_side: CockpitSide,
 
     device_active: bool,
     indusi_active: bool,
@@ -309,7 +310,7 @@ impl Indusi600mDeviceDecade {
         snd_btn_press_name: impl Into<String>,
         snd_btn_release_name: impl Into<String>,
 
-        cab_side: KeyEventCab,
+        cab_side: CockpitSide,
         init_value_rueckstellung: i32,
         init_value_freigabe: i32,
     ) -> Self {
@@ -531,7 +532,7 @@ impl Indusi600mDeviceDecade {
 //--------------------------
 
 pub struct Indusi600mDeviceLcd {
-    cab_side: KeyEventCab,
+    cab_side: CockpitSide,
 
     device_active: bool,
     indusi_active: bool,
@@ -575,7 +576,7 @@ impl Indusi600mDeviceLcd {
         lm_freigabe_btn_name: impl Into<String>,
         lm_betriebskontrolle_name: impl Into<String>,
 
-        cab_side: KeyEventCab,
+        cab_side: CockpitSide,
         init_value_rueckstellung: i32,
         init_value_freigabe: i32,
     ) -> Self {

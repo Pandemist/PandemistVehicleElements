@@ -27,13 +27,13 @@
 //!     .build();
 //! ```
 
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::{
     api::{
         animation::Animation,
         electrical_supply::{ApiPantograph, ApiThirdRailCollector},
-        key_event::KeyEventCab,
         light::Light,
         mock_enums::{ThirdRailState, VehicleInitState},
         simulation_settings::{init_ready_state, realisitc_electric_supply},
@@ -619,7 +619,7 @@ impl ManualPantograph {
         vis_rope_loss_name: impl Into<String>,
         vis_rope_knoted_name: impl Into<String>,
         curve: PiecewiseLinearFunction,
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
     ) -> ManualPantographBuilder {
         ManualPantographBuilder {
             height_curve: curve,

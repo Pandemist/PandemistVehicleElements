@@ -1,8 +1,9 @@
+use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::api::{
     animation::Animation,
-    key_event::{KeyEvent, KeyEventCab},
+    key_event::KeyEvent,
     light::Light,
     variable::{get_var, set_var},
     visible_flag::Visiblility,
@@ -20,7 +21,7 @@ pub struct SimpleInBtn {
 
 impl SimpleInBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_toggle_name: &str,
         ai_doors: Vec<usize>,
     ) -> Self {
@@ -52,7 +53,7 @@ pub struct DuoSpecialInBtn {
 }
 
 impl DuoSpecialInBtn {
-    pub fn new(cab_side: Option<KeyEventCab>, event_kombi_name: &str) -> Self {
+    pub fn new(cab_side: Option<CockpitSide>, event_kombi_name: &str) -> Self {
         Self {
             buggy: false,
             wheelchair: false,
@@ -108,7 +109,7 @@ pub struct SimpleWithStateInPushBtn {
 
 impl SimpleWithStateInPushBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         anim_name: impl Into<String>,
         event_toggle_name: &str,
         light_request_name: &str,
@@ -160,7 +161,7 @@ pub struct DuwagDreieckIn2PushBtn {
 
 impl DuwagDreieckIn2PushBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         anim1_name: impl Into<String>,
         anim2_name: impl Into<String>,
         event1_toggle_name: &str,
@@ -216,7 +217,7 @@ pub struct SimpleOutBtn {
 
 impl SimpleOutBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_toggle_name: &str,
         ai_doors: Vec<usize>,
     ) -> Self {
@@ -250,7 +251,7 @@ pub struct SimpleOutPushBtn {
 
 impl SimpleOutPushBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         anim_name: impl Into<String>,
         event_toggle_name: &str,
         ai_doors: Vec<usize>,
@@ -287,7 +288,7 @@ pub struct LightedOutPushBtn {
 
 impl LightedOutPushBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         anim_name: impl Into<String>,
         event_toggle_name: &str,
         light_name: &str,
@@ -338,7 +339,7 @@ pub struct RedGreenOutBtn {
 
 impl RedGreenOutBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_toggle_name: &str,
         green_vis_name: &str,
         red_vis_name: &str,
@@ -392,7 +393,7 @@ pub struct RedGreenBtn {
 
 impl RedGreenBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_name: &str,
         green_vis_name: &str,
         red_vis_name: &str,
@@ -444,7 +445,7 @@ pub struct RedGreenDuoBtn {
 
 impl RedGreenDuoBtn {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_buggy_name: &str,
         event_wheelchair_name: &str,
         green_vis_name: &str,

@@ -1,8 +1,6 @@
-use crate::api::{
-    animation::Animation,
-    general::mouse_move,
-    key_event::{KeyEvent, KeyEventCab},
-};
+use lotus_extra::vehicle::CockpitSide;
+
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent};
 
 //======================================================================
 // For GT6N microphone
@@ -25,7 +23,7 @@ pub struct Slider3d {
 
 impl Slider3d {
     pub fn new(
-        cab_side: Option<KeyEventCab>,
+        cab_side: Option<CockpitSide>,
         event_grab: &str,
         event_pull: &str,
         mouse_factor: f32,
