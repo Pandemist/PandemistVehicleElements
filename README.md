@@ -2,14 +2,14 @@
 
 Vehicle elements and components for the LOTUS simulator.
 
-## About the project
-
-This repository contains reusable vehicle components and elements for custom vehicles in the LOTUS simulator.
-
 ## Features
 
-- Modular vehicle components
-- Reusable elements for different vehicle types
+- Various controls such as switches, buttons, key switches, decade switches, cranks, movable parts, etc.
+- Various prefabricated components (mirrors, doors, windscreen wipers, folding seats, windows, speedometer, odometer, throttle lever, clutches, etc.)
+- Various electrical components (vehicle battery, current collector, converter, main switch, etc.)
+- Messages (GT6N coupling, MMS communication)
+- An ‘intermediate’ API level and various dummies for features that do not yet exist, for example, so that they can already be installed in the script. *
+- Documentation for each component already started (language: English, progress approx. 80%)
 
 ## Requirements
 

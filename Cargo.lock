@@ -171,7 +171,8 @@ checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
 [[package]]
 name = "lotus-bindgen-macros"
 version = "0.1.1"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1cdc60f8c7469dcebfc65a675f398b914ddb2b70eee5eaf81f6c21d87cfee5f3"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -180,8 +181,9 @@ dependencies = [
 
 [[package]]
 name = "lotus-extra"
-version = "0.1.0"
-source = "git+https://github.com/Oriolus-Software/lotus-extra.git?branch=master#62e4c24bf1ef0810995fd65f78e7c4b14c5ad529"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ae5e3607b7211d497a97d53270d84f24c01a94641aac309c9690fcdba6d13da"
 dependencies = [
  "lotus-script",
  "num-traits",
@@ -192,8 +194,9 @@ dependencies = [
 
 [[package]]
 name = "lotus-script"
-version = "0.6.2"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68b812b9e1277e0ce82c1be7ebb34e005fb760aed03db765f20e7e4df9f62b8e"
 dependencies = [
  "lotus-bindgen-macros",
  "lotus-script-sys",
@@ -207,8 +210,9 @@ dependencies = [
 
 [[package]]
 name = "lotus-script-sys"
-version = "0.3.0"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2f6688ba5373084b8a64b8a900fb410ee5fb8e1be7be512151b156da337349b0"
 dependencies = [
  "lotus-bindgen-macros",
  "rmp-serde",
@@ -218,8 +222,9 @@ dependencies = [
 
 [[package]]
 name = "lotus-shared"
-version = "0.4.1"
-source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#ae41abbc54e33bf3d55303dc688fbdce30289ff6"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d796031c4f8de8190b5bf4d5dd0b35a1d631eac596f29c04061f2d2f8a540587"
 dependencies = [
  "glam",
  "lotus-script-sys",
@@ -227,7 +232,6 @@ dependencies = [
  "serde_json",
  "serde_repr",
  "thiserror",
- "time",
 ]
 
 [[package]]
