@@ -24,3 +24,6 @@ serde = "1"
 serde_json = "1"
 time = { version = "0.3", features = ["serde"] }
 static-toml = "1.0"
+
+[patch.crates-io]
+lotus-shared = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git" }
