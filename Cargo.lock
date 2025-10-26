@@ -208,7 +208,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68b812b9e1277e0ce82c1be7ebb34e005fb760aed03db765f20e7e4df9f62b8e"
 dependencies = [
  "lotus-bindgen-macros 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "lotus-script-sys 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lotus-script-sys",
  "lotus-shared",
  "rmp-serde",
  "serde",
@@ -223,25 +223,13 @@ version = "0.7.0"
 source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#7ebf0a57852ddbe4679131638725eb9246cf2e0d"
 dependencies = [
  "lotus-bindgen-macros 0.1.1 (git+https://github.com/Oriolus-Software/LOTUS-Scripting.git)",
- "lotus-script-sys 0.5.0 (git+https://github.com/Oriolus-Software/LOTUS-Scripting.git)",
+ "lotus-script-sys",
  "lotus-shared",
  "rmp-serde",
  "serde",
  "serde_json",
  "serde_repr",
  "thiserror",
-]
-
-[[package]]
-name = "lotus-script-sys"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f6688ba5373084b8a64b8a900fb410ee5fb8e1be7be512151b156da337349b0"
-dependencies = [
- "lotus-bindgen-macros 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "rmp-serde",
- "serde",
- "serde_repr",
 ]
 
 [[package]]
@@ -261,7 +249,7 @@ version = "0.5.1"
 source = "git+https://github.com/Oriolus-Software/LOTUS-Scripting.git#7ebf0a57852ddbe4679131638725eb9246cf2e0d"
 dependencies = [
  "glam",
- "lotus-script-sys 0.5.0 (git+https://github.com/Oriolus-Software/LOTUS-Scripting.git)",
+ "lotus-script-sys",
  "serde",
  "serde_json",
  "serde_repr",

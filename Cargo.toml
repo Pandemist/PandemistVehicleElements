@@ -27,3 +27,5 @@ static-toml = "1.0"
 
 [patch.crates-io]
 lotus-shared = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git" }
+lotus-script-sys = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git" }
+lotus-extra = { git = "https://github.com/Oriolus-Software/lotus-extra.git" }
