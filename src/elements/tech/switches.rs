@@ -49,8 +49,8 @@
 //!     .event("UP", SwitchEventAction::Plus)
 //!     .event("DOWN", SwitchEventAction::Minus)
 //!     .event("MODE_1", SwitchEventAction::Set(1))
-//!     .snd_plus("step_up")
-//!     .snd_minus("step_down")
+//!     .snd_default_plus("step_up")
+//!     .snd_default_minus("step_down")
 //!     .build();
 //!
 //! // In your main loop
