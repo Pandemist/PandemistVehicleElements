@@ -62,7 +62,7 @@ message_type!(Bag, "Gt6n_Coupler", "BagVisibility");
 /// use lotus_script::message::Coupling;
 ///
 /// // Hide the  bag on the front coupling
-/// send__bag(false, Coupling::Front);
+/// send_bag(false, Coupling::Front);
 /// ```
 pub fn send_bag(value: bool, side: Coupling) {
     send_message(
@@ -74,20 +74,20 @@ pub fn send_bag(value: bool, side: Coupling) {
     );
 }
 
-/// Reader for receiving  bag visibility messages from a specific coupling side.
+/// Reader for receiving bag visibility messages from a specific coupling side.
 ///
-/// This struct maintains the current state of the  bag visibility
+/// This struct maintains the current state of the bag visibility
 /// for one coupling connection.
 #[derive(Debug)]
 pub struct BagReader {
     /// Which coupling side this reader monitors
     side: Coupling,
-    /// Current visibility state of the  bag
+    /// Current visibility state of the bag
     pub value: bool,
 }
 
 impl BagReader {
-    /// Creates a new  bag reader for the specified coupling side.
+    /// Creates a new bag reader for the specified coupling side.
     ///
     /// # Arguments
     ///
@@ -100,10 +100,10 @@ impl BagReader {
         Self { side, value: false }
     }
 
-    /// Processes incoming messages and updates the  bag state.
+    /// Processes incoming messages and updates the bag state.
     ///
     /// This method should be called for each received message to update
-    /// the internal state when relevant  bag messages arrive.
+    /// the internal state when relevant bag messages arrive.
     ///
     /// # Arguments
     ///

@@ -14,11 +14,11 @@ use serde::{Deserialize, Serialize};
 // Choice between GPM and ZB for IBIS
 //===================================================================
 
-/// Message indicating whether GPM (General Purpose Module) is available.
+/// Message indicating whether GPM (Gateway Peripheriebus-Multibus) is available.
 ///
 /// This message is used to broadcast the availability state of the GPM system
-/// within the IBIS (Integrated Board Information System) architecture.
-/// It helps components determine whether to use GPM or ZB (Zielbezeichnung) protocols.
+/// within the IBIS (Gateway Peripheriebus-Multibus) architecture.
+/// It helps components determine whether to use GPM or ZB (Zugbus) protocols.
 ///
 /// # Examples
 ///

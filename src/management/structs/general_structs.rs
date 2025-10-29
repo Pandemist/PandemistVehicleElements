@@ -126,16 +126,18 @@ impl FourDirections {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ActivStatePos {
     CabA,
     CabB,
     Train,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TrainActivState {
-    cab_a: CabActivState,
-    cab_b: CabActivState,
-    train: CabActivState,
+    pub cab_a: CabActivState,
+    pub cab_b: CabActivState,
+    pub train: CabActivState,
 }
 
 impl TrainActivState {

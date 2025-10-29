@@ -28,9 +28,9 @@ dependencies = [
 
 [[package]]
 name = "bstr"
-version = "1.12.0"
+version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "234113d19d0d7d613b40e86fb654acf958910802bcceab913a4f9e7cda03b1a4"
+checksum = "63044e1ae8e69f3b5a92c736ca6269b8d12fa7efe39bf34ddb06d102cf0e2cab"
 dependencies = [
  "memchr",
  "serde",
@@ -194,9 +194,9 @@ dependencies = [
 
 [[package]]
 name = "lotus-script"
-version = "0.7.0"
+version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68b812b9e1277e0ce82c1be7ebb34e005fb760aed03db765f20e7e4df9f62b8e"
+checksum = "5177d81121568c5a3f3c26ba6783c2bf7c39dbfd6c9842d51735f5f2383c4ed7"
 dependencies = [
  "lotus-bindgen-macros",
  "lotus-script-sys",

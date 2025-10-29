@@ -436,11 +436,11 @@ pub fn send_antislide_override(value: bool) {
 
 /// Message for driver's air conditioning diagnostic information.
 ///
-/// This message contains diagnostic data related to the driver's
-/// compartment air conditioning system.
+/// This message is used to communicate the control the driver's
+/// air con to the vehicle .
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct MsgDiagnosticDriverAirCon {
-    /// Air conditioning diagnostic value (units depend on specific measurement)
+    /// Air conditioning state
     pub value: f32,
 }
 
@@ -456,7 +456,7 @@ message_type!(
 /// Message for pantograph switching state.
 ///
 /// This message reports the current switching state of the vehicle's
-/// pantograph system used for power collection from overhead lines.
+/// pantograph to the diagnostic display.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DiagnosticPantoState {
     /// Current switching state of the pantograph
@@ -506,7 +506,7 @@ impl DiagnosticPantoStateSender {
 
 //--------------------------------
 
-/// Message for door state diagnostic information.
+/// Message for door state information.
 ///
 /// This message reports the current target state of the vehicle's door system,
 /// indicating the intended door operation mode.
