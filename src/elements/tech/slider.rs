@@ -41,13 +41,10 @@
 
 use std::rc::Rc;
 
-use lotus_extra::vehicle::CockpitSide;
+use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::{math::Vec2, time::delta};
 
-use crate::{
-    api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound},
-    elements::std::piecewise_linear_function::PiecewiseLinearFunction,
-};
+use crate::api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound};
 
 /// Builder for creating a [`Slider`] component with customizable properties.
 ///

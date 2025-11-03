@@ -27,7 +27,7 @@
 //!     .build();
 //! ```
 
-use lotus_extra::vehicle::CockpitSide;
+use lotus_extra::{math::PiecewiseLinearFunction, rand::gen_f32, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
 use crate::{
@@ -40,10 +40,7 @@ use crate::{
         sound::Sound,
         visible_flag::Visiblility,
     },
-    elements::{
-        std::{helper::gen_f32, piecewise_linear_function::PiecewiseLinearFunction},
-        tech::slider::Slider,
-    },
+    elements::tech::slider::Slider,
     management::enums::{
         general_enums::Side, state_enums::SwitchingState, target_enums::SwitchingTarget,
     },

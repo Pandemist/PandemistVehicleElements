@@ -1,13 +1,10 @@
-use lotus_extra::vehicle::CockpitSide;
+use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
-use crate::{
-    api::{
-        animation::{Animation, MappedAnimation},
-        light::{BlinkRelais, Light},
-        sound::{Sound, SoundTarget},
-    },
-    elements::std::piecewise_linear_function::PiecewiseLinearFunction,
+use crate::api::{
+    animation::{Animation, MappedAnimation},
+    light::{BlinkRelais, Light},
+    sound::{Sound, SoundTarget},
 };
 
 const LIFT_HIGHT_SO: f32 = 1.0;

@@ -1,6 +1,5 @@
+use lotus_extra::math::PiecewiseLinearFunction;
 use lotus_script::var::set_var;
-
-use crate::elements::std::piecewise_linear_function::PiecewiseLinearFunction;
 
 /// An animation controller that manages animation state and position.
 ///
