@@ -5,12 +5,12 @@
 //! - `HandCoupler`: A manual coupler with realistic physics and user interaction
 
 use lotus_extra::vehicle::CockpitSide;
-use lotus_script::{log, message::Coupling, rand::gen_f64, time::delta};
+use lotus_script::{message::Coupling, rand::gen_f64, time::delta};
 
 use crate::{
     api::{
         animation::Animation, coupler::ApiCoupler, general::mouse_move, key_event::KeyEvent,
-        mock_enums::CouplingState, variable::set_var, visible_flag::Visiblility,
+        mock_enums::CouplingState, visible_flag::Visiblility,
     },
     elements::tech::{buttons::PushButton, switches::Switch},
     messages::gt6n_coupling_messages::send_bag,
