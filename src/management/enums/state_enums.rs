@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::management::enums::target_enums::SwitchingTarget;
+
 /// Represents the switching state of a component or system.
 ///
 /// This enum is commonly used to represent tri-state logic where a component
@@ -27,6 +29,16 @@ pub enum SwitchingState {
     Neutral,
     /// Component is explicitly turned on
     On,
+}
+
+impl From<SwitchingTarget> for SwitchingState {
+    fn from(value: SwitchingTarget) -> Self {
+        match value {
+            SwitchingTarget::TurnOn(_) => SwitchingState::On,
+            SwitchingTarget::TurnOff(_) => SwitchingState::Off,
+            SwitchingTarget::Neutral => SwitchingState::Neutral,
+        }
+    }
 }
 
 impl SwitchingState {

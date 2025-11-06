@@ -16,7 +16,7 @@ use std::fmt;
 /// println!("{}", left_side);  // Prints "L"
 /// println!("{}", right_side); // Prints "R"
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Side {
     /// The left side
     Left,

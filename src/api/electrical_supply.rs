@@ -12,6 +12,11 @@
 
 use lotus_script::vehicle::{Pantograph, VehicleError};
 
+use crate::{
+    api::{mock_enums::ThirdRailState, variable::get_var},
+    management::enums::general_enums::Side,
+};
+
 //=========================================================================
 
 /// A wrapper around the lotus_script `Pantograph` for overhead line power collection.
@@ -111,5 +116,119 @@ impl ApiPantograph {
         } else {
             None
         }
+    }
+}
+
+//=========================================================================
+
+/// A third rail power collector for subway and metro systems.
+///
+/// Third rail systems provide power through a separate rail running alongside or between
+/// the running rails. This struct manages the connection state and voltage detection
+/// for a specific collector shoe on either the left or right side of the vehicle.
+///
+/// # Examples
+///
+/// ```rust
+/// use your_crate::electrical_supply::ApiThirdRailCollector;
+/// use your_crate::management::enums::general_enums::Side;
+///
+/// let collector = ApiThirdRailCollector::new(1, Side::Left);
+/// let has_voltage = collector.voltage();
+/// let connection_state = collector.value();
+/// ```
+#[derive(Debug)]
+pub struct ApiThirdRailCollector {
+    /// Unique identifier for this collector
+    id: usize,
+    /// Side of the vehicle (Left or Right) where this collector is located
+    side: Side,
+}
+
+impl ApiThirdRailCollector {
+    /// Creates a new `ApiThirdRailCollector` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - Unique identifier for the collector
+    /// * `side` - The side of the vehicle where this collector is mounted
+    ///
+    /// # Returns
+    ///
+    /// A new `ApiThirdRailCollector` instance.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use your_crate::electrical_supply::ApiThirdRailCollector;
+    /// use your_crate::management::enums::general_enums::Side;
+    ///
+    /// let left_collector = ApiThirdRailCollector::new(1, Side::Left);
+    /// let right_collector = ApiThirdRailCollector::new(2, Side::Right);
+    /// ```
+    #[must_use]
+    pub fn new(id: usize, side: Side) -> Self {
+        Self { id, side }
+    }
+
+    /// Returns the connection state of the third rail collector.
+    ///
+    /// This corresponds to the lotus_script variable: `V_ThirdRailCollector_{id}_{side}`
+    /// The variable can have values: -1 (disconnected), -0.5 (partially connected), 0/1 (connected)
+    ///
+    /// # Returns
+    ///
+    /// * [`ThirdRailState::Disconnnected`] - Collector is not in contact with the rail
+    /// * [`ThirdRailState::PartwiseConnected`] - Collector has partial contact
+    /// * [`ThirdRailState::Connected`] - Collector is fully connected
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use your_crate::electrical_supply::ApiThirdRailCollector;
+    /// use your_crate::mock_enums::ThirdRailState;
+    ///
+    /// let collector = ApiThirdRailCollector::new(1, Side::Left);
+    /// match collector.value() {
+    ///     ThirdRailState::Connected => println!("Fully connected to third rail"),
+    ///     ThirdRailState::PartwiseConnected => println!("Partial connection"),
+    ///     ThirdRailState::Disconnnected => println!("No connection"),
+    /// }
+    /// ```
+    #[must_use]
+    pub fn value(&self) -> ThirdRailState {
+        match get_var::<f32>(&format!("V_ThirdRailCollector_{}_{}", self.id, self.side)) {
+            -1.0 => ThirdRailState::Disconnnected,
+            -0.5 => ThirdRailState::PartwiseConnected,
+            _ => ThirdRailState::Connected,
+        }
+    }
+
+    /// Checks if the collector is receiving voltage from the third rail.
+    ///
+    /// This method returns `true` when the lotus_script variable `V_ThirdRailCollector_{id}_{side}` equals 1.0,
+    /// indicating that the collector is not only connected but also receiving power.
+    ///
+    /// # Returns
+    ///
+    /// * `true` - If voltage is detected (variable value = 1.0)
+    /// * `false` - If no voltage is detected
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// let collector = ApiThirdRailCollector::new(1, Side::Left);
+    /// if collector.voltage() {
+    ///     println!("Power available from third rail");
+    /// } else {
+    ///     println!("No power from third rail");
+    /// }
+    /// ```
+    #[must_use]
+    pub fn voltage(&self) -> bool {
+        matches!(
+            get_var::<f32>(&format!("V_ThirdRailCollector_{}_{}", self.id, self.side)),
+            1.0
+        )
     }
 }
