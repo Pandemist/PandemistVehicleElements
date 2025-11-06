@@ -1,6 +1,6 @@
 [package]
 name = "pandemist_vehicle_elements"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["pandemist.daniel@gmail.com"]
 edition = "2021"
 description = "A library with helpful structures for developing Lotus projects."
