@@ -40,7 +40,7 @@ pub struct Foldingramp {
 
 impl Foldingramp {
     #[must_use]
-    pub fn new(name: &str, cab_side: CockpitSide) -> Self {
+    pub fn new(cab_side: CockpitSide) -> Self {
         Foldingramp {
             lockpin: Switch::builder(
                 format!("AV_{}_Klapprampe_Lockpin", String::from(cab_side)),

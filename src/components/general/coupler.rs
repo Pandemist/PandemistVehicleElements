@@ -5,12 +5,12 @@
 //! - `HandCoupler`: A manual coupler with realistic physics and user interaction
 
 use lotus_extra::vehicle::CockpitSide;
-use lotus_script::{message::Coupling, rand::gen_f64, time::delta};
+use lotus_script::{log, message::Coupling, rand::gen_f64, time::delta};
 
 use crate::{
     api::{
         animation::Animation, coupler::ApiCoupler, general::mouse_move, key_event::KeyEvent,
-        mock_enums::CouplingState, visible_flag::Visiblility,
+        mock_enums::CouplingState, variable::set_var, visible_flag::Visiblility,
     },
     elements::tech::{buttons::PushButton, switches::Switch},
     messages::gt6n_coupling_messages::send_bag,
@@ -252,7 +252,7 @@ impl HandCoupler {
             coupler_a_anim: Animation::new(Some(&format!("Coupling_{id}_hingeA"))),
             coupler_b_anim: Animation::new(Some(&format!("Coupling_{id}_hingeB"))),
 
-            bag_timer: 0.0,
+            bag_timer: -1.0,
             bag_setted: false,
             coupled_state_last: false,
         };
@@ -395,8 +395,13 @@ impl HandCoupler {
         }
 
         // Hide bag
-        if self.key_bag.is_just_pressed() || !self.api_coupler.is_coupled() {
+        if self.key_bag.is_just_pressed() {
             self.bag_vis.make_invisible();
+        }
+
+        if self.api_coupler.is_coupled() && !self.coupled_state_last {
+            self.bag_timer = (gen_f64() * gen_f64()) as f32;
+            self.coupled_state_last = self.api_coupler.is_coupled();
         }
 
         if self.api_coupler.is_coupled() {
@@ -405,22 +410,20 @@ impl HandCoupler {
                 self.bag_setted = true;
             }
 
-            if !self.bag_setted && self.bag_timer >= 0.0 {
-                self.bag_timer -= delta();
-            }
+            if !self.bag_setted {
+                if self.bag_timer >= 0.0 {
+                    self.bag_timer -= delta();
+                }
 
-            // Inform the other car that this car has inserted the bag
-            if (self.bag_timer < 0.0) && !self.bag_setted && !remote_bag_state {
-                self.bag_vis.make_visible();
-                send_bag(true, self.api_coupler.coupler);
+                // Inform the other car that this car has inserted the bag
+                if (self.bag_timer < 0.0) && !self.bag_vis.check() && !remote_bag_state {
+                    self.bag_vis.make_visible();
+                    send_bag(true, self.api_coupler.coupler);
+                }
             }
         } else {
             self.bag_setted = false;
-        }
-
-        if self.api_coupler.is_coupled() && !self.coupled_state_last {
-            self.bag_timer = gen_f64() as f32;
-            self.coupled_state_last = self.api_coupler.is_coupled();
+            self.bag_vis.make_invisible();
         }
     }
 
