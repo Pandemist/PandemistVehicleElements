@@ -461,6 +461,7 @@ message_type!(
 pub struct DiagnosticPantoState {
     /// Current switching state of the pantograph
     pub value: SwitchingState,
+    pub cabin_side: CockpitSide,
 }
 
 message_type!(DiagnosticPantoState, "Pan_Diagnostic", "PantoState", "MMS");
@@ -472,6 +473,7 @@ message_type!(DiagnosticPantoState, "Pan_Diagnostic", "PantoState", "MMS");
 #[derive(Default, Debug)]
 pub struct DiagnosticPantoStateSender {
     value_last: SwitchingState,
+    pub cabin_side: CockpitSide,
 }
 
 impl DiagnosticPantoStateSender {
@@ -493,7 +495,10 @@ impl DiagnosticPantoStateSender {
     pub fn send(&mut self, value: SwitchingState) {
         if value != self.value_last {
             send_message(
-                &(DiagnosticPantoState { value }),
+                &(DiagnosticPantoState {
+                    value,
+                    cabin_side: self.cabin_side,
+                }),
                 [MessageTarget::Broadcast {
                     across_couplings: false,
                     include_self: true,
