@@ -6,34 +6,6 @@
 
 use serde::{Deserialize, Serialize};
 
-/// Specifies which side(s) of a door system to target for operations.
-///
-/// Used to control which door panels should be affected by door operations
-/// in systems with multiple door panels (e.g., left/right sliding doors).
-///
-/// # Examples
-///
-/// ```
-/// use pandemist_vehicle_elements::DoorSideTarget;
-///
-/// let target = DoorSideTarget::Left;
-/// assert_eq!(target, DoorSideTarget::Left);
-/// ```
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DoorSideTarget {
-    /// No specific side targeted (default)
-    #[default]
-    None,
-    /// Target the left door panel
-    Left,
-    /// Target the right door panel
-    Right,
-    /// Target both door panels simultaneously
-    Both,
-}
-
-//------------------------
-
 /// Specifies the step or platform level to target for door operations.
 ///
 /// Used in systems where doors can operate at different height levels,
@@ -46,8 +18,8 @@ pub enum DoorSideTarget {
 ///
 /// let step = DoorStepTarget::Street;
 /// ```
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum DoorStepTarget {
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum DoorStep {
     /// No specific step level targeted (default)
     #[default]
     None,
@@ -194,11 +166,13 @@ impl DoorTarget {
 /// ```
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum DoorState {
-    /// Door is fully closed
-    Closed,
-    /// Door is in an intermediate, unknown, or transitional state (default)
+    /// Door is fully closed  (default)
     #[default]
-    Other,
+    Closed,
+    /// Door is closing
+    Closing,
+    /// Door is opening
+    Opening,
     /// Door is fully open
     Open,
 }

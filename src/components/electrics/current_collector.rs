@@ -6,6 +6,7 @@ use crate::{
         animation::Animation, electrical_supply::ApiThirdRailCollector, light::Light,
         mock_enums::ThirdRailState, simulation_settings::realisitc_electric_supply, sound::Sound,
     },
+    elements::std::timer::Timer,
     management::enums::{
         general_enums::Side, state_enums::SwitchingState, target_enums::SwitchingTarget,
     },
@@ -26,8 +27,8 @@ pub struct ThirdRailCollectorBuilder {
     move_down_speed: f32,
 
     motor_relais: SwitchingState,
-    motor_swiching_timer: f32,
-    spark_timer: f32,
+    motor_swiching_timer: Timer,
+    spark_timer: Timer,
     third_rail_state_last: ThirdRailState,
 
     pos: f32,
@@ -97,13 +98,12 @@ impl ThirdRailCollectorBuilder {
         self
     }
 
-    pub fn init(mut self, applied: bool) -> Self {
-        if applied {
+    pub fn init(mut self, state: bool) -> Self {
+        if state {
             self.state = SwitchingState::On;
             self.pos = 1.0;
             self.anim.set(self.pos);
         }
-
         self
     }
 
@@ -153,8 +153,8 @@ pub struct ThirdRailCollector {
     move_down_speed: f32,
 
     motor_relais: SwitchingState,
-    motor_swiching_timer: f32,
-    spark_timer: f32,
+    motor_swiching_timer: Timer,
+    spark_timer: Timer,
     third_rail_state_last: ThirdRailState,
 
     pos: f32,
@@ -165,7 +165,7 @@ pub struct ThirdRailCollector {
     /// Normalized voltage output (0.0 to 1.0)
     pub voltage_norm: f32,
 
-    state: SwitchingState,
+    pub state: SwitchingState,
 
     api_thirdrailcollector: ApiThirdRailCollector,
 
@@ -192,9 +192,9 @@ impl ThirdRailCollector {
             spark_on_disconnect: false,
             move_up_speed: 1.0,
             move_down_speed: 1.0,
-            motor_relais: SwitchingState::Off,
-            motor_swiching_timer: 0.0,
-            spark_timer: 0.0,
+            motor_relais: SwitchingState::Neutral,
+            motor_swiching_timer: Timer::new(),
+            spark_timer: Timer::new(),
             third_rail_state_last: ThirdRailState::Disconnnected,
             pos: 0.0,
             anim: Animation::new(Some(&animation_name.into())),
@@ -216,24 +216,32 @@ impl ThirdRailCollector {
         // Target auf Motortarget übertragen
         match self.motor_target {
             SwitchingTarget::TurnOn(delay) => {
-                self.motor_swiching_timer += delta();
-                if self.motor_swiching_timer > delay {
+                if self.motor_swiching_timer.idle() {
+                    self.motor_swiching_timer.start(delay);
+                }
+                self.motor_swiching_timer.tick();
+                if self.motor_swiching_timer.finished() {
+                    self.motor_swiching_timer.reset();
                     self.motor_relais = SwitchingState::On;
                 }
             }
             SwitchingTarget::TurnOff(delay) => {
-                self.motor_swiching_timer += delta();
-                if self.motor_swiching_timer > delay {
+                if self.motor_swiching_timer.idle() {
+                    self.motor_swiching_timer.start(delay);
+                }
+                self.motor_swiching_timer.tick();
+                if self.motor_swiching_timer.finished() {
+                    self.motor_swiching_timer.reset();
                     self.motor_relais = SwitchingState::Off;
                 }
             }
             SwitchingTarget::Neutral => {
-                self.motor_swiching_timer = 0.0;
+                self.motor_swiching_timer.reset();
             }
         }
 
         // Target zurücksetzen, wenn keine battery oder keine Sicherung
-        if !battery || !safeguard {
+        if !(battery && safeguard) {
             self.motor_relais = SwitchingState::Neutral;
         }
 
@@ -255,10 +263,10 @@ impl ThirdRailCollector {
         // Motor bewegen
         match self.motor_relais {
             SwitchingState::On => {
-                self.pos = (self.pos + self.move_up_speed * delta()).min(1.0);
+                self.pos = (self.pos + self.move_up_speed.abs() * delta()).min(1.0);
             }
             SwitchingState::Off => {
-                self.pos = (self.pos - self.move_down_speed * delta()).max(0.0);
+                self.pos = (self.pos - self.move_down_speed.abs() * delta()).max(0.0);
             }
             SwitchingState::Neutral => {}
         }
@@ -289,10 +297,10 @@ impl ThirdRailCollector {
             self.snd_anlauf.start();
 
             if self.spark_on_connect && power_usage {
-                self.spark_timer = gen_f32(
+                self.spark_timer.start(gen_f32(
                     (self.spark_time - self.spark_variance)
                         ..=(self.spark_time + self.spark_variance),
-                );
+                ));
             }
         }
 
@@ -304,10 +312,10 @@ impl ThirdRailCollector {
             self.snd_ablauf.start();
 
             if self.spark_on_disconnect && power_usage {
-                self.spark_timer = gen_f32(
+                self.spark_timer.start(gen_f32(
                     (self.spark_time - self.spark_variance)
                         ..=(self.spark_time + self.spark_variance),
-                );
+                ));
             }
         }
         self.third_rail_state_last = self.api_thirdrailcollector.value();
@@ -327,13 +335,13 @@ impl ThirdRailCollector {
         .into();
 
         // Spark setzen
-        if self.spark_timer > 0.0 {
+        if self.spark_timer.running() {
             self.spark.set_brightness(1.0);
         } else {
             self.spark.set_brightness(0.0);
         }
 
-        self.spark_timer = (self.spark_timer - delta()).max(0.0);
+        self.spark_timer.tick();
 
         self.anim.set(self.pos);
     }

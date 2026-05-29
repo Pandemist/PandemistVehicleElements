@@ -41,7 +41,7 @@ use crate::{
 ///
 /// The  bag is a protective cover that can be shown or hidden
 /// depending on whether cars are coupled together.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Bag {
     /// Whether the  bag should be visible
     pub value: bool,
@@ -133,7 +133,7 @@ impl BagReader {
 ///
 /// This is used to coordinate the operational state across all cars,
 /// ensuring proper power distribution and system activation.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct CarActiv {
     /// Whether this car is currently active/powered
     pub value: bool,
@@ -141,13 +141,7 @@ pub struct CarActiv {
 
 message_type!(CarActiv, "Gt6n_Coupler", "CarActiv");
 
-/// Handler for car activation messages across couplings.
-///
-/// Uses OR logic to combine states - if any connected car is active,
-/// the overall state is considered active.
-pub struct CouplerCarActiv;
-
-impl MessageLine<bool> for CouplerCarActiv {
+impl MessageLine for CarActiv {
     /// Evaluates the combined car activation state using OR logic.
     ///
     /// # Arguments
@@ -158,8 +152,10 @@ impl MessageLine<bool> for CouplerCarActiv {
     /// # Returns
     ///
     /// True if either car is active, false only if both are inactive
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &CarActiv, b: &CarActiv) -> CarActiv {
+        CarActiv {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends car activation state to the specified coupling.
@@ -168,9 +164,9 @@ impl MessageLine<bool> for CouplerCarActiv {
     ///
     /// * `value` - Current activation state to transmit
     /// * `side` - Which coupling to send the message through
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: CarActiv, side: Coupling) {
         send_message(
-            &CarActiv { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -187,12 +183,12 @@ impl MessageLine<bool> for CouplerCarActiv {
     /// # Returns
     ///
     /// Some((coupling_side, activation_state)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, CarActiv)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<CarActiv>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("CarActiv: message handle failed");
@@ -210,7 +206,7 @@ impl MessageLine<bool> for CouplerCarActiv {
 ///
 /// The reverser controls the driving direction and its state needs to be
 /// coordinated across the entire train consist.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Reverser {
     /// Current driving direction state
     pub value: DirectionOfDriving,
@@ -224,7 +220,7 @@ message_type!(Reverser, "Gt6n_Coupler", "Reverser");
 /// direction interpretation across the entire train consist.
 pub struct CouplerReverser;
 
-impl MessageLine<DirectionOfDriving> for CouplerReverser {
+impl MessageLine for Reverser {
     /// Evaluates combined reverser state by merging the two states.
     ///
     /// # Arguments
@@ -235,8 +231,10 @@ impl MessageLine<DirectionOfDriving> for CouplerReverser {
     /// # Returns
     ///
     /// Merged driving direction state
-    fn evaluate(&self, a: &DirectionOfDriving, b: &DirectionOfDriving) -> DirectionOfDriving {
-        a.clone().merge(b)
+    fn evaluate(&self, a: &Reverser, b: &Reverser) -> Reverser {
+        Reverser {
+            value: a.value.clone().merge(&b.value),
+        }
     }
 
     /// Sends reverser state to the specified coupling.
@@ -248,14 +246,16 @@ impl MessageLine<DirectionOfDriving> for CouplerReverser {
     ///
     /// * `value` - Current reverser state
     /// * `side` - Which coupling to send through (affects direction interpretation)
-    fn send(&self, value: DirectionOfDriving, side: Coupling) {
+    fn send(&self, value: Reverser, side: Coupling) {
         let value = match side {
-            Coupling::Front => value.flip(),
-            Coupling::Rear => value,
+            Coupling::Front => Reverser {
+                value: value.value.flip(),
+            },
+            Coupling::Rear => Reverser { value: value.value },
         };
 
         send_message(
-            &Reverser { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -275,7 +275,7 @@ impl MessageLine<DirectionOfDriving> for CouplerReverser {
     /// # Returns
     ///
     /// Some((coupling_side, direction_state)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, DirectionOfDriving)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, Reverser)> {
         let mut result = None;
 
         if msg.source().is_front() || msg.source().is_rear() {
@@ -289,8 +289,10 @@ impl MessageLine<DirectionOfDriving> for CouplerReverser {
                 result = Some((
                     side,
                     match side {
-                        Coupling::Front => m.value,
-                        Coupling::Rear => m.value.flip(),
+                        Coupling::Front => m,
+                        Coupling::Rear => Reverser {
+                            value: m.value.flip(),
+                        },
                     },
                 ));
                 Ok(())
@@ -310,7 +312,7 @@ impl MessageLine<DirectionOfDriving> for CouplerReverser {
 ///
 /// Throttle values are additive across the train consist to coordinate
 /// traction effort distribution.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Throttle {
     /// Throttle position value (typically 0.0 to 1.0)
     pub value: f32,
@@ -318,12 +320,7 @@ pub struct Throttle {
 
 message_type!(Throttle, "Gt6n_Coupler", "Throttle");
 
-/// Handler for main throttle messages across couplings.
-///
-/// Uses additive logic to combine throttle inputs from multiple sources.
-pub struct CouplerThrottle;
-
-impl MessageLine<f32> for CouplerThrottle {
+impl MessageLine for Throttle {
     /// Evaluates combined throttle value using addition.
     ///
     /// # Arguments
@@ -334,8 +331,10 @@ impl MessageLine<f32> for CouplerThrottle {
     /// # Returns
     ///
     /// Sum of both throttle values
-    fn evaluate(&self, a: &f32, b: &f32) -> f32 {
-        *a + *b
+    fn evaluate(&self, a: &Throttle, b: &Throttle) -> Throttle {
+        Throttle {
+            value: a.value + b.value,
+        }
     }
 
     /// Sends throttle value to the specified coupling.
@@ -344,9 +343,9 @@ impl MessageLine<f32> for CouplerThrottle {
     ///
     /// * `value` - Current throttle position
     /// * `side` - Which coupling to send through
-    fn send(&self, value: f32, side: Coupling) {
+    fn send(&self, value: Throttle, side: Coupling) {
         send_message(
-            &Throttle { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -363,12 +362,12 @@ impl MessageLine<f32> for CouplerThrottle {
     /// # Returns
     ///
     /// Some((coupling_side, throttle_value)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, f32)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, Throttle)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<Throttle>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("Throttle: message handle failed");
@@ -386,7 +385,7 @@ impl MessageLine<f32> for CouplerThrottle {
 ///
 /// Separate from main throttle to handle dual-console operations where
 /// both front and rear driving positions may be active.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ThrottleRear {
     /// Rear console throttle position value
     pub value: f32,
@@ -394,21 +393,18 @@ pub struct ThrottleRear {
 
 message_type!(ThrottleRear, "Gt6n_Coupler", "ThrottleRear");
 
-/// Handler for rear console throttle messages across couplings.
-///
-/// Functions identically to main throttle but for rear console inputs.
-pub struct CouplerThrottleRear;
-
-impl MessageLine<f32> for CouplerThrottleRear {
+impl MessageLine for ThrottleRear {
     /// Evaluates combined rear throttle value using addition.
-    fn evaluate(&self, a: &f32, b: &f32) -> f32 {
-        *a + *b
+    fn evaluate(&self, a: &ThrottleRear, b: &ThrottleRear) -> ThrottleRear {
+        ThrottleRear {
+            value: a.value + b.value,
+        }
     }
 
     /// Sends rear throttle value to the specified coupling.
-    fn send(&self, value: f32, side: Coupling) {
+    fn send(&self, value: ThrottleRear, side: Coupling) {
         send_message(
-            &ThrottleRear { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -417,12 +413,12 @@ impl MessageLine<f32> for CouplerThrottleRear {
     }
 
     /// Receives and processes rear throttle messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, f32)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, ThrottleRear)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<ThrottleRear>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("ThrottleRear: message handle failed");
@@ -440,7 +436,7 @@ impl MessageLine<f32> for CouplerThrottleRear {
 ///
 /// Rail brakes (electromagnetic track brakes) need to be activated
 /// consistently across the entire train for effective braking.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Railbrake {
     /// Whether rail brake is activated
     pub value: bool,
@@ -448,23 +444,20 @@ pub struct Railbrake {
 
 message_type!(Railbrake, "Gt6n_Coupler", "Railbrake");
 
-/// Handler for rail brake messages across couplings.
-///
-/// Uses OR logic so rail brake activates if any car requests it.
-pub struct CouplerRailbrake;
-
-impl MessageLine<bool> for CouplerRailbrake {
+impl MessageLine for Railbrake {
     /// Evaluates rail brake state using OR logic.
     ///
     /// Rail brake is active if either source requests it.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &Railbrake, b: &Railbrake) -> Railbrake {
+        Railbrake {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends rail brake state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: Railbrake, side: Coupling) {
         send_message(
-            &Railbrake { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -473,12 +466,12 @@ impl MessageLine<bool> for CouplerRailbrake {
     }
 
     /// Receives and processes rail brake messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, Railbrake)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<Railbrake>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("Railbrake: message handle failed");
@@ -496,7 +489,7 @@ impl MessageLine<bool> for CouplerRailbrake {
 ///
 /// Spring brakes are safety brakes that engage when air pressure is lost
 /// or when explicitly activated for parking.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct SpringBrake {
     /// Whether spring brake is engaged
     pub value: bool,
@@ -504,21 +497,18 @@ pub struct SpringBrake {
 
 message_type!(SpringBrake, "Gt6n_Coupler", "SpringBrake");
 
-/// Handler for spring brake messages across couplings.
-///
-/// Uses OR logic for safety - spring brake engages if any car requests it.
-pub struct CouplerSpringBrake;
-
-impl MessageLine<bool> for CouplerSpringBrake {
+impl MessageLine for SpringBrake {
     /// Evaluates spring brake state using OR logic for safety.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &SpringBrake, b: &SpringBrake) -> SpringBrake {
+        SpringBrake {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends spring brake state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: SpringBrake, side: Coupling) {
         send_message(
-            &SpringBrake { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -527,12 +517,12 @@ impl MessageLine<bool> for CouplerSpringBrake {
     }
 
     /// Receives and processes spring brake messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, SpringBrake)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<SpringBrake>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("SpringBrake: message handle failed");
@@ -550,7 +540,7 @@ impl MessageLine<bool> for CouplerSpringBrake {
 ///
 /// Sanding improves wheel adhesion on slippery rails and should be
 /// coordinated across all powered cars in the consist.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Sanding {
     /// Whether sanding system is active
     pub value: bool,
@@ -558,21 +548,18 @@ pub struct Sanding {
 
 message_type!(Sanding, "Gt6n_Coupler", "Sanding");
 
-/// Handler for sanding system messages across couplings.
-///
-/// Uses OR logic so sanding activates if any car requests it.
-pub struct CouplerSanding;
-
-impl MessageLine<bool> for CouplerSanding {
+impl MessageLine for Sanding {
     /// Evaluates sanding state using OR logic.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &Sanding, b: &Sanding) -> Sanding {
+        Sanding {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends sanding activation state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: Sanding, side: Coupling) {
         send_message(
-            &Sanding { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -581,12 +568,12 @@ impl MessageLine<bool> for CouplerSanding {
     }
 
     /// Receives and processes sanding messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, Sanding)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<Sanding>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("Sanding: message handle failed");
@@ -604,7 +591,7 @@ impl MessageLine<bool> for CouplerSanding {
 ///
 /// Emergency brake has highest priority and must be activated immediately
 /// across all cars when triggered by any source.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct EmergencyBrake {
     /// Whether emergency brake is activated
     pub value: bool,
@@ -612,21 +599,18 @@ pub struct EmergencyBrake {
 
 message_type!(EmergencyBrake, "Gt6n_Coupler", "EmergencyBrake");
 
-/// Handler for emergency brake messages across couplings.
-///
-/// Uses OR logic for maximum safety - emergency brake activates if any car triggers it.
-pub struct CouplerEmergencyBrake;
-
-impl MessageLine<bool> for CouplerEmergencyBrake {
+impl MessageLine for EmergencyBrake {
     /// Evaluates emergency brake state using OR logic for safety.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &EmergencyBrake, b: &EmergencyBrake) -> EmergencyBrake {
+        EmergencyBrake {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends emergency brake state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: EmergencyBrake, side: Coupling) {
         send_message(
-            &EmergencyBrake { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -635,12 +619,12 @@ impl MessageLine<bool> for CouplerEmergencyBrake {
     }
 
     /// Receives and processes emergency brake messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, EmergencyBrake)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<EmergencyBrake>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("EmergencyBrake: message handle failed");
@@ -658,7 +642,7 @@ impl MessageLine<bool> for CouplerEmergencyBrake {
 ///
 /// Door control commands need to be synchronized to ensure passenger
 /// safety and operational consistency.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DoorControl {
     /// Target door state (open, close, etc.)
     pub value: DoorTarget,
@@ -666,21 +650,18 @@ pub struct DoorControl {
 
 message_type!(DoorControl, "Gt6n_Coupler", "DoorControl");
 
-/// Handler for door control messages across couplings.
-///
-/// Merges door control commands from multiple sources.
-pub struct CouplerDoorControl;
-
-impl MessageLine<DoorTarget> for CouplerDoorControl {
+impl MessageLine for DoorControl {
     /// Evaluates combined door control state by merging commands.
-    fn evaluate(&self, a: &DoorTarget, b: &DoorTarget) -> DoorTarget {
-        a.clone().merge(b)
+    fn evaluate(&self, a: &DoorControl, b: &DoorControl) -> DoorControl {
+        DoorControl {
+            value: a.value.clone().merge(&b.value),
+        }
     }
 
     /// Sends door control command to the specified coupling.
-    fn send(&self, value: DoorTarget, side: Coupling) {
+    fn send(&self, value: DoorControl, side: Coupling) {
         send_message(
-            &DoorControl { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -689,15 +670,76 @@ impl MessageLine<DoorTarget> for CouplerDoorControl {
     }
 
     /// Receives and processes door control messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, DoorTarget)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, DoorControl)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<DoorControl>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("DoorControl: message handle failed");
+        }
+
+        result
+    }
+}
+
+//===================================================================
+// Door side
+//===================================================================
+
+/// Message for coordinating door side operations across the train consist.
+///
+/// Doorside commands need to be synchronized to ensure passenger
+/// safety and operational consistency.
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct DoorSide {
+    pub left: bool,
+}
+
+message_type!(DoorSide, "Gt6n_Coupler", "DoorSide");
+
+impl MessageLine for DoorSide {
+    /// Evaluates combined door control state by merging commands.
+    fn evaluate(&self, a: &DoorSide, b: &DoorSide) -> DoorSide {
+        DoorSide {
+            left: a.left || b.left,
+        }
+    }
+
+    /// Sends door control command to the specified coupling.
+    fn send(&self, value: DoorSide, side: Coupling) {
+        let value = match side {
+            Coupling::Front => DoorSide { left: !value.left },
+            Coupling::Rear => DoorSide { left: value.left },
+        };
+
+        send_message(
+            &value,
+            [MessageTarget::AcrossCoupling {
+                coupling: side,
+                cascade: false,
+            }],
+        );
+    }
+
+    /// Receives and processes door control messages.
+    fn rcv(&self, msg: Message) -> Option<(Coupling, DoorSide)> {
+        let mut result = None;
+
+        if let Some(side) = msg.source().coupling {
+            msg.handle::<DoorSide>(|m| {
+                result = Some((
+                    side,
+                    match side {
+                        Coupling::Front => m,
+                        Coupling::Rear => DoorSide { left: !m.left },
+                    },
+                ));
+                Ok(())
+            })
+            .expect("DoorSide: message handle failed");
         }
 
         result
@@ -712,7 +754,7 @@ impl MessageLine<DoorTarget> for CouplerDoorControl {
 ///
 /// Used to coordinate power distribution and monitor electrical
 /// system status across the train consist.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct PowerlinePower {
     /// Current power level or voltage
     pub value: f32,
@@ -720,21 +762,18 @@ pub struct PowerlinePower {
 
 message_type!(PowerlinePower, "Gt6n_Coupler", "PowerlinePower");
 
-/// Handler for powerline power messages across couplings.
-///
-/// Uses additive logic to combine power values.
-pub struct CouplerPowerlinePower;
-
-impl MessageLine<f32> for CouplerPowerlinePower {
+impl MessageLine for PowerlinePower {
     /// Evaluates combined power value using addition.
-    fn evaluate(&self, a: &f32, b: &f32) -> f32 {
-        *a + *b
+    fn evaluate(&self, a: &PowerlinePower, b: &PowerlinePower) -> PowerlinePower {
+        PowerlinePower {
+            value: a.value + b.value,
+        }
     }
 
     /// Sends power information to the specified coupling.
-    fn send(&self, value: f32, side: Coupling) {
+    fn send(&self, value: PowerlinePower, side: Coupling) {
         send_message(
-            &PowerlinePower { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -743,12 +782,12 @@ impl MessageLine<f32> for CouplerPowerlinePower {
     }
 
     /// Receives and processes powerline power messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, f32)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, PowerlinePower)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<PowerlinePower>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("PowerlinePower: message handle failed");
@@ -766,7 +805,7 @@ impl MessageLine<f32> for CouplerPowerlinePower {
 ///
 /// Shunting signals indicate when the train is being moved at low speed
 /// for positioning or coupling operations.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ShuntingSignal {
     /// Whether shunting signal is active
     pub value: bool,
@@ -774,21 +813,18 @@ pub struct ShuntingSignal {
 
 message_type!(ShuntingSignal, "Gt6n_Coupler", "ShuntingSignal");
 
-/// Handler for shunting signal messages across couplings.
-///
-/// Uses OR logic so signal activates if any car is in shunting mode.
-pub struct CouplerShuntingSignal;
-
-impl MessageLine<bool> for CouplerShuntingSignal {
+impl MessageLine for ShuntingSignal {
     /// Evaluates shunting signal state using OR logic.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &ShuntingSignal, b: &ShuntingSignal) -> ShuntingSignal {
+        ShuntingSignal {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends shunting signal state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: ShuntingSignal, side: Coupling) {
         send_message(
-            &ShuntingSignal { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -797,12 +833,12 @@ impl MessageLine<bool> for CouplerShuntingSignal {
     }
 
     /// Receives and processes shunting signal messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, ShuntingSignal)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<ShuntingSignal>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("ShuntingSignal: message handle failed");
@@ -820,7 +856,7 @@ impl MessageLine<bool> for CouplerShuntingSignal {
 ///
 /// Interior lights should be synchronized to provide consistent
 /// passenger experience throughout the train.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct InteriorLight {
     /// Whether interior lights are on
     pub value: bool,
@@ -828,21 +864,18 @@ pub struct InteriorLight {
 
 message_type!(InteriorLight, "Gt6n_Coupler", "InteriorLight");
 
-/// Handler for interior light messages across couplings.
-///
-/// Uses OR logic so lights turn on if any car requests them.
-pub struct CouplerInteriorLight;
-
-impl MessageLine<bool> for CouplerInteriorLight {
+impl MessageLine for InteriorLight {
     /// Evaluates interior light state using OR logic.
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &InteriorLight, b: &InteriorLight) -> InteriorLight {
+        InteriorLight {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends interior light state to the specified coupling.
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: InteriorLight, side: Coupling) {
         send_message(
-            &InteriorLight { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -851,12 +884,12 @@ impl MessageLine<bool> for CouplerInteriorLight {
     }
 
     /// Receives and processes interior light messages.
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, InteriorLight)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<InteriorLight>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("InteriorLight: message handle failed");
@@ -945,13 +978,7 @@ impl Indicator {
 
 message_type!(Indicator, "Gt6n_Coupler", "Indicator");
 
-/// Handler for indicator messages across couplings.
-///
-/// Handles directional flipping to maintain correct indicator
-/// interpretation throughout the train consist.
-pub struct CouplerIndicator;
-
-impl MessageLine<Indicator> for CouplerIndicator {
+impl MessageLine for Indicator {
     /// Evaluates combined indicator state by merging both inputs.
     ///
     /// # Arguments
@@ -1037,7 +1064,7 @@ impl MessageLine<Indicator> for CouplerIndicator {
 ///
 /// Critical safety message used to ensure all doors are properly
 /// closed before departure authorization.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DoorsClosed {
     /// Whether all doors on this car are closed
     pub value: bool,
@@ -1045,12 +1072,7 @@ pub struct DoorsClosed {
 
 message_type!(DoorsClosed, "Gt6n_Coupler", "DoorsClosed");
 
-/// Handler for door closure status messages across couplings.
-///
-/// Uses AND logic for safety - all doors must be closed for clearance.
-pub struct CouplerDoorsClosed;
-
-impl MessageLine<bool> for CouplerDoorsClosed {
+impl MessageLine for DoorsClosed {
     /// Evaluates overall door closure state using AND logic.
     ///
     /// Doors are considered closed only if ALL cars report doors closed.
@@ -1063,8 +1085,10 @@ impl MessageLine<bool> for CouplerDoorsClosed {
     /// # Returns
     ///
     /// True only if both cars have all doors closed
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a && *b
+    fn evaluate(&self, a: &DoorsClosed, b: &DoorsClosed) -> DoorsClosed {
+        DoorsClosed {
+            value: a.value && b.value,
+        }
     }
 
     /// Sends door closure status to the specified coupling.
@@ -1073,9 +1097,9 @@ impl MessageLine<bool> for CouplerDoorsClosed {
     ///
     /// * `value` - Current door closure status
     /// * `side` - Which coupling to send through
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: DoorsClosed, side: Coupling) {
         send_message(
-            &DoorsClosed { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -1092,12 +1116,12 @@ impl MessageLine<bool> for CouplerDoorsClosed {
     /// # Returns
     ///
     /// Some((coupling_side, doors_closed_status)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, DoorsClosed)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<DoorsClosed>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("DoorsClosed: message handle failed");
@@ -1115,7 +1139,7 @@ impl MessageLine<bool> for CouplerDoorsClosed {
 ///
 /// Used to coordinate accessibility features and ensure proper
 /// accommodation for passengers with mobility devices.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BuggyReqest {
     /// Whether wheelchair/buggy assistance is requested
     pub value: bool,
@@ -1123,12 +1147,7 @@ pub struct BuggyReqest {
 
 message_type!(BuggyReqest, "Gt6n_Coupler", "KiWaReqest");
 
-/// Handler for wheelchair/buggy request messages across couplings.
-///
-/// Uses OR logic so request is honored if any car reports it.
-pub struct CouplerBuggyReqest;
-
-impl MessageLine<bool> for CouplerBuggyReqest {
+impl MessageLine for BuggyReqest {
     /// Evaluates accessibility request state using OR logic.
     ///
     /// Request is active if any car reports an accessibility need.
@@ -1141,8 +1160,10 @@ impl MessageLine<bool> for CouplerBuggyReqest {
     /// # Returns
     ///
     /// True if either car has an active accessibility request
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &BuggyReqest, b: &BuggyReqest) -> BuggyReqest {
+        BuggyReqest {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends accessibility request status to the specified coupling.
@@ -1151,9 +1172,9 @@ impl MessageLine<bool> for CouplerBuggyReqest {
     ///
     /// * `value` - Current request status
     /// * `side` - Which coupling to send through
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: BuggyReqest, side: Coupling) {
         send_message(
-            &BuggyReqest { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -1170,12 +1191,12 @@ impl MessageLine<bool> for CouplerBuggyReqest {
     /// # Returns
     ///
     /// Some((coupling_side, request_status)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, BuggyReqest)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<BuggyReqest>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("BuggyReqest: message handle failed");
@@ -1193,7 +1214,7 @@ impl MessageLine<bool> for CouplerBuggyReqest {
 ///
 /// Used to clear accessibility requests and reset related systems
 /// after passenger needs have been accommodated.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct BuggyReset {
     /// Whether to reset the accessibility system
     pub value: bool,
@@ -1201,12 +1222,7 @@ pub struct BuggyReset {
 
 message_type!(BuggyReset, "Gt6n_Coupler", "BuggyReset");
 
-/// Handler for accessibility system reset messages across couplings.
-///
-/// Uses OR logic so reset occurs if any car initiates it.
-pub struct CouplerBuggyReset;
-
-impl MessageLine<bool> for CouplerBuggyReset {
+impl MessageLine for BuggyReset {
     /// Evaluates reset command using OR logic.
     ///
     /// Reset occurs if any car sends a reset command.
@@ -1219,8 +1235,10 @@ impl MessageLine<bool> for CouplerBuggyReset {
     /// # Returns
     ///
     /// True if either car requests a reset
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &BuggyReset, b: &BuggyReset) -> BuggyReset {
+        BuggyReset {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends accessibility reset command to the specified coupling.
@@ -1229,9 +1247,9 @@ impl MessageLine<bool> for CouplerBuggyReset {
     ///
     /// * `value` - Whether to perform reset
     /// * `side` - Which coupling to send through
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: BuggyReset, side: Coupling) {
         send_message(
-            &BuggyReset { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -1248,12 +1266,12 @@ impl MessageLine<bool> for CouplerBuggyReset {
     /// # Returns
     ///
     /// Some((coupling_side, reset_command)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, BuggyReset)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<BuggyReset>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("BuggyReset: message handle failed");
@@ -1271,7 +1289,7 @@ impl MessageLine<bool> for CouplerBuggyReset {
 ///
 /// Allows passengers in any car to request a stop at the next station,
 /// with the request being propagated throughout the entire train.
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct StopRequest {
     /// Whether a passenger has requested a stop
     pub value: bool,
@@ -1279,12 +1297,7 @@ pub struct StopRequest {
 
 message_type!(StopRequest, "Gt6n_Coupler", "StopRequest");
 
-/// Handler for passenger stop request messages across couplings.
-///
-/// Uses OR logic so stop request is active if any passenger requests it.
-pub struct CouplerStopRequest;
-
-impl MessageLine<bool> for CouplerStopRequest {
+impl MessageLine for StopRequest {
     /// Evaluates stop request state using OR logic.
     ///
     /// Stop is requested if any passenger in any car has requested it.
@@ -1297,8 +1310,10 @@ impl MessageLine<bool> for CouplerStopRequest {
     /// # Returns
     ///
     /// True if either car has an active stop request
-    fn evaluate(&self, a: &bool, b: &bool) -> bool {
-        *a || *b
+    fn evaluate(&self, a: &StopRequest, b: &StopRequest) -> StopRequest {
+        StopRequest {
+            value: a.value || b.value,
+        }
     }
 
     /// Sends stop request status to the specified coupling.
@@ -1307,9 +1322,9 @@ impl MessageLine<bool> for CouplerStopRequest {
     ///
     /// * `value` - Current stop request status
     /// * `side` - Which coupling to send through
-    fn send(&self, value: bool, side: Coupling) {
+    fn send(&self, value: StopRequest, side: Coupling) {
         send_message(
-            &StopRequest { value },
+            &value,
             [MessageTarget::AcrossCoupling {
                 coupling: side,
                 cascade: false,
@@ -1326,12 +1341,12 @@ impl MessageLine<bool> for CouplerStopRequest {
     /// # Returns
     ///
     /// Some((coupling_side, stop_request_status)) if message was relevant, None otherwise
-    fn rcv(&self, msg: Message) -> Option<(Coupling, bool)> {
+    fn rcv(&self, msg: Message) -> Option<(Coupling, StopRequest)> {
         let mut result = None;
 
         if let Some(side) = msg.source().coupling {
             msg.handle::<StopRequest>(|m| {
-                result = Some((side, m.value));
+                result = Some((side, m));
                 Ok(())
             })
             .expect("StopRequest: message handle failed");

@@ -4,6 +4,7 @@
 //! - [`Scroller`]: Linear interpolation-based scrolling with constant speed
 //! - [`Pointer`]: Physics-based movement with force and friction simulation
 
+use lotus_extra::math::PiecewiseLinearFunction;
 use lotus_script::time::delta;
 
 use crate::api::animation::Animation;
@@ -118,7 +119,7 @@ impl Scroller {
 #[derive(Debug)]
 pub struct Pointer {
     /// Current position of the pointer
-    pos: f32,
+    pub pos: f32,
 
     /// Force constant - how strongly the pointer is attracted to the target
     force: f32,
@@ -129,6 +130,8 @@ pub struct Pointer {
     speed: f32,
     /// Current acceleration
     acc: f32,
+
+    path: Option<PiecewiseLinearFunction>,
 
     /// Animation object for external animation system integration
     pos_anim: Animation,
@@ -162,13 +165,19 @@ impl Pointer {
     /// // Smooth, flowing movement
     /// let camera = Pointer::new(3.0, 0.8, "camera_follow");
     /// ```
-    pub fn new(force: f32, friction: f32, anim_name: impl Into<String>) -> Self {
+    pub fn new(
+        force: f32,
+        friction: f32,
+        anim_name: impl Into<String>,
+        path: Option<PiecewiseLinearFunction>,
+    ) -> Self {
         Self {
             pos: 0.0,
             force,
             friction,
             speed: 0.0,
             acc: 0.0,
+            path,
             pos_anim: Animation::new(Some(&anim_name.into())),
         }
     }
@@ -197,6 +206,11 @@ impl Pointer {
         self.speed += self.acc * delta();
         self.pos += self.speed * delta();
 
-        self.pos_anim.set(self.pos);
+        let new_pos = if let Some(ref mut path) = self.path {
+            path.get_value_or_default(self.pos)
+        } else {
+            self.pos
+        };
+        self.pos_anim.set(new_pos);
     }
 }

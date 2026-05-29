@@ -175,7 +175,7 @@ pub struct StagedThrottleLever {
 impl StagedThrottleLever {
     pub fn builder(
         anim_name: impl Into<String>,
-        cab_side: CockpitSide,
+        cab_side: Option<CockpitSide>,
     ) -> StagedThrottleLeverBuilder {
         StagedThrottleLeverBuilder {
             max_snappoint: 0,
@@ -199,10 +199,10 @@ impl StagedThrottleLever {
             pos_anim: Animation::new(Some(&anim_name.into())),
             snd_alt_snappoint: HashMap::new(),
             snd_snappoint_default: Sound::new_simple(None),
-            key_throttle: KeyEvent::new(Some("Throttle"), Some(cab_side)),
-            key_neutral: KeyEvent::new(Some("Neutral"), Some(cab_side)),
-            key_brake: KeyEvent::new(Some("Brake"), Some(cab_side)),
-            key_max_brake: KeyEvent::new(Some("MaxBrake"), Some(cab_side)),
+            key_throttle: KeyEvent::new(Some("Throttle"), cab_side),
+            key_neutral: KeyEvent::new(Some("Neutral"), cab_side),
+            key_brake: KeyEvent::new(Some("Brake"), cab_side),
+            key_max_brake: KeyEvent::new(Some("MaxBrake"), cab_side),
         }
     }
 

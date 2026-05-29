@@ -141,7 +141,7 @@ pub struct ContinuousThrottleLever {
 impl ContinuousThrottleLever {
     pub fn builder(
         anim_name: impl Into<String>,
-        cab_side: CockpitSide,
+        cab_side: Option<CockpitSide>,
     ) -> ContinuousThrottleLeverBuilder {
         ContinuousThrottleLeverBuilder {
             speed: 0.0,
@@ -164,10 +164,10 @@ impl ContinuousThrottleLever {
             snd_notch_end: Sound::new_simple(None),
             snd_notch_other: Sound::new_simple(None),
 
-            key_throttle: KeyEvent::new(Some("Throttle"), Some(cab_side)),
-            key_neutral: KeyEvent::new(Some("Neutral"), Some(cab_side)),
-            key_brake: KeyEvent::new(Some("Brake"), Some(cab_side)),
-            key_max_brake: KeyEvent::new(Some("MaxBrake"), Some(cab_side)),
+            key_throttle: KeyEvent::new(Some("Throttle"), cab_side),
+            key_neutral: KeyEvent::new(Some("Neutral"), cab_side),
+            key_brake: KeyEvent::new(Some("Brake"), cab_side),
+            key_max_brake: KeyEvent::new(Some("MaxBrake"), cab_side),
         }
     }
 

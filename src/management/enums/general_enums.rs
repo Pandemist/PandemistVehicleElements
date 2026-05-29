@@ -1,5 +1,7 @@
 use std::fmt;
 
+use serde::{Deserialize, Serialize};
+
 /// Represents the side of a vehicle or object.
 ///
 /// This enum is commonly used to distinguish between left and right sides
@@ -16,7 +18,7 @@ use std::fmt;
 /// println!("{}", left_side);  // Prints "L"
 /// println!("{}", right_side); // Prints "R"
 /// ```
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum Side {
     /// The left side
     Left,
@@ -54,7 +56,9 @@ impl fmt::Display for Side {
 ///     _ => println!("Other wiper mode"),
 /// }
 /// ```
-#[derive(Debug, Default, Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    Debug, Default, Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize,
+)]
 pub enum WiperTarget {
     /// Wipers are turned off (default state)
     #[default]

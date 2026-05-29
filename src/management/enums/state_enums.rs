@@ -45,7 +45,7 @@ impl SwitchingState {
     pub fn or(self, other: SwitchingState) -> Self {
         match (self, other) {
             (SwitchingState::Off, SwitchingState::Off) => SwitchingState::Off,
-            (SwitchingState::Off, SwitchingState::Neutral) => SwitchingState::Neutral,
+            (SwitchingState::Off, SwitchingState::Neutral) => SwitchingState::Off,
             (SwitchingState::Off, SwitchingState::On) => SwitchingState::Neutral,
             (SwitchingState::Neutral, SwitchingState::Off) => SwitchingState::Off,
             (SwitchingState::Neutral, SwitchingState::Neutral) => SwitchingState::Neutral,

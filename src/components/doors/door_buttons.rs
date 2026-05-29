@@ -1,12 +1,14 @@
 use lotus_extra::vehicle::CockpitSide;
-use lotus_script::time::delta;
 
-use crate::api::{
-    animation::Animation,
-    key_event::KeyEvent,
-    light::Light,
-    variable::{get_var, set_var},
-    visible_flag::Visiblility,
+use crate::{
+    api::{
+        animation::Animation,
+        key_event::KeyEvent,
+        light::Light,
+        variable::{get_var, set_var},
+        visible_flag::Visiblility,
+    },
+    elements::std::timer::Timer,
 };
 
 const KOMBIBTN_PRESS_TIME: f32 = 0.5;
@@ -327,7 +329,7 @@ impl LightedOutPushBtn {
 pub struct RedGreenOutBtn {
     value: bool,
     pressed: bool,
-    push_timer: f32,
+    push_timer: Timer,
 
     key_toggle: KeyEvent,
 
@@ -348,7 +350,7 @@ impl RedGreenOutBtn {
         Self {
             value: false,
             pressed: false,
-            push_timer: 0.0,
+            push_timer: Timer::new(),
             key_toggle: KeyEvent::new(Some(event_toggle_name), cab_side),
             green_vis: Visiblility::new(green_vis_name),
             red_vis: Visiblility::new(red_vis_name),
@@ -361,12 +363,12 @@ impl RedGreenOutBtn {
 
         self.green_vis.set_visbility(green_light);
         self.red_vis
-            .set_visbility(red_light || (self.push_timer > 0.0));
+            .set_visbility(red_light || (self.push_timer.running()));
 
         if self.key_toggle.is_pressed() {
-            self.push_timer = KOMBIBTN_PRESS_TIME;
+            self.push_timer.start(KOMBIBTN_PRESS_TIME);
         } else {
-            self.push_timer = (self.push_timer - delta()).max(0.0);
+            self.push_timer.tick();
         }
 
         for ai_door in &self.ai_door_btns {
@@ -383,7 +385,7 @@ impl RedGreenOutBtn {
 
 pub struct RedGreenBtn {
     value: bool,
-    push_timer: f32,
+    push_timer: Timer,
 
     key: KeyEvent,
 
@@ -400,7 +402,7 @@ impl RedGreenBtn {
     ) -> Self {
         Self {
             value: false,
-            push_timer: 0.0,
+            push_timer: Timer::new(),
             key: KeyEvent::new(Some(event_name), cab_side),
             green_vis: Visiblility::new(green_vis_name),
             red_vis: Visiblility::new(red_vis_name),
@@ -410,13 +412,13 @@ impl RedGreenBtn {
     pub fn tick(&mut self, green_light: bool, red_light: bool) {
         self.green_vis.set_visbility(green_light);
         self.red_vis
-            .set_visbility(red_light || (self.push_timer > 0.0));
+            .set_visbility(red_light || (self.push_timer.running()));
 
         if self.key.is_pressed() {
-            self.push_timer = KOMBIBTN_PRESS_TIME;
+            self.push_timer.start(KOMBIBTN_PRESS_TIME);
             self.value = true;
         } else {
-            self.push_timer = (self.push_timer - delta()).max(0.0);
+            self.push_timer.tick();
         }
 
         if self.key.is_released() {
@@ -434,7 +436,7 @@ impl RedGreenBtn {
 pub struct RedGreenDuoBtn {
     buggy: bool,
     wheelchair: bool,
-    push_timer: f32,
+    push_timer: Timer,
 
     key_buggy: KeyEvent,
     key_wheelchair: KeyEvent,
@@ -454,7 +456,7 @@ impl RedGreenDuoBtn {
         Self {
             buggy: false,
             wheelchair: false,
-            push_timer: 0.0,
+            push_timer: Timer::new(),
             key_buggy: KeyEvent::new(Some(event_buggy_name), cab_side),
             key_wheelchair: KeyEvent::new(Some(event_wheelchair_name), cab_side),
             green_vis: Visiblility::new(green_vis_name),
@@ -465,16 +467,16 @@ impl RedGreenDuoBtn {
     pub fn tick(&mut self, green_light: bool, red_light: bool) {
         self.green_vis.set_visbility(green_light);
         self.red_vis
-            .set_visbility(red_light || (self.push_timer > 0.0));
+            .set_visbility(red_light || (self.push_timer.running()));
 
         if self.key_buggy.is_pressed() {
-            self.push_timer = KOMBIBTN_PRESS_TIME;
+            self.push_timer.start(KOMBIBTN_PRESS_TIME);
             self.buggy = true;
         } else if self.key_wheelchair.is_pressed() {
-            self.push_timer = KOMBIBTN_PRESS_TIME;
+            self.push_timer.start(KOMBIBTN_PRESS_TIME);
             self.wheelchair = true;
         } else {
-            self.push_timer = (self.push_timer - delta()).max(0.0);
+            self.push_timer.tick();
         }
 
         if self.key_buggy.is_released() {

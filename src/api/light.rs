@@ -33,6 +33,9 @@ impl Light {
     /// let unnamed_light = Light::new(None);
     /// ```
     pub fn new(name: Option<&str>) -> Self {
+        if let Some(light) = name {
+            set_var(light, 0.0);
+        }
         Light {
             name: name.map(|s| s.into()),
         }

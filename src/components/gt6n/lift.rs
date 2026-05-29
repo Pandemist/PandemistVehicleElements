@@ -1,10 +1,13 @@
 use lotus_extra::{math::PiecewiseLinearFunction, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
-use crate::api::{
-    animation::{Animation, MappedAnimation},
-    light::{BlinkRelais, Light},
-    sound::{Sound, SoundTarget},
+use crate::{
+    api::{
+        animation::{Animation, MappedAnimation},
+        light::{BlinkRelais, Light},
+        sound::{Sound, SoundTarget},
+    },
+    elements::std::timer::Timer,
 };
 
 const LIFT_HIGHT_SO: f32 = 1.0;
@@ -19,6 +22,7 @@ const LIFT_DOORWARN_INTERVAL_HALF: f32 = LIFT_DOORWARN_INTERVAL / 2.0;
 #[derive(Debug)]
 #[expect(clippy::struct_excessive_bools)]
 pub struct Hublift {
+    cab_side: CockpitSide,
     height_pos: f32,
     height_anim: Animation,
     ramp_pos: f32,
@@ -28,7 +32,7 @@ pub struct Hublift {
     rampflap_anim: MappedAnimation,
     ramptransition_anim: MappedAnimation,
 
-    paus_timer: f32,
+    paus_timer: Timer,
 
     locking: f32,
 
@@ -60,6 +64,8 @@ impl Hublift {
     #[must_use]
     pub fn new(cab_side: CockpitSide) -> Self {
         Self {
+            cab_side,
+
             height_pos: 0.0,
             height_anim: Animation::new(Some(&format!(
                 "AV_{}_Hublift_Hight_Pos",
@@ -122,7 +128,7 @@ impl Hublift {
                 ])),
             ),
 
-            paus_timer: 0.0,
+            paus_timer: Timer::new(),
             locking: 0.0,
             fuse_control: false,
             fuse_power: false,
@@ -222,17 +228,35 @@ impl Hublift {
                 target = 0;
             }
 
-            /*set_var("AA_Lift_Target", target);
-            set_var("AA_Lift_Level", target_level);
-            set_var("AA_Lift_Pause", self.paus_timer);
-            set_var("AA_Lift_InUse", self.in_use);
-            set_var("AA_Lift_Arretierung", self.locking);
-            set_var("AA_Lift_Vorbereitet", self.prepared);*/
+            /*set_var(
+                &format!("AA_{}_Lift_Target", String::from(self.cab_side)),
+                target,
+            );
+            set_var(
+                &format!("AA_{}_Lift_Level", String::from(self.cab_side)),
+                target_level,
+            );
+            set_var(
+                &format!("AA_{}_Lift_Pause", String::from(self.cab_side)),
+                self.paus_timer.time,
+            );
+            set_var(
+                &format!("AA_{}_Lift_InUse", String::from(self.cab_side)),
+                self.in_use,
+            );
+            set_var(
+                &format!("AA_{}_Lift_Arretierung", String::from(self.cab_side)),
+                self.locking,
+            );
+            set_var(
+                &format!("AA_{}_Lift_Vorbereitet", String::from(self.cab_side)),
+                self.prepared,
+            );*/
 
-            self.paus_timer = (self.paus_timer * delta()).max(0.0);
+            self.paus_timer.tick();
 
             // Pause timer <= 0
-            if self.paus_timer <= 0.0 {
+            if !self.paus_timer.running() {
                 // Lowering
                 if target < 0 && target_level > 1 {
                     self.locking = (self.locking + delta()).min(LOCKING_CHANGE_TIME);
@@ -314,7 +338,7 @@ impl Hublift {
 
                         // Short pause when the ramp has reached the end position
                         if self.ramp_pos <= 0.0 && ramp_pos_last > 0.0 {
-                            self.paus_timer = 0.5;
+                            self.paus_timer.start(0.5);
                         }
 
                         // Lock the lock again

@@ -594,5 +594,6 @@ impl SoundWithStartAndEnd {
 
             self.trigger_last = trigger;
         }
+        self.snd.start_stop(trigger);
     }
 }

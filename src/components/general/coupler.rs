@@ -12,7 +12,10 @@ use crate::{
         animation::Animation, coupler::ApiCoupler, general::mouse_move, key_event::KeyEvent,
         mock_enums::CouplingState, visible_flag::Visiblility,
     },
-    elements::tech::{buttons::PushButton, switches::Switch},
+    elements::{
+        std::timer::Timer,
+        tech::{buttons::PushButton, switches::Switch},
+    },
     messages::gt6n_coupling_messages::send_bag,
 };
 
@@ -182,7 +185,7 @@ pub struct HandCoupler {
     coupler_b_anim: Animation,
 
     /// Timer for automatic bag insertion
-    bag_timer: f32,
+    bag_timer: Timer,
     /// Flag indicating if bag has been manually set
     bag_setted: bool,
     /// Previous coupling state for change detection
@@ -252,7 +255,7 @@ impl HandCoupler {
             coupler_a_anim: Animation::new(Some(&format!("Coupling_{id}_hingeA"))),
             coupler_b_anim: Animation::new(Some(&format!("Coupling_{id}_hingeB"))),
 
-            bag_timer: -1.0,
+            bag_timer: Timer::new(),
             bag_setted: false,
             coupled_state_last: false,
         };
@@ -400,7 +403,7 @@ impl HandCoupler {
         }
 
         if self.api_coupler.is_coupled() && !self.coupled_state_last {
-            self.bag_timer = (gen_f64() * gen_f64()) as f32;
+            self.bag_timer.start((gen_f64() * gen_f64()) as f32);
             self.coupled_state_last = self.api_coupler.is_coupled();
         }
 
@@ -411,12 +414,10 @@ impl HandCoupler {
             }
 
             if !self.bag_setted {
-                if self.bag_timer >= 0.0 {
-                    self.bag_timer -= delta();
-                }
+                self.bag_timer.tick();
 
                 // Inform the other car that this car has inserted the bag
-                if (self.bag_timer < 0.0) && !self.bag_vis.check() && !remote_bag_state {
+                if (self.bag_timer.finished()) && !self.bag_vis.check() && !remote_bag_state {
                     self.bag_vis.make_visible();
                     send_bag(true, self.api_coupler.coupler);
                 }

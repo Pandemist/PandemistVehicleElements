@@ -35,7 +35,7 @@ use crate::{
         animation::Animation, electrical_supply::ApiPantograph,
         simulation_settings::realisitc_electric_supply, sound::Sound, visible_flag::Visiblility,
     },
-    elements::tech::slider::Slider,
+    elements::{std::timer::Timer, tech::slider::Slider},
     management::enums::{state_enums::SwitchingState, target_enums::SwitchingTarget},
 };
 
@@ -64,7 +64,7 @@ pub struct ElectricPantographBuilder {
 
     sub_animations: Vec<(Animation, PiecewiseLinearFunction)>,
 
-    motor_swiching_timer: f32,
+    motor_swiching_timer: Timer,
     current_wire_height: f32,
     current_wire_max_anim: f32,
 
@@ -180,13 +180,15 @@ impl ElectricPantographBuilder {
     ///
     /// * `init` - Whether to initialize in raised position
     pub fn init(mut self, init: bool) -> Self {
-        self.motor_pos = 1.0;
-        self.state = SwitchingState::On;
+        if init {
+            self.motor_pos = 1.0;
+            self.state = SwitchingState::On;
 
-        self.animation.set(self.motor_pos);
-        for sub_anim in &mut self.sub_animations {
-            let sub_pos = sub_anim.1.get_value_or_default(self.motor_pos);
-            sub_anim.0.set(sub_pos);
+            self.animation.set(self.motor_pos);
+            for sub_anim in &mut self.sub_animations {
+                let sub_pos = sub_anim.1.get_value_or_default(self.motor_pos);
+                sub_anim.0.set(sub_pos);
+            }
         }
 
         self
@@ -251,7 +253,7 @@ pub struct ElectricPantograph {
     height_curve: PiecewiseLinearFunction,
     sub_animations: Vec<(Animation, PiecewiseLinearFunction)>,
 
-    motor_swiching_timer: f32,
+    motor_swiching_timer: Timer,
     current_wire_height: f32,
     current_wire_max_anim: f32,
 
@@ -315,7 +317,7 @@ impl ElectricPantograph {
             snd_down: Sound::new_simple(None),
             motor_target: SwitchingTarget::Neutral,
             motor_relais: SwitchingState::Neutral,
-            motor_swiching_timer: 0.0,
+            motor_swiching_timer: Timer::new(),
             current_wire_max_anim: 0.0,
             motor_pos: 0.0,
             panto_pos: 0.0,
@@ -375,19 +377,27 @@ impl ElectricPantograph {
 
         match self.motor_target {
             SwitchingTarget::TurnOn(delay) => {
-                self.motor_swiching_timer += delta();
-                if self.motor_swiching_timer > delay {
+                if self.motor_swiching_timer.idle() {
+                    self.motor_swiching_timer.start(delay);
+                }
+                self.motor_swiching_timer.tick();
+                if self.motor_swiching_timer.finished() {
+                    self.motor_swiching_timer.reset();
                     self.motor_relais = SwitchingState::On;
                 }
             }
             SwitchingTarget::TurnOff(delay) => {
-                self.motor_swiching_timer += delta();
-                if self.motor_swiching_timer > delay {
+                if self.motor_swiching_timer.idle() {
+                    self.motor_swiching_timer.start(delay);
+                }
+                self.motor_swiching_timer.tick();
+                if self.motor_swiching_timer.finished() {
+                    self.motor_swiching_timer.reset();
                     self.motor_relais = SwitchingState::Off;
                 }
             }
             SwitchingTarget::Neutral => {
-                self.motor_swiching_timer = 0.0;
+                self.motor_swiching_timer.reset();
             }
         }
 

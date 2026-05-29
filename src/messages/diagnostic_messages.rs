@@ -299,7 +299,7 @@ message_type!(DiagnosticMessage, "Pan_Diagnostic", "Diagnostic", "MMS");
 /// ```
 #[derive(Default, Debug)]
 pub struct DiagnosticMessageSender {
-    value_last: HashMap<DiagnosticFaultKind, bool>,
+    value_last: HashMap<(DiagnosticFaultKind, Option<CockpitSide>), bool>,
 }
 
 impl DiagnosticMessageSender {
@@ -335,7 +335,7 @@ impl DiagnosticMessageSender {
     /// sender.send(DiagnosticFaultKind::BlinkerAusfall, true, None);
     /// ```
     pub fn send(&mut self, kind: DiagnosticFaultKind, state: bool, cabin: Option<CockpitSide>) {
-        let last_value = self.value_last.get(&kind).unwrap_or(&false);
+        let last_value = self.value_last.get(&(kind, cabin)).unwrap_or(&false);
         if state != *last_value {
             send_message(
                 &(DiagnosticMessage {
@@ -349,7 +349,7 @@ impl DiagnosticMessageSender {
                     include_self: true,
                 }],
             );
-            self.value_last.insert(kind, state);
+            self.value_last.insert((kind, cabin), state);
         }
     }
 }

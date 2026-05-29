@@ -43,7 +43,11 @@ pub struct PushButtonBuilder {
     time: Option<f32>,
     timer: f32,
 
+    inject_press: bool,
+    inject_press_last: bool,
+
     key_press: KeyEvent,
+    key_press2: KeyEvent,
     key_release: KeyEvent,
     key_toggle: KeyEvent,
 
@@ -51,12 +55,19 @@ pub struct PushButtonBuilder {
     rot_anim: Animation,
 
     snd_press: Sound,
+    snd_press_2: Sound,
     snd_release: Sound,
+    snd_release_2: Sound,
 
     mode: PushButtonMode,
 }
 
 impl PushButtonBuilder {
+    pub fn add_sec_press_key(mut self, event_name: &str) -> Self {
+        self.key_press2 = KeyEvent::new(Some(event_name), self.cab_side);
+        self
+    }
+
     /// Initialize the button in a pressed state
     ///
     /// This method sets the initial position and value based on the button's mode.
@@ -97,6 +108,11 @@ impl PushButtonBuilder {
         self
     }
 
+    pub fn snd_press_2(mut self, name: impl Into<String>) -> Self {
+        self.snd_press_2 = Sound::new_simple(Some(&name.into()));
+        self
+    }
+
     /// Set the sound effect for button release events
     ///
     /// # Arguments
@@ -108,6 +124,11 @@ impl PushButtonBuilder {
     /// Returns the builder instance for method chaining.
     pub fn snd_release(mut self, name: impl Into<String>) -> Self {
         self.snd_release = Sound::new_simple(Some(&name.into()));
+        self
+    }
+
+    pub fn snd_release_2(mut self, name: impl Into<String>) -> Self {
+        self.snd_release_2 = Sound::new_simple(Some(&name.into()));
         self
     }
 
@@ -128,13 +149,18 @@ impl PushButtonBuilder {
             target: self.target,
             time: self.time,
             timer: self.timer,
+            inject_press: self.inject_press,
+            inject_press_last: self.inject_press_last,
             key_press: self.key_press,
+            key_press2: self.key_press2,
             key_release: self.key_release,
             key_toggle: self.key_toggle,
             btn_anim: self.btn_anim,
             rot_anim: self.rot_anim,
             snd_press: self.snd_press,
+            snd_press_2: self.snd_press_2,
             snd_release: self.snd_release,
+            snd_release_2: self.snd_release_2,
             mode: self.mode,
         }
     }
@@ -175,8 +201,12 @@ pub struct PushButton {
     time: Option<f32>,
     timer: f32,
 
+    pub inject_press: bool,
+    inject_press_last: bool,
+
     /// Key event for button press actions
     pub key_press: KeyEvent,
+    pub key_press2: KeyEvent,
     /// Key event for button release actions
     pub key_release: KeyEvent,
     /// Key event for button toggle actions
@@ -186,7 +216,9 @@ pub struct PushButton {
     rot_anim: Animation,
 
     snd_press: Sound,
+    snd_press_2: Sound,
     snd_release: Sound,
+    snd_release_2: Sound,
 
     mode: PushButtonMode,
 }
@@ -363,13 +395,18 @@ impl PushButton {
             target: false,
             time: None,
             timer: 0.0,
+            inject_press: false,
+            inject_press_last: false,
             key_press: KeyEvent::new(event_name, cab_side),
+            key_press2: KeyEvent::new(None, cab_side),
             key_release: KeyEvent::new(None, cab_side),
             key_toggle: KeyEvent::new(None, cab_side),
             btn_anim: Animation::new(Some(&animation_name.into())),
             rot_anim: Animation::new(None),
             snd_press: Sound::new_simple(None),
+            snd_press_2: Sound::new_simple(None),
             snd_release: Sound::new_simple(None),
+            snd_release_2: Sound::new_simple(None),
 
             mode: PushButtonMode::Regular,
         }
@@ -427,6 +464,18 @@ impl PushButton {
         }
     }
 
+    /// Manually unset the button to pressed state
+    ///
+    /// This method programmatically deactivates the button, setting its position and value
+    /// according to its current mode. Only works for `PushHold` mode.
+    pub fn unset(&mut self) {
+        if self.mode == PushButtonMode::PushHold {
+            self.pos = 0.0;
+            self.value = false;
+            self.btn_anim.set(self.pos);
+        }
+    }
+
     /// Update the button state for the current frame
     ///
     /// This method should be called once per frame to update the button's state,
@@ -435,7 +484,10 @@ impl PushButton {
     pub fn tick(&mut self) {
         self.value_last = self.value;
 
-        if self.key_press.is_just_pressed() {
+        if self.key_press.is_just_pressed()
+            || self.key_press2.is_just_pressed()
+            || (self.inject_press && !self.inject_press_last)
+        {
             match self.mode {
                 PushButtonMode::Regular | PushButtonMode::HoldTimed(_) => {
                     self.pos = 1.0;
@@ -445,7 +497,11 @@ impl PushButton {
                 PushButtonMode::PushHold | PushButtonMode::ToggleValueOnlyPress => {
                     self.pos = 1.0;
                     self.value = !self.value;
-                    self.snd_press.start();
+                    if self.value {
+                        self.snd_press.start();
+                    } else {
+                        self.snd_press_2.start();
+                    }
                 }
                 PushButtonMode::RotateReset => {
                     if !self.target {
@@ -458,14 +514,17 @@ impl PushButton {
         }
 
         if matches!(self.mode, PushButtonMode::HoldTimed(_)) {
-            if self.key_press.is_pressed() {
+            if self.key_press.is_pressed() || self.key_press2.is_pressed() || self.inject_press {
                 self.timer += delta();
             } else {
                 self.timer = 0.0;
             }
         }
 
-        if self.key_press.is_just_released() {
+        if self.key_press.is_just_released()
+            || self.key_press2.is_just_released()
+            || (!self.inject_press && self.inject_press_last)
+        {
             match self.mode {
                 PushButtonMode::Regular => {
                     self.pos = 0.0;
@@ -478,7 +537,11 @@ impl PushButton {
                 }
                 PushButtonMode::PushHold => {
                     self.pos = if self.value { 0.75 } else { 0.0 };
-                    self.snd_release.start();
+                    if self.value {
+                        self.snd_release_2.start();
+                    } else {
+                        self.snd_release.start();
+                    }
                 }
                 PushButtonMode::HoldTimed(t) => {
                     if self.timer > t {
@@ -531,6 +594,7 @@ impl PushButton {
             self.btn_anim.set(self.pos);
             self.rot_anim.set(self.rot);
         }
+        self.inject_press_last = self.inject_press;
     }
 
     /// Get the button's value with additional permission check

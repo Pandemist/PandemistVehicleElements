@@ -9,6 +9,229 @@ use serde::{Deserialize, Serialize};
 /// # Examples
 ///
 /// ```
+/// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+///
+/// // Create a turn-on target
+/// let target = SimpleSwitchingTarget::TurnOn;
+///
+/// // Create from boolean
+/// let target = SimpleSwitchingTarget::from(true);
+///
+/// // Create from integer with data
+/// let target = SimpleSwitchingTarget::new(1);
+/// ```
+#[derive(Default, Debug, Serialize, Deserialize, Copy, Clone, PartialEq)]
+pub enum SimpleSwitchingTarget {
+    /// Turn on the electrical system with the specified intensity/parameter value.
+    TurnOn,
+
+    /// Turn off the electrical system with the specified parameter value.
+    TurnOff,
+
+    /// Neutral state - no action should be taken.
+    #[default]
+    Neutral,
+}
+
+impl SimpleSwitchingTarget {
+    /// Creates a new `SimpleSwitchingTarget` from an integer value and associated data.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - The switching command: -1 for TurnOff, 1 for TurnOn, any other value for Neutral
+    /// * `data` - The associated floating-point parameter value
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+    ///
+    /// let turn_on = SimpleSwitchingTarget::new(1);
+    /// let turn_off = SimpleSwitchingTarget::new(-1);
+    /// let neutral = SimpleSwitchingTarget::new(0);
+    /// ```
+    pub fn new(val: i32) -> Self {
+        match val {
+            -1 => SimpleSwitchingTarget::TurnOff,
+            1 => SimpleSwitchingTarget::TurnOn,
+            _ => SimpleSwitchingTarget::Neutral,
+        }
+    }
+
+    /// Creates a new `SimpleSwitchingTarget` from a boolean value and associated data.
+    ///
+    /// # Arguments
+    ///
+    /// * `val` - `true` for TurnOn, `false` for TurnOff
+    /// * `data` - The associated floating-point parameter value
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+    ///
+    /// let turn_on = SimpleSwitchingTarget::new_bool(true);
+    /// let turn_off = SimpleSwitchingTarget::new_bool(false);
+    /// ```
+    pub fn new_bool(val: bool) -> Self {
+        match val {
+            false => SimpleSwitchingTarget::TurnOff,
+            true => SimpleSwitchingTarget::TurnOn,
+        }
+    }
+
+    /// Conditionally returns this target or neutral based on a flag.
+    ///
+    /// This method is useful for conditional switching logic where the target
+    /// should only be applied when certain conditions are met.
+    ///
+    /// # Arguments
+    ///
+    /// * `flag` - If `true`, returns `self`; if `false`, returns `Neutral`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+    ///
+    /// let target = SimpleSwitchingTarget::TurnOn;
+    /// let conditional = target.and(true);  // Returns TurnOn
+    /// let disabled = target.and(false);    // Returns Neutral
+    /// ```
+    pub fn and(self, flag: bool) -> Self {
+        if flag {
+            self
+        } else {
+            Self::default()
+        }
+    }
+
+    /// Combines two `SimpleSwitchingTarget` values according to specific rules.
+    ///
+    /// The combination rules are:
+    /// - If one target is `Neutral`, the other target takes precedence
+    /// - If targets conflict (TurnOn vs TurnOff), the first target (`self`) wins
+    /// - If targets are the same type, their parameter values are averaged
+    ///
+    /// # Arguments
+    ///
+    /// * `other` - The other `SimpleSwitchingTarget` to combine with
+    ///
+    /// # Returns
+    ///
+    /// A new `SimpleSwitchingTarget` representing the combination of both inputs
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+    ///
+    /// let target1 = SimpleSwitchingTarget::TurnOn;
+    /// let target2 = SimpleSwitchingTarget::TurnOn;
+    /// let combined = target1.combine(target2); // TurnOn
+    ///
+    /// let target3 = SimpleSwitchingTarget::TurnOff;
+    /// let conflicted = target1.combine(target3); // TurnOn - first target wins
+    /// ```
+    pub fn combine(self, other: SimpleSwitchingTarget) -> SimpleSwitchingTarget {
+        use SimpleSwitchingTarget::*;
+
+        match (self, other) {
+            // If one is neutral, the other wins
+            (Neutral, x) | (x, Neutral) => x,
+
+            // TurnOn vs. TurnOff → self wins
+            (TurnOn, TurnOff) => self,
+            (TurnOff, TurnOn) => self,
+            (TurnOn, TurnOn) => self,
+            (TurnOff, TurnOff) => self,
+        }
+    }
+}
+
+/// Converts an `i32` value to a `SimpleSwitchingTarget` with zero data.
+///
+/// # Conversion Rules
+///
+/// * `-1` → `TurnOff`
+/// * `1` → `TurnOn`
+/// * Any other value → `Neutral`
+///
+/// # Examples
+///
+/// ```
+/// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+///
+/// let turn_on: SimpleSwitchingTarget = 1.into();
+/// let turn_off: SimpleSwitchingTarget = (-1).into();
+/// let neutral: SimpleSwitchingTarget = 0.into();
+/// ```
+impl From<i32> for SimpleSwitchingTarget {
+    fn from(val: i32) -> Self {
+        match val {
+            -1 => SimpleSwitchingTarget::TurnOff,
+            1 => SimpleSwitchingTarget::TurnOn,
+            _ => SimpleSwitchingTarget::Neutral,
+        }
+    }
+}
+
+/// Converts a `bool` value to a `SimpleSwitchingTarget` with zero data.
+///
+/// # Conversion Rules
+///
+/// * `true` → `TurnOn`
+/// * `false` → `TurnOff`
+///
+/// # Examples
+///
+/// ```
+/// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+///
+/// let turn_on: SimpleSwitchingTarget = true.into();
+/// let turn_off: SimpleSwitchingTarget = false.into();
+/// ```
+impl From<bool> for SimpleSwitchingTarget {
+    fn from(val: bool) -> Self {
+        match val {
+            false => SimpleSwitchingTarget::TurnOff,
+            true => SimpleSwitchingTarget::TurnOn,
+        }
+    }
+}
+
+/// Converts a `SwitchingTarget` value to a `SimpleSwitchingTarget`.
+///
+///
+/// # Examples
+///
+/// ```
+/// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
+///
+/// let turn_on: SimpleSwitchingTarget = SwitchingTarget.TurnOn(0.4).into();
+/// let turn_off: SimpleSwitchingTarget = SwitchingTarget.TurnOff(0.1).into();
+/// ```
+impl From<SwitchingTarget> for SimpleSwitchingTarget {
+    fn from(val: SwitchingTarget) -> Self {
+        match val {
+            SwitchingTarget::TurnOff(_) => SimpleSwitchingTarget::TurnOff,
+            SwitchingTarget::TurnOn(_) => SimpleSwitchingTarget::TurnOn,
+            SwitchingTarget::Neutral => SimpleSwitchingTarget::Neutral,
+        }
+    }
+}
+
+//=====================================
+
+/// Represents the target state for controlling electrical systems.
+///
+/// This enum is used to specify whether an electrical system should be turned on,
+/// turned off, or remain in a neutral state. Each active state (TurnOn/TurnOff)
+/// can carry an associated floating-point value for additional control parameters.
+///
+/// # Examples
+///
+/// ```
 /// use pandemist_vehicle_elements_name::SwitchingTarget;
 ///
 /// // Create a turn-on target with intensity 0.8

@@ -7,7 +7,10 @@
 
 use lotus_script::time::delta;
 
-use crate::{api::sound::Sound, management::enums::target_enums::SwitchingTarget};
+use crate::{
+    api::sound::Sound, elements::std::timer::Timer,
+    management::enums::target_enums::SwitchingTarget,
+};
 
 /// Builder for creating and configuring a `LowVoltageLevel` instance.
 ///
@@ -38,7 +41,7 @@ pub struct LowVoltageLevelBuilder {
     battery_voltage_abs: f32,
     battery_voltage_abs_last: f32,
 
-    battery_switching_timer: f32,
+    battery_switching_timer: Timer,
 
     battery_mainswitch: bool,
     battery_mainswitch_last: bool,
@@ -259,7 +262,7 @@ pub struct LowVoltageLevel {
     battery_voltage_abs_last: f32,
 
     /// Timer for delayed switching operations
-    battery_switching_timer: f32,
+    battery_switching_timer: Timer,
 
     /// Current state of the battery main switch
     pub battery_mainswitch: bool,
@@ -314,7 +317,7 @@ impl LowVoltageLevel {
             const_battery_voltage_load_vs: 0.0,
             battery_voltage_abs: voltage_normal_v,
             battery_voltage_abs_last: voltage_normal_v,
-            battery_switching_timer: 0.0,
+            battery_switching_timer: Timer::new(),
             battery_mainswitch: false,
             battery_mainswitch_last: false,
             low_voltage_abs: 0.0,
@@ -363,21 +366,29 @@ impl LowVoltageLevel {
         // Handle battery main switch with delay for turn on/off operations
         match battery_target {
             SwitchingTarget::TurnOn(delay) => {
-                self.battery_switching_timer += delta();
-                if self.battery_switching_timer > delay {
+                if self.battery_switching_timer.idle() {
+                    self.battery_switching_timer.start(delay);
+                }
+                self.battery_switching_timer.tick();
+                if self.battery_switching_timer.finished() {
+                    self.battery_switching_timer.reset();
                     self.battery_mainswitch = true;
                     self.snd_battery_on.start();
                 }
             }
             SwitchingTarget::TurnOff(delay) => {
-                self.battery_switching_timer += delta();
-                if self.battery_switching_timer > delay {
+                if self.battery_switching_timer.idle() {
+                    self.battery_switching_timer.start(delay);
+                }
+                self.battery_switching_timer.tick();
+                if self.battery_switching_timer.finished() {
+                    self.battery_switching_timer.reset();
                     self.battery_mainswitch = false;
                     self.snd_battery_off.start();
                 }
             }
             SwitchingTarget::Neutral => {
-                self.battery_switching_timer = 0.0;
+                self.battery_switching_timer.reset();
             }
         }
 

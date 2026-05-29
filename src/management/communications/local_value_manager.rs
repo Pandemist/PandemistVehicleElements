@@ -166,3 +166,15 @@ impl Default for LocalValueManager {
         Self::new()
     }
 }
+
+//===================================================================
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! typed_kind {
+    ($struct:ty, $type:ty) => {
+        impl $crate::typedmap::TypedMapKey for $namespace {
+            type Value = $type;
+        }
+    };
+}

@@ -33,10 +33,10 @@
 //! ```
 
 use lotus_extra::vehicle::CockpitSide;
-use lotus_script::time::delta;
 
 use crate::{
     api::{animation::Animation, general::mouse_move, key_event::KeyEvent, sound::Sound},
+    elements::std::timer::Timer,
     management::enums::target_enums::SwitchingTarget,
 };
 
@@ -59,7 +59,7 @@ use crate::{
 pub struct MainSwitchBuilder {
     cab_side: Option<CockpitSide>,
     state: bool,
-    switching_timer: f32,
+    switching_timer: Timer,
     switching_allowed: bool,
 
     output: f32,
@@ -345,7 +345,7 @@ pub struct MainSwitch {
     pub state: bool,
     /// Whether automatic switching operations are allowed
     pub switching_allowed: bool,
-    switching_timer: f32,
+    switching_timer: Timer,
 
     /// Current output voltage (input_voltage * state)
     pub output: f32,
@@ -398,7 +398,7 @@ impl MainSwitch {
             snd_turn_on: Sound::new_simple(None),
             snd_turn_off: Sound::new_simple(None),
             snd_trigger: Sound::new_simple(None),
-            switching_timer: 0.0,
+            switching_timer: Timer::new(),
             output: 0.0,
             target: SwitchingTarget::Neutral,
             target_last: SwitchingTarget::Neutral,
@@ -464,21 +464,30 @@ impl MainSwitch {
                 if self.target_last != self.target {
                     self.snd_turn_on_start.start();
                 }
-                self.switching_timer += delta();
-                if self.switching_timer > delay && self.switching_allowed {
+
+                if self.switching_timer.idle() {
+                    self.switching_timer.start(delay);
+                }
+                self.switching_timer.tick();
+                if self.switching_timer.finished() && self.switching_allowed {
+                    self.switching_timer.reset();
                     self.snd_turn_on.start();
                     self.state = true;
                 }
             }
             (SwitchingTarget::TurnOff(delay), true) => {
-                self.switching_timer += delta();
-                if self.switching_timer > delay && self.switching_allowed {
+                if self.switching_timer.idle() {
+                    self.switching_timer.start(delay);
+                }
+                self.switching_timer.tick();
+                if self.switching_timer.finished() && self.switching_allowed {
+                    self.switching_timer.reset();
                     self.snd_turn_off.start();
                     self.state = false;
                 }
             }
             (_, _) => {
-                self.switching_timer = 0.0;
+                self.switching_timer.reset();
             }
         }
 

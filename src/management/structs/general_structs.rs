@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::management::enums::general_enums::CabActivState;
 
 /// A struct representing movement or state in four cardinal directions.
@@ -193,5 +195,74 @@ impl TrainActivState {
 impl Default for TrainActivState {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+//===================================================================
+// AllAny
+//===================================================================
+
+#[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub struct AllAny {
+    all: u32,
+    any: u32,
+}
+
+impl AllAny {
+    pub fn new() -> Self {
+        Self { all: 0, any: 0 }
+    }
+
+    pub fn add(&mut self, value: bool) {
+        self.all += 1;
+        self.any += value as u32;
+    }
+
+    pub fn combine(self, other: AllAny) -> Self {
+        Self {
+            all: self.all + other.all,
+            any: self.any + other.any,
+        }
+    }
+
+    pub fn all(&self) -> bool {
+        self.all == self.any
+    }
+
+    pub fn any(&self) -> bool {
+        self.any > 0
+    }
+}
+
+impl From<bool> for AllAny {
+    fn from(value: bool) -> Self {
+        AllAny {
+            all: 1,
+            any: value as u32,
+        }
+    }
+}
+
+//===================================================================
+// Three State
+//===================================================================
+
+#[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ThreeState {
+    On,
+    TurnOff,
+    #[default]
+    Off,
+}
+
+impl ThreeState {
+    pub fn or(self, other: ThreeState) -> Self {
+        match (self, other) {
+            (ThreeState::TurnOff, _) => ThreeState::TurnOff,
+            (_, ThreeState::TurnOff) => ThreeState::TurnOff,
+            (ThreeState::On, _) => ThreeState::On,
+            (_, ThreeState::On) => ThreeState::On,
+            (ThreeState::Off, ThreeState::Off) => ThreeState::Off,
+        }
     }
 }

@@ -403,7 +403,7 @@ pub struct OutsideMirror {
     /// Speed at which the arm closes
     close_speed: f32,
     /// Current state of the arm
-    arm_state: bool,
+    pub arm_state: bool,
     /// Target state for the arm (publicly accessible for external control)
     pub arm_target: bool,
     /// Previous target state (used for sound triggering)

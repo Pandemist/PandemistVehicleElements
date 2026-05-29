@@ -1,16 +1,18 @@
 use std::f32::consts::PI;
 
-use lotus_extra::rand::gen_f32;
+use lotus_extra::{rand::gen_f32, vehicle::CockpitSide};
 use lotus_script::time::delta;
 
 use crate::{
     api::{
         animation::Animation,
         general::mouse_move,
+        key_event::KeyEvent,
         light::{BlinkRelais, Light},
         sound::Sound,
         vehicle_door::VehicleDoor,
     },
+    elements::std::timer::Timer,
     management::enums::door_enums::{DoorState, DoorTarget},
 };
 
@@ -36,12 +38,9 @@ pub struct AegElectricDoorBuilder {
     speed: f32,
     anim_x: Animation,
     anim_y: Animation,
-    close_timer: f32,
+    close_timer: Timer,
     regular_open_time: f32,
     min_open_time: f32,
-
-    grabbing_a: bool,
-    grabbing_b: bool,
 
     mouse_factor: f32,
 
@@ -49,7 +48,8 @@ pub struct AegElectricDoorBuilder {
 
     state: DoorState,
 
-    target: i32,
+    target: bool,
+    manual_hold_open: bool,
 
     warn_relais: BlinkRelais,
     lm_warn_in: Light,
@@ -60,6 +60,9 @@ pub struct AegElectricDoorBuilder {
     open_flag: bool,
 
     closed_while_warning: bool,
+
+    hand_event_a: KeyEvent,
+    hand_event_b: KeyEvent,
 
     snd_open_start: Sound,
     snd_open_end: Sound,
@@ -194,6 +197,17 @@ impl AegElectricDoorBuilder {
         self
     }
 
+    pub fn add_hand_movement(
+        mut self,
+        side: Option<CockpitSide>,
+        event_a: impl Into<String>,
+        event_b: impl Into<String>,
+    ) -> Self {
+        self.hand_event_a = KeyEvent::new(Some(&takes_string(event_a)), side);
+        self.hand_event_b = KeyEvent::new(Some(&takes_string(event_b)), side);
+        self
+    }
+
     pub fn add_warning(
         mut self,
         light_name: impl Into<String>,
@@ -226,18 +240,19 @@ impl AegElectricDoorBuilder {
             close_timer: self.close_timer,
             regular_open_time: self.regular_open_time,
             min_open_time: self.min_open_time,
-            grabbing_a: self.grabbing_a,
-            grabbing_b: self.grabbing_b,
             mouse_factor: self.mouse_factor,
             is_series_1: self.is_series_1,
             state: self.state,
             target: self.target,
+            manual_hold_open: self.manual_hold_open,
             warn_relais: self.warn_relais,
             lm_warn_in: self.lm_warn_in,
             emergency_door_unlock: self.emergency_door_unlock,
             emergency_door_unlock_last: self.emergency_door_unlock_last,
             open_flag: self.open_flag,
             closed_while_warning: self.closed_while_warning,
+            hand_event_a: self.hand_event_a,
+            hand_event_b: self.hand_event_b,
             snd_open_start: self.snd_open_start,
             snd_open_end: self.snd_open_end,
             snd_close_start: self.snd_close_start,
@@ -274,11 +289,9 @@ pub struct AegElectricDoor {
     speed: f32,
     anim_x: Animation,
     anim_y: Animation,
-    close_timer: f32,
+    pub close_timer: Timer,
     regular_open_time: f32,
     min_open_time: f32,
-    grabbing_a: bool,
-    grabbing_b: bool,
 
     mouse_factor: f32,
 
@@ -286,7 +299,8 @@ pub struct AegElectricDoor {
 
     pub state: DoorState,
 
-    target: i32,
+    target: bool,
+    manual_hold_open: bool,
 
     warn_relais: BlinkRelais,
     lm_warn_in: Light,
@@ -297,6 +311,9 @@ pub struct AegElectricDoor {
     open_flag: bool,
 
     closed_while_warning: bool,
+
+    hand_event_a: KeyEvent,
+    hand_event_b: KeyEvent,
 
     snd_open_start: Sound,
     snd_open_end: Sound,
@@ -339,21 +356,22 @@ impl AegElectricDoor {
             speed: 0.0,
             anim_x: Animation::new(Some(&animation_x_name.into())),
             anim_y: Animation::new(Some(&animation_y_name.into())),
-            close_timer: 0.0,
+            close_timer: Timer::new(),
             regular_open_time: 6.0,
             min_open_time: 2.0,
-            grabbing_a: false,
-            grabbing_b: false,
             mouse_factor: 1.0,
             is_series_1: false,
             state: DoorState::default(),
-            target: 0,
+            target: false,
+            manual_hold_open: false,
             warn_relais: BlinkRelais::new(DOORWARN_INTERVAL_IN, DOORWARN_INTERVAL_IN_HALF, 0.12),
             lm_warn_in: Light::new(None),
             emergency_door_unlock: false,
             emergency_door_unlock_last: false,
             open_flag: false,
             closed_while_warning: false,
+            hand_event_a: KeyEvent::new(None, None),
+            hand_event_b: KeyEvent::new(None, None),
             snd_open_start: Sound::new_simple(None),
             snd_open_end: Sound::new_simple(None),
             snd_close_start: Sound::new_simple(None),
@@ -450,17 +468,86 @@ impl AegElectricDoor {
         power: bool,
         door_target: DoorTarget,
         door_1_btn: bool,
+        forced_open: bool,
         emergency_door_unlock: bool,
         haltewunsch: bool,
     ) {
-        self.emergency_door_unlock = emergency_door_unlock;
+        //self.emergency_door_unlock = emergency_door_unlock;
 
         let lichtschranke_frei = !self.pass_door.occupied();
 
+        let target_last = self.target;
+
+        // Ansteuerung NEU
+        //----------------------------------------------
+
+        let door_target = if forced_open {
+            DoorTarget::Open
+        } else {
+            door_target
+        };
+
+        if power && !self.emergency_door_unlock {
+            if door_target == DoorTarget::Open {
+                self.target = true;
+                self.manual_hold_open = false;
+                self.close_timer.reset();
+            } else if door_target == DoorTarget::Release {
+                if self.manual_hold_open {
+                    self.close_timer.reset();
+                } else {
+                    if haltewunsch {
+                        self.target = true;
+                        self.close_timer.reset();
+                    }
+
+                    if self.state == DoorState::Open
+                        && (self.close_timer.idle() || haltewunsch || !lichtschranke_frei)
+                    {
+                        self.close_timer.start(self.regular_open_time);
+                    }
+
+                    if self.close_timer.finished() {
+                        self.close_timer.reset();
+                        self.target = false;
+                    }
+
+                    if self.state == DoorState::Closing && (haltewunsch || !lichtschranke_frei) {
+                        self.target = true;
+                        self.close_timer.reset();
+                    }
+                }
+            } else if self.state == DoorState::Open {
+                if self.manual_hold_open {
+                    self.close_timer.reset();
+                } else {
+                    if self.close_timer.idle() {
+                        self.close_timer.start(self.min_open_time);
+                    } else {
+                        self.close_timer.time = self.close_timer.time.min(self.min_open_time);
+                    }
+                    if self.close_timer.finished() {
+                        self.target = false;
+                    }
+                }
+            }
+
+            if door_1_btn && door_target != DoorTarget::Open {
+                self.close_timer.reset();
+
+                self.target = !(self.state == DoorState::Open || self.state == DoorState::Opening);
+                self.manual_hold_open = self.target;
+            }
+        } else {
+            self.close_timer.reset();
+        }
+
+        self.close_timer.tick();
+
+        /*
         // Ansteuerung
         //----------------------------------------------
 
-        let target_last = self.target;
 
         if power && !self.emergency_door_unlock {
             // Öffnen
@@ -640,7 +727,7 @@ impl AegElectricDoor {
         } else {
             self.target = 0;
             self.close_timer = 0.0;
-        }*/
+        }*/ */
 
         //----------------------------------------------
 
@@ -663,17 +750,17 @@ impl AegElectricDoor {
         let mouse_delta_x = mouse_move().x * self.mouse_factor;
 
         if self.emergency_door_unlock || !(power && self.pos > 0.01) {
-            if self.grabbing_a {
+            if self.hand_event_a.is_pressed() {
                 self.pos = (self.pos - mouse_delta_x * delta()).clamp(0.0, 1.0);
-            } else if self.grabbing_b {
+            } else if self.hand_event_b.is_pressed() {
                 self.pos = (self.pos + mouse_delta_x * delta()).clamp(0.0, 1.0);
             }
         }
 
         if (self.speed == 0.0)
-            && ((self.target > 0 && self.pos >= 1.0) || (self.target < 0 && self.pos <= 0.0))
+            && ((self.target && self.pos >= 1.0) || (!self.target && self.pos <= 0.0))
         {
-            self.target = 0;
+            self.target = false;
             self.speed = 0.0;
         }
 
@@ -688,53 +775,64 @@ impl AegElectricDoor {
             self.move_door(a);
         }
 
-        if self.target > 0 {
-            if self.pos < 0.01 && self.speed <= 0.0 {
-                if self.is_series_1 {
-                    self.snd_open_start.start();
-                } else {
-                    self.snd_open_start_2.start();
-                }
-            }
-
-            let v_soll = if self.pos < self.open_start_end_change_pos {
-                self.open_start_speed
+        self.state = if self.target {
+            if self.pos >= 1.0 {
+                DoorState::Open
             } else {
-                self.open_end_speed
-            };
-
-            self.move_door((v_soll - self.speed) * self.traction_stiftness);
-        }
-
-        if self.target < 0 {
-            if self.pos > 0.99 && self.speed >= 0.0 {
-                if self.is_series_1 {
-                    self.snd_close_start.start();
-                } else {
-                    self.snd_close_start_2.start();
-                }
+                DoorState::Opening
             }
-
-            let v_soll = if self.pos > self.close_start_end_change_pos {
-                -self.close_start_speed
-            } else {
-                -self.close_end_speed
-            };
-
-            self.move_door((v_soll - self.speed) * self.traction_stiftness);
-        }
-
-        if self.pos == 1.0 {
-            self.state = DoorState::Open;
-            self.open_flag = false;
         } else if self.pos < 0.005 {
-            self.state = DoorState::Closed;
+            DoorState::Closed
         } else {
-            self.state = DoorState::Other;
+            DoorState::Closing
+        };
+
+        // Only move if power and not unlocked
+        if power && !self.emergency_door_unlock {
+            if self.state == DoorState::Opening {
+                if self.pos < 0.01 && self.speed <= 0.0 {
+                    if self.is_series_1 {
+                        self.snd_open_start.start();
+                    } else {
+                        self.snd_open_start_2.start();
+                    }
+                }
+
+                let v_soll = if self.pos < self.open_start_end_change_pos {
+                    self.open_start_speed
+                } else {
+                    self.open_end_speed
+                };
+
+                self.move_door((v_soll - self.speed) * self.traction_stiftness);
+            }
+
+            if self.state == DoorState::Closing {
+                if self.pos > 0.99 && self.speed >= 0.0 {
+                    if self.is_series_1 {
+                        self.snd_close_start.start();
+                    } else {
+                        self.snd_close_start_2.start();
+                    }
+                }
+
+                let v_soll = if self.pos > self.close_start_end_change_pos {
+                    -self.close_start_speed
+                } else {
+                    -self.close_end_speed
+                };
+
+                self.move_door((v_soll - self.speed) * self.traction_stiftness);
+            }
         }
 
         self.pass_door.update_open(self.pos > 0.75);
         self.pass_door
             .update_released(door_target >= DoorTarget::Release);
     }
+}
+
+fn takes_string(s: impl Into<String>) -> String {
+    let s: String = s.into();
+    s
 }

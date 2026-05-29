@@ -47,7 +47,10 @@ use std::{collections::HashMap, rc::Rc};
 use lotus_script::time::delta;
 use std::hash::Hash;
 
-use crate::api::{animation::Animation, sound::Sound};
+use crate::{
+    api::{animation::Animation, sound::Sound},
+    elements::std::timer::Timer,
+};
 
 /// Configuration for a single wiper speed level.
 ///
@@ -102,7 +105,7 @@ pub struct WiperBuilder<T> {
 
     current_target: Option<T>,
 
-    delay_timer: f32,
+    delay_timer: Timer,
     motor_pos: f32,
     runs: u32,
 
@@ -384,7 +387,7 @@ pub struct Wiper<T> {
     /// Currently active wiper level target
     pub current_target: Option<T>,
 
-    delay_timer: f32,
+    delay_timer: Timer,
     /// Current motor position (0.0 to 1.0)
     pub motor_pos: f32,
     runs: u32,
@@ -427,7 +430,7 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
 
             current_target: None,
 
-            delay_timer: 0.0,
+            delay_timer: Timer::new(),
             motor_pos: 0.0,
             runs: 0,
 
@@ -497,7 +500,7 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
         // Target change handling
         if self.levels.contains_key(&target) || self.change_target_instant {
             if self.current_target != Some(target.clone()) {
-                self.delay_timer = 0.0;
+                self.delay_timer.reset();
                 self.runs = 0;
             }
             self.current_target = Some(target.clone());
@@ -511,11 +514,9 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
             };
 
             // Handle run delay
-            if self.delay_timer > 0.0 {
-                self.delay_timer -= delta();
-                if self.delay_timer > 0.0 {
-                    return;
-                }
+            self.delay_timer.tick();
+            if self.delay_timer.running() {
+                return;
             }
 
             // Motor movement calculation
@@ -545,7 +546,7 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
                     self.runs -= 1;
                 }
 
-                self.delay_timer = level.run_delay;
+                self.delay_timer.start(level.run_delay);
                 self.motor_at_start_pos = true;
 
                 self.snd_back.start();
@@ -557,7 +558,7 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
 
                 // Stop operation if no target
                 if self.current_target.is_none() {
-                    self.delay_timer = 0.0;
+                    self.delay_timer.reset();
                     self.runs = 0;
                     self.snd_back.stop();
                     self.snd_forth.stop();
@@ -567,7 +568,7 @@ impl<T: Eq + Hash + Clone> Wiper<T> {
             self.update();
         } else {
             // No active target - stop all operation
-            self.delay_timer = 0.0;
+            self.delay_timer.reset();
             self.runs = 0;
             self.snd_back.stop();
             self.snd_forth.stop();
