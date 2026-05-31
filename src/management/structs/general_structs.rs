@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 use serde::{Deserialize, Serialize};
 
 use crate::management::enums::general_enums::CabActivState;
@@ -264,5 +266,54 @@ impl ThreeState {
             (_, ThreeState::On) => ThreeState::On,
             (ThreeState::Off, ThreeState::Off) => ThreeState::Off,
         }
+    }
+}
+
+//===================================================================
+// Pair<T>
+//===================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct Pair<T> {
+    values: [T; 2],
+}
+
+impl<T> Pair<T> {
+    pub fn new(a: T, b: T) -> Self {
+        Self { values: [a, b] }
+    }
+
+    pub fn get(&self, index: usize) -> &T {
+        &self.values[index.min(1)]
+    }
+
+    pub fn get_mut(&mut self, index: usize) -> &mut T {
+        &mut self.values[index.min(1)]
+    }
+
+    pub fn set(&mut self, index: usize, value: T) {
+        self.values[index.min(1)] = value;
+    }
+
+    pub fn both(&self) -> (&T, &T) {
+        (&self.values[0], &self.values[1])
+    }
+
+    pub fn other(index: usize) -> usize {
+        1 - index
+    }
+}
+
+impl<T> Index<usize> for Pair<T> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &T {
+        self.get(index)
+    }
+}
+
+impl<T> IndexMut<usize> for Pair<T> {
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        self.get_mut(index)
     }
 }
