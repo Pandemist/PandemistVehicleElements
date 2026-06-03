@@ -326,6 +326,7 @@ impl LightedOutPushBtn {
 
 //------------------------
 
+#[derive(Debug)]
 pub struct RedGreenOutBtn {
     value: bool,
     pressed: bool,
@@ -370,6 +371,22 @@ impl RedGreenOutBtn {
         } else {
             self.push_timer.tick();
         }
+
+        for ai_door in &self.ai_door_btns {
+            let var_name = format!("DoorReqOut_{ai_door}");
+            value = value || get_var::<bool>(&var_name);
+            set_var(&var_name, false);
+        }
+
+        value
+    }
+
+    pub fn tick_only_one_light(&mut self, green_light: bool, red_light: bool) -> bool {
+        let mut value = self.key_toggle.is_pressed();
+
+        let red_light = red_light || self.key_toggle.is_pressed();
+        self.red_vis.set_visbility(red_light);
+        self.green_vis.set_visbility(green_light && !red_light);
 
         for ai_door in &self.ai_door_btns {
             let var_name = format!("DoorReqOut_{ai_door}");

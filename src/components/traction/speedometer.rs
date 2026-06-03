@@ -237,8 +237,8 @@ pub struct Speedometer {
     needle_pos: f32,
     arrow_pos: f32,
 
-    force: f32,
-    friction: f32,
+    pub force: f32,
+    pub friction: f32,
 
     needle_speed: f32,
     needle_acc: f32,

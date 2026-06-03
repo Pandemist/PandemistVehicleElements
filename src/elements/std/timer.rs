@@ -97,6 +97,7 @@ impl<T: Clone> TimerWithValue<T> {
     pub fn tick(&mut self) -> bool {
         if self.time >= 0.0 {
             self.time -= delta();
+            self.finished = self.time < 0.0;
             self.time < 0.0
         } else {
             false
