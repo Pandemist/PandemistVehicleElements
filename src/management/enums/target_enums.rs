@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::messages::extended_modul_messenges::SimplePantoTarget;
+
 /// Represents the target state for controlling electrical systems.
 ///
 /// This enum is used to specify whether an electrical system should be turned on,
@@ -402,6 +404,16 @@ impl From<i32> for SwitchingTarget {
         match val {
             -1 => SwitchingTarget::TurnOff(0.0),
             1 => SwitchingTarget::TurnOn(0.0),
+            _ => SwitchingTarget::Neutral,
+        }
+    }
+}
+
+impl From<SimplePantoTarget> for SwitchingTarget {
+    fn from(val: SimplePantoTarget) -> Self {
+        match val {
+            SimplePantoTarget::Down => SwitchingTarget::TurnOff(0.0),
+            SimplePantoTarget::Up => SwitchingTarget::TurnOn(0.0),
             _ => SwitchingTarget::Neutral,
         }
     }

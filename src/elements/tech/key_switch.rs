@@ -11,6 +11,8 @@
 use std::collections::HashMap;
 
 use lotus_extra::vehicle::CockpitSide;
+use lotus_script::message::{message_type, send_message, Message, MessageTarget};
+use serde::{Deserialize, Serialize};
 
 use crate::api::{
     animation::Animation,
@@ -44,7 +46,7 @@ use crate::api::{
 #[derive(Debug, Clone)]
 pub struct KeyDepot {
     /// The variable name used to track key availability in the inventory
-    key_inventory: String,
+    pub key_inventory: String,
 }
 
 impl KeyDepot {
@@ -109,6 +111,90 @@ impl KeyDepot {
         }
     }
 }
+
+//---------------------------------------
+
+pub struct RemoteKeyManager {
+    key_inventory: String,
+
+    last_state: bool,
+}
+
+impl RemoteKeyManager {
+    pub fn new(key_depot: KeyDepot) -> Self {
+        Self {
+            key_inventory: key_depot.key_inventory,
+            last_state: false,
+        }
+    }
+
+    pub fn tick(&mut self) {
+        let state = get_var::<bool>(&self.key_inventory);
+
+        if state != self.last_state {
+            self.last_state = state;
+            send_message(
+                &KeyState {
+                    value: state,
+                    key_name: self.key_inventory.clone(),
+                },
+                [MessageTarget::Broadcast {
+                    across_couplings: false,
+                    include_self: false,
+                }],
+            );
+        }
+    }
+    pub fn put_in(&mut self) {
+        if !self.last_state {
+            self.last_state = true;
+            send_message(
+                &KeyState {
+                    value: true,
+                    key_name: self.key_inventory.clone(),
+                },
+                [MessageTarget::Broadcast {
+                    across_couplings: false,
+                    include_self: true,
+                }],
+            );
+        }
+    }
+
+    pub fn take_out(&mut self) {
+        if self.last_state {
+            self.last_state = false;
+            send_message(
+                &KeyState {
+                    value: false,
+                    key_name: self.key_inventory.clone(),
+                },
+                [MessageTarget::Broadcast {
+                    across_couplings: false,
+                    include_self: true,
+                }],
+            );
+        }
+    }
+
+    pub fn on_message(&mut self, msg: Message) {
+        msg.handle::<KeyState>(|m| {
+            if m.key_name == self.key_inventory {
+                set_var(&self.key_inventory, m.value);
+            }
+            Ok(())
+        })
+        .expect("KeyState: message handle failed");
+    }
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct KeyState {
+    pub value: bool,
+    pub key_name: String,
+}
+
+message_type!(KeyState, "Pan_RemoteKey", "KeyState");
 
 //---------------------------------------
 
@@ -442,7 +528,7 @@ pub struct KeySwitch {
     cab_side: Option<CockpitSide>,
 
     /// Key depot for managing key availability
-    key_depot: KeyDepot,
+    pub key_depot: KeyDepot,
     /// Maximum position value
     max: i32,
     /// Minimum position value
@@ -678,6 +764,22 @@ impl KeySwitch {
     /// * `false` if the key is removed
     pub fn is_inserted(&self) -> bool {
         self.key_visibility.check()
+    }
+
+    pub fn set(&mut self, new_value: i32) {
+        if (self.min..=self.max).contains(&new_value)
+            && self.value != new_value
+            && self.is_inserted()
+        {
+            self.value = new_value;
+            self.update();
+        }
+    }
+
+    pub fn try_insert(&mut self) {
+        if self.key_depot.test_and_take_out() {
+            self.key_visibility.make_visible();
+        }
     }
 
     /// Gets the current position value of the switch.

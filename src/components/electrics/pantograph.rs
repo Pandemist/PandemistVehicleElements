@@ -57,6 +57,8 @@ use crate::{
 ///     .build();
 /// ```
 pub struct ElectricPantographBuilder {
+    is_modul: bool,
+
     move_up_speed: f32,
     move_down_speed: f32,
 
@@ -92,6 +94,11 @@ pub struct ElectricPantographBuilder {
 }
 
 impl ElectricPantographBuilder {
+    pub fn is_modul(mut self) -> Self {
+        self.is_modul = true;
+        self
+    }
+
     /// Adds a sub-animation that follows a specific path based on the main pantograph position.
     ///
     /// Sub-animations are useful for animating additional parts of the pantograph
@@ -201,10 +208,13 @@ impl ElectricPantographBuilder {
     /// A configured `ElectricPantograph` ready for use in simulation.
     pub fn build(self) -> ElectricPantograph {
         ElectricPantograph {
+            is_modul: self.is_modul,
             move_up_speed: self.move_up_speed,
             move_down_speed: self.move_down_speed,
+            remote_height: None,
             height_curve: self.height_curve,
             sub_animations: self.sub_animations,
+
             motor_relais: self.motor_relais,
             motor_swiching_timer: self.motor_swiching_timer,
             current_wire_height: self.current_wire_height,
@@ -245,16 +255,20 @@ impl ElectricPantographBuilder {
 /// - Automatic shutdown when safety conditions are not met
 /// - Prevents operation beyond safe limits
 pub struct ElectricPantograph {
+    is_modul: bool,
+
     move_up_speed: f32,
     move_down_speed: f32,
 
-    panto_pos: f32,
+    pub remote_height: Option<f32>,
+
+    pub panto_pos: f32,
     animation: Animation,
     height_curve: PiecewiseLinearFunction,
     sub_animations: Vec<(Animation, PiecewiseLinearFunction)>,
 
     motor_swiching_timer: Timer,
-    current_wire_height: f32,
+    pub current_wire_height: f32,
     current_wire_max_anim: f32,
 
     /// Current motor target state
@@ -304,6 +318,7 @@ impl ElectricPantograph {
         curve: PiecewiseLinearFunction,
     ) -> ElectricPantographBuilder {
         ElectricPantographBuilder {
+            is_modul: false,
             move_up_speed: 1.0,
             move_down_speed: 1.0,
             sub_animations: Vec::new(),
@@ -365,7 +380,11 @@ impl ElectricPantograph {
             self.current_wire_height = f32::MAX;
         }
 
-        if let Some(height) = self.api_panto.height() {
+        if self.is_modul {
+            if let Some(height) = self.remote_height {
+                self.current_wire_height = height;
+            }
+        } else if let Some(height) = self.api_panto.height() {
             self.current_wire_height = height;
         }
 

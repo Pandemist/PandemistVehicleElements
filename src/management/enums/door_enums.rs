@@ -31,6 +31,24 @@ pub enum DoorStep {
     Street,
 }
 
+impl DoorStep {
+    pub fn merge(&self, other: &DoorStep) -> Self {
+        match (self, other) {
+            (DoorStep::None, _)
+            | (DoorStep::High, DoorStep::Low)
+            | (DoorStep::High, DoorStep::Street)
+            | (DoorStep::Street, DoorStep::High)
+            | (DoorStep::Street, DoorStep::Low) => *other,
+            (_, DoorStep::None)
+            | (DoorStep::High, DoorStep::High)
+            | (DoorStep::Low, DoorStep::Low)
+            | (DoorStep::Street, DoorStep::Street)
+            | (DoorStep::Low, DoorStep::High)
+            | (DoorStep::Low, DoorStep::Street) => *self,
+        }
+    }
+}
+
 //------------------------
 
 /// Represents door control commands and target states.
@@ -175,4 +193,45 @@ pub enum DoorState {
     Opening,
     /// Door is fully open
     Open,
+}
+
+//------------------------
+
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum DoorSide {
+    #[default]
+    None,
+    Left,
+    Right,
+    Both,
+}
+
+impl DoorSide {
+    pub fn flip(self) -> Self {
+        match self {
+            DoorSide::None => DoorSide::None,
+            DoorSide::Left => DoorSide::Right,
+            DoorSide::Right => DoorSide::Left,
+            DoorSide::Both => DoorSide::Both,
+        }
+    }
+
+    pub fn merge(&self, other: &DoorSide) -> Self {
+        match (self, other) {
+            (DoorSide::None, _) | (_, DoorSide::Both) => *other,
+            (_, DoorSide::None)
+            | (DoorSide::Both, _)
+            | (DoorSide::Left, DoorSide::Left)
+            | (DoorSide::Right, DoorSide::Right) => *self,
+            (DoorSide::Left, DoorSide::Right) => DoorSide::Both,
+            (DoorSide::Right, DoorSide::Left) => DoorSide::Both,
+        }
+    }
+
+    pub fn right(&self) -> bool {
+        matches!(self, DoorSide::Right | DoorSide::Both)
+    }
+    pub fn left(&self) -> bool {
+        matches!(self, DoorSide::Left | DoorSide::Both)
+    }
 }

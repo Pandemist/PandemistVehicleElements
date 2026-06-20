@@ -3,6 +3,8 @@
 //! This module provides enumerations for representing various states and conditions
 //! in vehicle simulation applications, particularly for train and rail vehicle systems.
 
+use serde::{Deserialize, Serialize};
+
 /// Represents the current state of a coupling mechanism (clutch).
 ///
 /// This enum describes the operational status of a vehicle's coupling system,
@@ -52,7 +54,7 @@ pub enum CouplingState {
 /// let state_code: i32 = current_state.into();
 /// assert_eq!(state_code, 1);
 /// ```
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, PartialOrd)]
 pub enum VehicleInitState {
     /// Vehicle is completely powered down with all systems inactive
     ColdAndDark = 0,

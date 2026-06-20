@@ -1,7 +1,12 @@
+use std::collections::HashMap;
+
 use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
+use crate::{
+    api::{animation::Animation, key_event::KeyEvent, sound::Sound},
+    elements::tech::switches::SwitchSoundDirection,
+};
 
 #[derive(Debug, PartialEq)]
 pub enum ThrottleMode {
@@ -39,6 +44,7 @@ pub struct ContinuousThrottleLeverBuilder {
     snd_notch_neutral: Sound,
     snd_notch_end: Sound,
     snd_notch_other: Sound,
+    snd_alt: HashMap<i32, (Sound, Option<SwitchSoundDirection>)>,
 
     key_throttle: KeyEvent,
     key_neutral: KeyEvent,
@@ -77,6 +83,19 @@ impl ContinuousThrottleLeverBuilder {
         self
     }
 
+    pub fn add_alt_sound(
+        mut self,
+        position: i32,
+        sound_name: impl Into<String>,
+        switching_dir: Option<SwitchSoundDirection>,
+    ) -> Self {
+        self.snd_alt.insert(
+            position,
+            (Sound::new_simple(Some(&sound_name.into())), switching_dir),
+        );
+        self
+    }
+
     pub fn build(self) -> ContinuousThrottleLever {
         let mut s = ContinuousThrottleLever {
             speed: self.speed,
@@ -96,6 +115,7 @@ impl ContinuousThrottleLeverBuilder {
             snd_notch_neutral: self.snd_notch_neutral,
             snd_notch_end: self.snd_notch_end,
             snd_notch_other: self.snd_notch_other,
+            snd_alt: self.snd_alt,
             key_throttle: self.key_throttle,
             key_neutral: self.key_neutral,
             key_brake: self.key_brake,
@@ -132,6 +152,8 @@ pub struct ContinuousThrottleLever {
     snd_notch_end: Sound,
     snd_notch_other: Sound,
 
+    snd_alt: HashMap<i32, (Sound, Option<SwitchSoundDirection>)>,
+
     key_throttle: KeyEvent,
     key_neutral: KeyEvent,
     key_brake: KeyEvent,
@@ -163,6 +185,7 @@ impl ContinuousThrottleLever {
             snd_notch_neutral: Sound::new_simple(None),
             snd_notch_end: Sound::new_simple(None),
             snd_notch_other: Sound::new_simple(None),
+            snd_alt: HashMap::new(),
 
             key_throttle: KeyEvent::new(Some("Throttle"), cab_side),
             key_neutral: KeyEvent::new(Some("Neutral"), cab_side),
@@ -292,6 +315,8 @@ impl ContinuousThrottleLever {
 
         self.snappoint_last = self.snappoint;
         if self.snappoint_new != self.snappoint {
+            self.play_sound(self.snappoint < self.snappoint_new);
+
             if self.snappoint == 4 {
                 self.snd_notch_neutral.start();
             } else if (self.snappoint == 6 && self.snappoint_new == 7)
@@ -307,6 +332,21 @@ impl ContinuousThrottleLever {
         self.snappoint = self.snappoint_new;
 
         self.pos_anim.set(self.pos);
+    }
+
+    fn play_sound(&mut self, is_plus: bool) {
+        if let Some(snd) = self.snd_alt.get_mut(&self.snappoint_new) {
+            if let Some(dir) = snd.1 {
+                match (dir, is_plus) {
+                    (SwitchSoundDirection::Plus, true) | (SwitchSoundDirection::Minus, false) => {
+                        snd.0.start()
+                    }
+                    _ => {}
+                }
+            } else {
+                snd.0.start()
+            }
+        }
     }
 
     pub fn axis_input(&mut self, cab_is_vr: bool, new_value: f32) {

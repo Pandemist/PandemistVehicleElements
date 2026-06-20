@@ -91,7 +91,7 @@ pub enum WiperTarget {
 ///     println!("Cab system is active");
 /// }
 /// ```
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CabActivState {
     /// Cab system is deactivated (default state)
     #[default]

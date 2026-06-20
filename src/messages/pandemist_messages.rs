@@ -62,3 +62,14 @@ pub fn send_gpm_state() {
         }],
     );
 }
+
+//===================================================================
+// Validator Back Cover
+//===================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct ValidatorBackCover {
+    pub value: bool,
+}
+
+message_type!(ValidatorBackCover, "Pan", "ValidatorBackCover");

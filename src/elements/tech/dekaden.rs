@@ -152,6 +152,7 @@ impl DecadeSwitchBuilder {
             pos: self.pos,
             target: self.target,
             pre_target: self.pre_target,
+            running: false,
             value: self.value,
             step_last: self.step_last,
             new_step: self.new_step,
@@ -190,6 +191,8 @@ pub struct DecadeSwitch {
     pub pos: f32,
     pub target: f32,
     pre_target: f32,
+
+    pub running: bool,
 
     pub step_last: u8,
     pub new_step: u8,
@@ -280,6 +283,8 @@ impl DecadeSwitch {
             self.pos = (self.pos - self.rotation_speed * delta()).max(self.target);
         }
         self.pos_anim.set(self.pos);
+
+        self.running = self.pos != self.target;
 
         self.value = self.pos.rem_euclid(self.max_value as f32);
 

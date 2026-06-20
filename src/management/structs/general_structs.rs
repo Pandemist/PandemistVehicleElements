@@ -137,7 +137,7 @@ pub enum ActivStatePos {
     Train,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TrainActivState {
     pub cab_a: CabActivState,
     pub cab_b: CabActivState,

@@ -32,6 +32,8 @@ pub struct HandDoorWithLeverBuilder {
     mouse_factor: f32,
     pub door_key_value: bool,
 
+    snd_open_start: Sound,
+
     snd_open_end: Sound,
     snd_open_end_vol_curve: Rc<dyn Fn(f32) -> f32>,
 
@@ -75,6 +77,11 @@ impl HandDoorWithLeverBuilder {
 
     pub fn mouse_factor(mut self, mouse_factor: f32) -> Self {
         self.mouse_factor = mouse_factor;
+        self
+    }
+
+    pub fn snd_open_start(mut self, snd_open_start_name: impl Into<String>) -> Self {
+        self.snd_open_start = Sound::new(Some(&snd_open_start_name.into()), None, None);
         self
     }
 
@@ -157,6 +164,7 @@ impl HandDoorWithLeverBuilder {
             friction: self.friction,
             mouse_factor: self.mouse_factor,
             door_key_value: self.door_key_value,
+            snd_open_start: self.snd_open_start,
             snd_open_end: self.snd_open_end,
             snd_open_end_vol_curve: self.snd_open_end_vol_curve,
             snd_close_snap_end: self.snd_close_snap_end,
@@ -190,6 +198,8 @@ pub struct HandDoorWithLever {
     friction: f32,
     mouse_factor: f32,
     pub door_key_value: bool,
+
+    snd_open_start: Sound,
 
     snd_open_end: Sound,
     snd_open_end_vol_curve: Rc<dyn Fn(f32) -> f32>,
@@ -241,6 +251,8 @@ impl HandDoorWithLever {
             friction: 0.0,
             mouse_factor: 0.0,
             door_key_value: false,
+
+            snd_open_start: Sound::new_simple(None),
 
             snd_open_end: Sound::new_simple(None),
             snd_open_end_vol_curve: Rc::new(|x| x),
@@ -326,6 +338,20 @@ impl HandDoorWithLever {
             };
 
             self.speed = force / delta();
+
+            // Sound for snapping
+            if self.pos == 0.0 && pos_last > 0.0 {
+                self.snd_close_snap_end
+                    .update_volume((self.snd_close_snap_end_vol_curve)(self.speed.abs()));
+                self.snd_close_snap_end.start();
+            }
+
+            // Door bounces off the outer end
+            if self.pos == 1.0 && pos_last < 1.0 {
+                self.snd_open_end
+                    .update_volume((self.snd_open_end_vol_curve)(self.speed.abs()));
+                self.snd_open_end.start();
+            }
         } else {
             // Während gerade auf höhe der Falle
             self.pos = if !pos_bolt_latch && self.pos < self.reflect_close {
@@ -359,7 +385,7 @@ impl HandDoorWithLever {
             // Sound for bouncing
             if self.pos <= self.reflect_close && pos_last > self.reflect_close {
                 self.snd_close_bounce_end
-                    .update_volume((self.snd_close_bounce_end_vol_curve)(self.speed));
+                    .update_volume((self.snd_close_bounce_end_vol_curve)(self.speed.abs()));
                 self.snd_close_bounce_end.start();
                 self.pos = self.reflect_close;
                 self.speed *= -0.2;
@@ -370,15 +396,20 @@ impl HandDoorWithLever {
             // Sound for throw
             if self.pos < self.reflect_close && pos_last >= self.reflect_close && !grabbing {
                 self.snd_close_throw_end
-                    .update_volume((self.snd_close_throw_end_vol_curve)(self.speed));
+                    .update_volume((self.snd_close_throw_end_vol_curve)(self.speed.abs()));
                 self.snd_close_throw_end.start();
             }
+        }
+
+        // Sound for opening
+        if self.pos > 0.01 && pos_last <= 0.01 {
+            self.snd_open_start.start();
         }
 
         // Sound for snapping
         if self.pos < 0.0 {
             self.snd_close_snap_end
-                .update_volume((self.snd_close_snap_end_vol_curve)(self.speed));
+                .update_volume((self.snd_close_snap_end_vol_curve)(self.speed.abs()));
             self.snd_close_snap_end.start();
             self.pos = 0.0;
             self.speed = 0.0;
@@ -387,7 +418,7 @@ impl HandDoorWithLever {
         // Door bounces off the outer end
         if self.pos > 1.0 {
             self.snd_open_end
-                .update_volume((self.snd_open_end_vol_curve)(self.speed));
+                .update_volume((self.snd_open_end_vol_curve)(self.speed.abs()));
             self.snd_open_end.start();
             self.pos = 1.0;
             self.speed *= -0.2;

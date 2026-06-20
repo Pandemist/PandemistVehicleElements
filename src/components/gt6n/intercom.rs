@@ -1,3 +1,5 @@
+use lotus_extra::vehicle::CockpitSide;
+
 use crate::api::{
     key_event::KeyEvent, light::BlinkRelais, sound::Sound, visible_flag::Visiblility,
 };
@@ -33,6 +35,7 @@ impl IntercomGt6n {
         yellow_light_name: impl Into<String>,
         event_name: impl Into<String>,
         sound_activated_name: impl Into<String>,
+        cab_side: Option<CockpitSide>,
     ) -> Self {
         IntercomGt6n {
             id,
@@ -46,7 +49,7 @@ impl IntercomGt6n {
             lm_green: Visiblility::new(green_light_name.into()),
             lm_yellow: Visiblility::new(yellow_light_name.into()),
 
-            key_activate: KeyEvent::new(Some(&event_name.into()), None),
+            key_activate: KeyEvent::new(Some(&event_name.into()), cab_side),
 
             snd_talk: Sound::new_simple(Some(&sound_activated_name.into())),
         }

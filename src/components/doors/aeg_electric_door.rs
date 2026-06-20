@@ -478,6 +478,7 @@ impl AegElectricDoor {
 
         let target_last = self.target;
 
+        //----------------------------------------------
         // Ansteuerung NEU
         //----------------------------------------------
 
@@ -730,6 +731,8 @@ impl AegElectricDoor {
         }*/ */
 
         //----------------------------------------------
+        // Stop Sounds on Target Change
+        //----------------------------------------------
 
         if target_last != self.target {
             if self.is_series_1 {
@@ -747,6 +750,10 @@ impl AegElectricDoor {
             }
         }
 
+        //----------------------------------------------
+        // Hand movement on emergency unlock
+        //----------------------------------------------
+
         let mouse_delta_x = mouse_move().x * self.mouse_factor;
 
         if self.emergency_door_unlock || !(power && self.pos > 0.01) {
@@ -757,12 +764,20 @@ impl AegElectricDoor {
             }
         }
 
+        //----------------------------------------------
+        // Reset target on end pos
+        //----------------------------------------------
+
         if (self.speed == 0.0)
             && ((self.target && self.pos >= 1.0) || (!self.target && self.pos <= 0.0))
         {
             self.target = false;
             self.speed = 0.0;
         }
+
+        //----------------------------------------------
+        // Post movement if unpowered
+        //----------------------------------------------
 
         if !power {
             let a = if self.speed > 0.0 {
@@ -774,6 +789,10 @@ impl AegElectricDoor {
             };
             self.move_door(a);
         }
+
+        //----------------------------------------------
+        // State
+        //----------------------------------------------
 
         self.state = if self.target {
             if self.pos >= 1.0 {
@@ -787,7 +806,10 @@ impl AegElectricDoor {
             DoorState::Closing
         };
 
+        //----------------------------------------------
         // Only move if power and not unlocked
+        //----------------------------------------------
+
         if power && !self.emergency_door_unlock {
             if self.state == DoorState::Opening {
                 if self.pos < 0.01 && self.speed <= 0.0 {
@@ -825,6 +847,10 @@ impl AegElectricDoor {
                 self.move_door((v_soll - self.speed) * self.traction_stiftness);
             }
         }
+
+        //----------------------------------------------
+        // AI Door State
+        //----------------------------------------------
 
         self.pass_door.update_open(self.pos > 0.75);
         self.pass_door
