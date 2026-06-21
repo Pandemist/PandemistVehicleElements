@@ -57,7 +57,7 @@ impl Default for Timer {
 
 #[derive(Debug)]
 pub struct TimerWithValue<T: Clone> {
-    time: f32,
+    pub time: f32,
     finished: bool,
     value: T,
 }
