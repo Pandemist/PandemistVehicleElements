@@ -1,53 +1,8 @@
-//! Decade Switch Component
-//!
-//! This module provides a `DecadeSwitch` component that implements a rotary switch
-//! with configurable steps (decades). It's commonly used in aviation and industrial
-//! control interfaces where precise value selection is required.
-//!
-//! The switch supports:
-//! - Smooth animated transitions between values
-//! - Keyboard input handling for increment/decrement operations
-//! - Threshold crossing detection for value changes
-//! - Configurable rotation speed and maximum values
-//!
-//! # Example
-//!
-//! ```rust
-//! use pandemist_vehicle_elements::DecadeSwitch;
-//!
-//! let mut switch = DecadeSwitch::builder(10, "rotation_anim", Some(CockpitSide::A))
-//!     .rotation_speed(2.0)
-//!     .button_events("increment", "decrement")
-//!     .init_value(5.0)
-//!     .build();
-//!
-//! // In your game loop
-//! let value_change = switch.tick(0.0);
-//! if value_change != 0 {
-//!     println!("Value changed by: {}", value_change);
-//! }
-//! ```
-
 use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
 use crate::api::{animation::Animation, key_event::KeyEvent};
 
-/// Builder for creating a `DecadeSwitch` with custom configuration.
-///
-/// This builder allows you to configure various aspects of the decade switch
-/// before creating the final instance. All configuration methods can be chained
-/// for a fluent API experience.
-///
-/// # Example
-///
-/// ```rust
-/// let switch = DecadeSwitch::builder(10, "my_animation", None)
-///     .rotation_speed(1.5)
-///     .button_events("plus_key", "minus_key")
-///     .init_value(3.0)
-///     .build();
-/// ```
 pub struct DecadeSwitchBuilder {
     cab_side: Option<CockpitSide>,
 
@@ -70,43 +25,11 @@ pub struct DecadeSwitchBuilder {
 }
 
 impl DecadeSwitchBuilder {
-    /// Sets the rotation speed of the decade switch.
-    ///
-    /// The rotation speed determines how fast the switch animates between positions.
-    /// Higher values result in faster transitions.
-    ///
-    /// # Arguments
-    ///
-    /// * `rotation_speed` - The speed multiplier for rotations (default: 1.0)
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// let builder = DecadeSwitch::builder(10, "anim", None)
-    ///     .rotation_speed(2.0); // Double speed rotations
-    /// ```
     pub fn rotation_speed(mut self, rotation_speed: f32) -> Self {
         self.rotation_speed = rotation_speed;
         self
     }
 
-    /// Configures the key events for increment and decrement operations.
-    ///
-    /// This method sets up the keyboard input handling for the decade switch.
-    /// The switch will respond to the specified key events to increment or
-    /// decrement its value.
-    ///
-    /// # Arguments
-    ///
-    /// * `event_plus_name` - Name of the key event for incrementing
-    /// * `event_minus_name` - Name of the key event for decrementing
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// let builder = DecadeSwitch::builder(10, "anim", None)
-    ///     .button_events("arrow_up", "arrow_down");
-    /// ```
     pub fn button_events(
         mut self,
         event_plus_name: impl Into<String>,
@@ -117,21 +40,6 @@ impl DecadeSwitchBuilder {
         self
     }
 
-    /// Sets the initial value and position of the decade switch.
-    ///
-    /// This method initializes the switch to a specific value. The position
-    /// and target will be set to match this value.
-    ///
-    /// # Arguments
-    ///
-    /// * `value` - The initial value for the switch
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// let builder = DecadeSwitch::builder(10, "anim", None)
-    ///     .init_value(7.5); // Start at position 7.5
-    /// ```
     pub fn init_value(mut self, value: f32) -> Self {
         self.value = value;
         self.pos = value;
@@ -139,13 +47,6 @@ impl DecadeSwitchBuilder {
         self
     }
 
-    /// Builds the final `DecadeSwitch` instance.
-    ///
-    /// Consumes the builder and returns a configured `DecadeSwitch` ready for use.
-    ///
-    /// # Returns
-    ///
-    /// A new `DecadeSwitch` instance with the configured settings.
     pub fn build(self) -> DecadeSwitch {
         DecadeSwitch {
             cab_side: self.cab_side,
@@ -165,25 +66,6 @@ impl DecadeSwitchBuilder {
     }
 }
 
-/// A rotary decade switch component with smooth animation and input handling.
-///
-/// The `DecadeSwitch` represents a rotary control commonly found in aviation
-/// and industrial interfaces. It provides:
-///
-/// - Smooth animated transitions between positions
-/// - Keyboard input handling for precise control
-/// - Threshold crossing detection for discrete value changes
-/// - Configurable maximum values and rotation speeds
-///
-/// The switch maintains both a continuous position value and discrete step detection,
-/// making it suitable for applications that need both smooth visual feedback and
-/// discrete value changes.
-///
-/// # Fields
-///
-/// - `value`: The current continuous value of the switch
-/// - `key_plus`: Key event handler for increment operations
-/// - `key_minus`: Key event handler for decrement operations
 #[derive(Debug)]
 pub struct DecadeSwitch {
     cab_side: Option<CockpitSide>,
@@ -197,23 +79,23 @@ pub struct DecadeSwitch {
     pub step_last: u8,
     pub new_step: u8,
 
-    /// The current continuous value of the decade switch.
-    /// This value is automatically wrapped within the range [0, max_value).
     pub value: f32,
     max_value: u8,
 
     rotation_speed: f32,
 
-    pub pos_anim: Animation,
+    pos_anim: Animation,
 
-    /// Key event handler for incrementing the switch value.
-    /// Check `is_just_pressed()` to detect increment inputs.
     pub key_plus: KeyEvent,
-
-    /// Key event handler for decrementing the switch value.
-    /// Check `is_just_pressed()` to detect decrement inputs.
     pub key_minus: KeyEvent,
 }
+
+/// Wenn |pos| diesen Vielfachen-Wert von max_value überschreitet, wird
+/// pos/target/pre_target gemeinsam um ein Vielfaches von max_value verschoben,
+/// um f32-Präzisionsverlust bei sehr langer Laufzeit zu vermeiden.
+/// 10_000 volle Umdrehungen sind ein guter Kompromiss zwischen
+/// "selten genug, um Carry-Logik nicht zu stören" und "f32 bleibt präzise".
+const RECENTER_THRESHOLD_TURNS: f32 = 10_000.0;
 
 impl DecadeSwitch {
     pub fn builder(
@@ -243,6 +125,8 @@ impl DecadeSwitch {
     }
 
     pub fn tick(&mut self, add_target: f32) -> f32 {
+        let max_val = self.max_value as f32;
+
         if (self.pos - self.target).abs() < 0.001 {
             if self.key_plus.is_just_pressed() {
                 self.target += 1.0;
@@ -252,26 +136,25 @@ impl DecadeSwitch {
                 self.target -= 1.0;
             }
 
-            if self.pre_target == 0.0 {
-                self.pos = self.pos.rem_euclid(self.max_value as f32);
-                self.target = self.target.rem_euclid(self.max_value as f32);
-
-                // Runden
-                if (self.pos - self.pos.round()).abs() < 0.000001 {
-                    self.pos = self.pos.round();
-                }
-                if (self.target - self.target.round()).abs() < 0.000001 {
-                    self.target = self.target.round();
-                }
-            }
-
-            if self.pre_target.abs() > 0.0 {
-                self.target = self.pre_target;
-                self.pre_target = 0.0;
-            }
+            // Anstehenden Carry/Eingabe-Überhang IMMER additiv verrechnen,
+            // niemals target überschreiben - sonst gehen aufgelaufene
+            // Übertragsimpulse verloren, wenn mehrere kurz hintereinander
+            // eintreffen, während diese Dekade noch in Bewegung ist.
+            self.target += self.pre_target;
+            self.pre_target = 0.0;
 
             self.target += add_target;
+
+            // Rundungskorrektur gegen f32-Restfehler (rein kosmetisch,
+            // ändert den logischen Wert nicht)
+            if (self.pos - self.pos.round()).abs() < 0.000001 {
+                self.pos = self.pos.round();
+            }
+            if (self.target - self.target.round()).abs() < 0.000001 {
+                self.target = self.target.round();
+            }
         } else {
+            // Während der Bewegung: anstehende Werte additiv sammeln.
             self.pre_target += add_target;
         }
 
@@ -282,69 +165,124 @@ impl DecadeSwitch {
         } else {
             self.pos = (self.pos - self.rotation_speed * delta()).max(self.target);
         }
-        self.pos_anim.set(self.pos);
+
+        // Anzeige/Animation bekommt immer den normalisierten Wert,
+        // pos selbst bleibt unnormalisiert (siehe Kommentar an der Struktur).
+        self.pos_anim.set(self.pos.rem_euclid(max_val));
 
         self.running = self.pos != self.target;
 
-        self.value = self.pos.rem_euclid(self.max_value as f32);
+        self.value = self.pos.rem_euclid(max_val);
 
-        self.detect_threshold_crossing(pos_last, self.pos)
+        // step_last/new_step als Anzeige-Hilfswerte aus der tatsächlichen
+        // pos-Bewegung ableiten.
+        self.update_step_display(pos_last, self.pos);
+
+        // Carry über die geometrische Überlappung des in diesem Frame
+        // zurückgelegten Bewegungssegments [pos_last, pos] mit der
+        // "Kopplungszone" direkt vor jeder max_value-Schwelle ermitteln.
+        // Das sorgt dafür, dass die Nachbarstelle PARALLEL zur Bewegung
+        // mitdreht, sobald diese Dekade die Zone betritt - nicht erst,
+        // wenn sie eine volle Umdrehung abgeschlossen hat.
+        let carry = Self::zone_overlap_carry(pos_last, self.pos, max_val);
+
+        // Sicherheitsmechanismus: pos/target/pre_target laufen bewusst
+        // unnormalisiert (nicht mehr per rem_euclid zurückgefaltet), damit
+        // mehrere kurz aufeinanderfolgende Carry-Ereignisse nicht
+        // durcheinanderlaufen. Das heißt aber, die Werte wachsen über die
+        // Laufzeit unbegrenzt. Nur wenn die Dekade gerade "ruht" (pos ==
+        // target, kein offener pre_target) und weit genug von der nächsten
+        // Schwelle entfernt ist, ziehen wir ein gemeinsames Vielfaches von
+        // max_value ab. Das ändert nichts an Anzeige oder Carry-Verhalten,
+        // hält die f32-Werte aber dauerhaft klein und präzise.
+        self.recenter_if_needed();
+
+        carry
     }
 
-    fn detect_threshold_crossing(&mut self, pos_last: f32, new_pos: f32) -> f32 {
+    /// Berechnet den Carry-Anteil für die Nachbarstelle aus der Überlappung
+    /// des Bewegungssegments [pos_last, pos_new] mit den "Kopplungszonen"
+    /// [n*max_val - 1, n*max_val) für jedes ganzzahlige n.
+    ///
+    /// Die Kopplungszone ist die letzte Einheit vor jeder vollen
+    /// max_value-Schwelle (z. B. bei max_value=10 die Zone [9, 10), bzw.
+    /// [19, 20), [-1, 0) usw.). Solange sich pos innerhalb dieser Zone
+    /// bewegt, soll die Nachbarstelle 1:1 mitdrehen - so wie bei einem
+    /// mechanischen Zahnrad, das schon kurz vor der vollen Umdrehung des
+    /// Vorgängerrads beginnt mitzulaufen.
+    ///
+    /// Der Rückgabewert ist die Strecke (mit Vorzeichen der
+    /// Bewegungsrichtung), die innerhalb dieser Zonen zurückgelegt wurde.
+    /// Liegt das gesamte Segment außerhalb jeder Zone, ist das Ergebnis 0.
+    /// Überquert ein einzelner Frame mehrere Zonen (z. B. bei einem sehr
+    /// großen Einzelsprung), werden alle betroffenen Zonen aufsummiert.
+    fn zone_overlap_carry(pos_last: f32, pos_new: f32, max_val: f32) -> f32 {
+        if pos_new == pos_last {
+            return 0.0;
+        }
+
+        let direction = if pos_new > pos_last { 1.0 } else { -1.0 };
+        let lo = pos_last.min(pos_new);
+        let hi = pos_last.max(pos_new);
+
+        // Alle Zonen-Indizes n, deren Zone [n*max_val - 1, n*max_val) das
+        // Segment [lo, hi] potenziell schneiden könnte.
+        let n_start = (lo / max_val).floor() as i64 - 1;
+        let n_end = (hi / max_val).floor() as i64 + 2;
+
+        let mut total_overlap = 0.0;
+        for n in n_start..=n_end {
+            let zone_lo = n as f32 * max_val - 1.0;
+            let zone_hi = n as f32 * max_val;
+
+            let overlap_lo = lo.max(zone_lo);
+            let overlap_hi = hi.min(zone_hi);
+
+            if overlap_hi > overlap_lo {
+                total_overlap += overlap_hi - overlap_lo;
+            }
+        }
+
+        direction * total_overlap
+    }
+
+    fn recenter_if_needed(&mut self) {
+        let max_val = self.max_value as f32;
+        let threshold = RECENTER_THRESHOLD_TURNS * max_val;
+
+        if self.pos.abs() < threshold {
+            return;
+        }
+
+        // Nur re-centern, wenn die Dekade ruht und kein Übertrag mehr
+        // ausstehend ist - sonst könnten wir mitten in einer Carry-Kette
+        // den Bezugspunkt verschieben.
+        if self.running || self.pre_target != 0.0 {
+            return;
+        }
+
+        // Ganzes Vielfaches von max_value abziehen, damit pos im
+        // Bereich [0, max_value) landet, target sich exakt mitverschiebt.
+        let shift = (self.pos / max_val).floor() * max_val;
+
+        if shift != 0.0 {
+            self.pos -= shift;
+            self.target -= shift;
+        }
+    }
+
+    fn update_step_display(&mut self, pos_last: f32, new_pos: f32) {
         let max_val = self.max_value as f32;
 
-        // Normalisiere die Positionen auf den [0, max_val) Bereich für step_last und new_step
+        // Normalisierte Werte ausschließlich für die Anzeige von
+        // step_last/new_step (0..max_value). Diese Werte haben keinen
+        // Einfluss mehr auf die Carry-Erkennung (siehe tick()) - sie dienen
+        // nur noch dazu, von außen den zuletzt angezeigten bzw. neuen
+        // Ziffern-Schritt ablesen zu können.
         let normalized_last = pos_last.rem_euclid(max_val);
         let normalized_new = new_pos.rem_euclid(max_val);
 
         self.step_last = normalized_last.floor() as u8;
         self.new_step = normalized_new.floor() as u8;
-
-        if (pos_last < new_pos && normalized_last >= (max_val - 1.0))
-            || (pos_last > new_pos && normalized_last < 1.0)
-        {
-            return new_pos - pos_last;
-        }
-
-        /*if pos_last < new_pos
-            && ((normalized_last >= (max_val - 1.0) && normalized_new < 1.0)
-                || (normalized_last >= (max_val - 1.0) && normalized_new >= (max_val - 1.0)))
-        {
-            return new_pos - pos_last;
-        }
-
-        if pos_last > new_pos
-            && ((normalized_last < 1.0 && normalized_new >= (max_val - 1.0))
-                || (normalized_last < 1.0 && normalized_new < 1.0))
-        {
-            return new_pos - pos_last;
-        }*/
-
-        0.0
-
-        /*let max_val = self.max_value as f32;
-        let movement = new_pos - pos_last;
-
-        self.step_last = (pos_last.rem_euclid(max_val).floor() as u8) % self.max_value;
-        self.new_step = (new_pos.rem_euclid(max_val).floor() as u8) % self.max_value;
-
-        // Forward crossing: last step to first step, or crossing max boundary
-        if (self.step_last == self.max_value - 1 && self.new_step == 0 && new_pos > pos_last)
-            || (pos_last < max_val && new_pos >= max_val)
-        {
-            let overflow = new_pos - pos_last.floor() - 1.0;
-            return overflow.max(0.0);
-        }
-
-        // Backward crossing: first step to last step, or crossing zero boundary
-        if (pos_last >= 0.0 && new_pos < 0.0)
-            || (self.step_last == 0 && self.new_step == self.max_value - 1 && new_pos < pos_last)
-        {
-            let underflow = new_pos - pos_last.ceil();
-            return underflow.min(0.0);
-        }
-
-        0.0*/
     }
 }

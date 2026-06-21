@@ -235,3 +235,14 @@ impl DoorSide {
         matches!(self, DoorSide::Left | DoorSide::Both)
     }
 }
+
+impl From<DoorSide> for lotus_extra::messages::std::DoorSide {
+    fn from(val: DoorSide) -> Self {
+        match val {
+            DoorSide::None => lotus_extra::messages::std::DoorSide::None,
+            DoorSide::Left => lotus_extra::messages::std::DoorSide::Left,
+            DoorSide::Right => lotus_extra::messages::std::DoorSide::Right,
+            DoorSide::Both => lotus_extra::messages::std::DoorSide::Both,
+        }
+    }
+}
