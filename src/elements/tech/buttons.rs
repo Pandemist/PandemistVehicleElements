@@ -461,6 +461,11 @@ impl PushButton {
             self.pos = 0.75;
             self.value = true;
             self.btn_anim.set(self.pos);
+        } else {
+            self.pos = 1.0;
+            self.value = true;
+            self.btn_anim.set(self.pos);
+            self.snd_press.start();
         }
     }
 
@@ -469,11 +474,10 @@ impl PushButton {
     /// This method programmatically deactivates the button, setting its position and value
     /// according to its current mode. Only works for `PushHold` mode.
     pub fn unset(&mut self) {
-        if self.mode == PushButtonMode::PushHold {
-            self.pos = 0.0;
-            self.value = false;
-            self.btn_anim.set(self.pos);
-        }
+        self.pos = 0.0;
+        self.value = false;
+        self.btn_anim.set(self.pos);
+        self.snd_release.start();
     }
 
     /// Update the button state for the current frame

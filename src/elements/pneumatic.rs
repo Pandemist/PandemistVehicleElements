@@ -218,10 +218,6 @@ impl PneumaticSystem {
         self.tanks[index].pressure
     }
 
-    pub fn set_tank_pressure(&mut self, index: usize, pressure: f32) {
-        self.tanks[index].pressure = pressure;
-    }
-
     pub fn set_valve_open(&mut self, connection_index: usize, valve_open: f32) {
         self.connections[connection_index].valve_open = valve_open;
     }
@@ -232,6 +228,20 @@ impl PneumaticSystem {
 
     pub fn set_compressor_speed(&mut self, index: usize, speed: f32) {
         self.compressors[index].set_speed(speed);
+    }
+
+    pub fn set_tank_pressure(&mut self, index: usize, pressure: f32) {
+        self.tanks[index].pressure = pressure;
+    }
+
+    pub fn set_coupling_opening(
+        &mut self,
+        coupling: message::Coupling,
+        coupling_index: usize,
+        opening: f32,
+    ) {
+        let coupling_side: usize = coupling.into();
+        self.couplings[coupling_side].connections[coupling_index].open = opening;
     }
 
     // ------------------------------------------------------------------
@@ -285,10 +295,6 @@ impl PneumaticSystem {
         index
     }
 
-    pub fn set_valve_type(&mut self, index: usize, new_type: ValveAutomatic) {
-        self.connections[index].automatic = new_type;
-    }
-
     pub fn tank_count(&self) -> usize {
         self.tanks.len()
     }
@@ -299,6 +305,10 @@ impl PneumaticSystem {
 
     pub fn compressor_count(&self) -> usize {
         self.compressors.len()
+    }
+
+    pub fn set_valve_type(&mut self, index: usize, new_type: ValveAutomatic) {
+        self.connections[index].automatic = new_type;
     }
 
     // ------------------------------------------------------------------

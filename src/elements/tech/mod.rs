@@ -3,6 +3,7 @@ pub mod cranc;
 pub mod dekaden;
 pub mod handpin;
 pub mod key_switch;
+pub mod pump;
 pub mod rollerblind;
 pub mod seals;
 pub mod slider;

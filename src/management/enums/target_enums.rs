@@ -223,6 +223,16 @@ impl From<SwitchingTarget> for SimpleSwitchingTarget {
     }
 }
 
+impl SimpleSwitchingTarget {
+    pub fn complex(&self, time: f32) -> SwitchingTarget {
+        match &self {
+            SimpleSwitchingTarget::TurnOff => SwitchingTarget::TurnOff(time),
+            SimpleSwitchingTarget::TurnOn => SwitchingTarget::TurnOn(time),
+            SimpleSwitchingTarget::Neutral => SwitchingTarget::Neutral,
+        }
+    }
+}
+
 //=====================================
 
 /// Represents the target state for controlling electrical systems.
