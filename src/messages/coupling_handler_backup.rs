@@ -118,14 +118,14 @@ impl<T: MessageLine> UniversalCouplingLine<T> {
 
         let to_front = if ok_0 {
             self.local_value
-                .evaluate(&self.received.1, &self.local_value)
+                .evaluate(&self.received.0, &self.local_value)
         } else {
             self.local_value.clone()
         };
 
         let to_rear = if ok_1 {
             self.local_value
-                .evaluate(&self.received.0, &self.local_value)
+                .evaluate(&self.received.1, &self.local_value)
         } else {
             self.local_value.clone()
         };
