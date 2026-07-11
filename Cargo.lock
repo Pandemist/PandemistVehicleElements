@@ -232,7 +232,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 
 [[package]]
-name = "lotus-bindgen-macros"
+name = "lotus-extra"
+version = "0.3.3"
+dependencies = [
+ "bon",
+ "lotussim-script",
+ "num-traits",
+ "rust-embed",
+ "serde",
+ "toml 0.9.12+spec-1.1.0",
+]
+
+[[package]]
+name = "lotussim-bindgen-macros"
 version = "0.1.1"
 dependencies = [
  "proc-macro2",
@@ -241,24 +253,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "lotus-extra"
-version = "0.2.3"
+name = "lotussim-script"
+version = "0.8.3"
 dependencies = [
- "bon",
- "lotus-script",
- "num-traits",
- "rust-embed",
- "serde",
- "toml 0.9.12+spec-1.1.0",
-]
-
-[[package]]
-name = "lotus-script"
-version = "0.7.3"
-dependencies = [
- "lotus-bindgen-macros",
- "lotus-script-sys",
- "lotus-shared",
+ "lotussim-bindgen-macros",
+ "lotussim-script-sys",
+ "lotussim-shared",
  "rmp-serde",
  "serde",
  "serde_json",
@@ -267,21 +267,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "lotus-script-sys"
+name = "lotussim-script-sys"
 version = "0.5.0"
 dependencies = [
- "lotus-bindgen-macros",
+ "lotussim-bindgen-macros",
  "rmp-serde",
  "serde",
  "serde_repr",
 ]
 
 [[package]]
-name = "lotus-shared"
-version = "0.5.1"
+name = "lotussim-shared"
+version = "0.6.0"
 dependencies = [
  "glam",
- "lotus-script-sys",
+ "lotussim-script-sys",
  "serde",
  "serde_json",
  "serde_repr",
@@ -331,7 +331,7 @@ name = "pandemist_vehicle_elements"
 version = "0.2.0"
 dependencies = [
  "lotus-extra",
- "lotus-script",
+ "lotussim-script",
  "serde",
  "serde_json",
  "static-toml",
