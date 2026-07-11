@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use lotus_extra::{messages::std::Batteryvoltage, vehicle::CockpitSide};
 use lotus_script::prelude::{message_type, send_message, MessageTarget};
 use serde::{Deserialize, Serialize};
@@ -83,6 +85,119 @@ impl DiagnosticVoltageSender {
             );
             self.value_last = value;
             self.state_last = state;
+        }
+    }
+}
+
+//--------------------------------
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct DiagnosticWorkshopMode {
+    pub value: bool,
+}
+
+message_type!(
+    DiagnosticWorkshopMode,
+    "Pan_Diagnostic_F6_1",
+    "WorkshopMode"
+);
+
+//--------------------------------
+
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
+pub enum DiagnosticStatusReportKind {
+    KeineFahrspannung,
+    AutomatAus,
+    Notbremse,
+    Stromabnehmer,
+    TuerNotauf,
+    TuerOffen,
+    Federspeicher,
+    KeineLuft,
+    Stoerstrom,
+    AntriebAus,
+    BMA,
+    LufthahnZKE,
+}
+
+impl DiagnosticStatusReportKind {
+    pub fn get_pos(&self) -> (i32, i32) {
+        match self {
+            DiagnosticStatusReportKind::KeineFahrspannung => (0, 0),
+            DiagnosticStatusReportKind::AutomatAus => (1, 0),
+            DiagnosticStatusReportKind::Notbremse => (0, 1),
+            DiagnosticStatusReportKind::Stromabnehmer => (1, 1),
+            DiagnosticStatusReportKind::TuerNotauf => (0, 2),
+            DiagnosticStatusReportKind::TuerOffen => (1, 2),
+            DiagnosticStatusReportKind::Federspeicher => (0, 3),
+            DiagnosticStatusReportKind::KeineLuft => (1, 3),
+            DiagnosticStatusReportKind::Stoerstrom => (0, 4),
+            DiagnosticStatusReportKind::AntriebAus => (1, 4),
+            DiagnosticStatusReportKind::BMA => (0, 5),
+            DiagnosticStatusReportKind::LufthahnZKE => (1, 5),
+        }
+    }
+
+    pub fn get_text(&self) -> String {
+        match self {
+            DiagnosticStatusReportKind::KeineFahrspannung => "keine Fahrspg.".to_string(),
+            DiagnosticStatusReportKind::AutomatAus => "Automat aus".to_string(),
+            DiagnosticStatusReportKind::Notbremse => "Notbremse".to_string(),
+            DiagnosticStatusReportKind::Stromabnehmer => "Stromabnehmer".to_string(),
+            DiagnosticStatusReportKind::TuerNotauf => "Notöffnung".to_string(),
+            DiagnosticStatusReportKind::TuerOffen => "Tür offen".to_string(),
+            DiagnosticStatusReportKind::Federspeicher => "Federspeicher".to_string(),
+            DiagnosticStatusReportKind::KeineLuft => "keine Luft".to_string(),
+            DiagnosticStatusReportKind::Stoerstrom => "Störstrom".to_string(),
+            DiagnosticStatusReportKind::AntriebAus => "Antrieb aus".to_string(),
+            DiagnosticStatusReportKind::BMA => "Brandalarm".to_string(),
+            DiagnosticStatusReportKind::LufthahnZKE => "Lufthahn ZKE".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct DiagnosticStatusMessage {
+    pub veh_number: String,
+    pub kind: DiagnosticStatusReportKind,
+    pub state: bool,
+}
+
+message_type!(
+    DiagnosticStatusMessage,
+    "Pan_Diagnostic_F6_1",
+    "StatusMessage"
+);
+
+//--------------------------------
+
+#[derive(Default, Debug)]
+pub struct DiagnosticStatusSender {
+    value_last: HashMap<(DiagnosticStatusReportKind, String), bool>,
+}
+
+impl DiagnosticStatusSender {
+    pub fn new() -> Self {
+        Self {
+            value_last: HashMap::new(),
+        }
+    }
+
+    pub fn send(&mut self, kind: DiagnosticStatusReportKind, state: bool, veh_number: String) {
+        let last_value = self
+            .value_last
+            .get(&(kind, veh_number.clone()))
+            .unwrap_or(&false);
+        if state != *last_value {
+            send_message(
+                &(DiagnosticStatusMessage {
+                    veh_number: veh_number.clone(),
+                    kind,
+                    state,
+                }),
+                [MessageTarget::broadcast_all()],
+            );
+            self.value_last.insert((kind, veh_number), state);
         }
     }
 }
