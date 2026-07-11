@@ -1,6 +1,15 @@
-use lotus_extra::messages::std::Batteryvoltage;
+use lotus_extra::{messages::std::Batteryvoltage, vehicle::CockpitSide};
 use lotus_script::prelude::{message_type, send_message, MessageTarget};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct DiagnosticDeviceSide {
+    pub value: CockpitSide,
+}
+
+message_type!(DiagnosticDeviceSide, "Pan_Diagnostic", "DeviceSide");
+
+//--------------------------------
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DiagnosticZugbustaufe {
