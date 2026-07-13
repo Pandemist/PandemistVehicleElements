@@ -231,6 +231,10 @@ impl AllAny {
         self.all == self.any
     }
 
+    pub fn not_all(&self) -> bool {
+        self.all != self.any || self.all == 0
+    }
+
     pub fn any(&self) -> bool {
         self.any > 0
     }

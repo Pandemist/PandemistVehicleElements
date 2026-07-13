@@ -5,7 +5,10 @@
 
 use lotus_script::time::delta;
 
-use crate::api::sound::Sound;
+use crate::{
+    api::sound::Sound, elements::std::timer::Timer,
+    management::enums::target_enums::SwitchingTarget,
+};
 
 /// A voltage converter with sound feedback that handles startup and shutdown sequences.
 ///
@@ -135,5 +138,131 @@ impl Converter {
 
         // Apply volume change to sound system
         self.sound.update_volume(self.sound_vol);
+    }
+}
+
+//====================================
+
+#[derive(Debug, Default)]
+pub struct ManualConverterBuilder {
+    const_min_voltage_norm: f32,
+    const_startup_time: f32,
+    const_shutdown_time: f32,
+
+    snd_turn_on: Sound,
+    snd_turn_off: Sound,
+
+    sound: Sound,
+}
+
+impl ManualConverterBuilder {
+    pub fn add_start_sound(mut self, snd_turn_on_name: &str) -> Self {
+        self.snd_turn_on = Sound::new_simple(Some(snd_turn_on_name));
+        self
+    }
+
+    pub fn add_end_sound(mut self, snd_turn_off_name: &str) -> Self {
+        self.snd_turn_off = Sound::new_simple(Some(snd_turn_off_name));
+        self
+    }
+
+    pub fn add_run_sound(mut self, snd_run_name: &str) -> Self {
+        self.sound = Sound::new_simple(Some(snd_run_name));
+        self
+    }
+
+    pub fn build(self) -> ManualConverter {
+        ManualConverter {
+            state: false,
+            switching_timer: Timer::new(),
+            target: SwitchingTarget::Neutral,
+            target_last: SwitchingTarget::Neutral,
+            const_min_voltage_norm: self.const_min_voltage_norm,
+            const_startup_time: self.const_startup_time,
+            const_shutdown_time: self.const_shutdown_time,
+            snd_turn_on: self.snd_turn_on,
+            snd_turn_off: self.snd_turn_off,
+            sound_vol: 0.0,
+            sound: self.sound,
+            ouput_voltage_norm: 0.0,
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ManualConverter {
+    pub state: bool,
+
+    switching_timer: Timer,
+
+    pub target: SwitchingTarget,
+    target_last: SwitchingTarget,
+
+    const_min_voltage_norm: f32,
+    const_startup_time: f32,
+    const_shutdown_time: f32,
+
+    snd_turn_on: Sound,
+    snd_turn_off: Sound,
+
+    sound_vol: f32,
+    sound: Sound,
+    pub ouput_voltage_norm: f32,
+}
+
+impl ManualConverter {
+    pub fn builder(
+        min_voltage_norm: f32,
+        startup_time: f32,
+        shutdown_time: f32,
+    ) -> ManualConverterBuilder {
+        ManualConverterBuilder {
+            const_min_voltage_norm: min_voltage_norm,
+            const_startup_time: startup_time,
+            const_shutdown_time: shutdown_time,
+            snd_turn_on: Sound::new_simple(None),
+            snd_turn_off: Sound::new_simple(None),
+            sound: Sound::new_simple(None),
+        }
+    }
+
+    pub fn tick(&mut self, input_voltage_norm: f32, fuse: bool) {
+        match (self.target, self.state) {
+            (SwitchingTarget::TurnOn(delay), false) => {
+                if self.switching_timer.idle() {
+                    self.switching_timer.start(delay);
+                }
+                self.switching_timer.tick();
+                if self.switching_timer.finished() {
+                    self.switching_timer.reset();
+                    self.snd_turn_on.start();
+                    self.state = true;
+                }
+            }
+            (SwitchingTarget::TurnOff(delay), true) => {
+                if self.switching_timer.idle() {
+                    self.switching_timer.start(delay);
+                }
+                self.switching_timer.tick();
+                if self.switching_timer.finished() {
+                    self.switching_timer.reset();
+                    self.snd_turn_off.start();
+                    self.state = false;
+                }
+            }
+            (_, _) => {
+                self.switching_timer.reset();
+            }
+        }
+
+        if self.state {
+            self.sound_vol = (self.sound_vol + (1.0 / self.const_startup_time) * delta()).min(1.0);
+        } else {
+            self.sound_vol = (self.sound_vol - (1.0 / self.const_shutdown_time) * delta()).max(0.0);
+        }
+
+        self.sound.update_volume(self.sound_vol);
+
+        self.ouput_voltage_norm = input_voltage_norm * self.sound_vol;
     }
 }

@@ -126,7 +126,7 @@ impl SimpleSeal {
     /// }
     /// ```
     pub fn tick(&mut self) -> bool {
-        if self.key_off.is_just_pressed() && !self.visibility.check() {
+        if self.key_off.is_just_pressed() || !self.visibility.check() {
             self.visibility.make_invisible();
             true
         } else {
