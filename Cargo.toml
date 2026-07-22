@@ -22,7 +22,7 @@ lotus-extra = "0.3.3"
 lotussim-script = { version = "*", features = ["time"] }
 
 #lotus-extra = { git = "https://github.com/Oriolus-Software/lotus-extra.git" }
-#lotus-script = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git", features = [
+#lotussim-script = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git", features = [
 #	"time",
 #] }
 # lotus-script = "0.7.0"

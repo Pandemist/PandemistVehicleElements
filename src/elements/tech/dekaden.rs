@@ -1,7 +1,7 @@
 use lotus_extra::vehicle::CockpitSide;
 use lotus_script::time::delta;
 
-use crate::api::{animation::Animation, key_event::KeyEvent};
+use crate::api::{animation::Animation, key_event::KeyEvent, sound::Sound};
 
 pub struct DecadeSwitchBuilder {
     cab_side: Option<CockpitSide>,
@@ -20,6 +20,9 @@ pub struct DecadeSwitchBuilder {
 
     pos_anim: Animation,
 
+    snd_dekade_press: Sound,
+    snd_dekade_release: Sound,
+
     key_plus: KeyEvent,
     key_minus: KeyEvent,
 }
@@ -37,6 +40,16 @@ impl DecadeSwitchBuilder {
     ) -> Self {
         self.key_plus = KeyEvent::new(Some(&event_plus_name.into()), self.cab_side);
         self.key_minus = KeyEvent::new(Some(&event_minus_name.into()), self.cab_side);
+        self
+    }
+
+    pub fn add_btn_sound(
+        mut self,
+        snd_press_name: impl Into<String>,
+        snd_release_name: impl Into<String>,
+    ) -> Self {
+        self.snd_dekade_press = Sound::new_simple(Some(&snd_press_name.into()));
+        self.snd_dekade_release = Sound::new_simple(Some(&snd_release_name.into()));
         self
     }
 
@@ -60,6 +73,8 @@ impl DecadeSwitchBuilder {
             max_value: self.max_value,
             rotation_speed: self.rotation_speed,
             pos_anim: self.pos_anim,
+            snd_dekade_press: self.snd_dekade_press,
+            snd_dekade_release: self.snd_dekade_release,
             key_plus: self.key_plus,
             key_minus: self.key_minus,
         }
@@ -85,6 +100,9 @@ pub struct DecadeSwitch {
     rotation_speed: f32,
 
     pos_anim: Animation,
+
+    snd_dekade_press: Sound,
+    snd_dekade_release: Sound,
 
     pub key_plus: KeyEvent,
     pub key_minus: KeyEvent,
@@ -119,6 +137,9 @@ impl DecadeSwitch {
 
             pos_anim: Animation::new(Some(&animation_name.into())),
 
+            snd_dekade_press: Sound::new_simple(None),
+            snd_dekade_release: Sound::new_simple(None),
+
             key_plus: KeyEvent::new(None, cab_side),
             key_minus: KeyEvent::new(None, cab_side),
         }
@@ -126,6 +147,13 @@ impl DecadeSwitch {
 
     pub fn tick(&mut self, add_target: f32) -> f32 {
         let max_val = self.max_value as f32;
+
+        if self.key_plus.is_just_pressed() || self.key_minus.is_just_pressed() {
+            self.snd_dekade_press.start();
+        }
+        if self.key_plus.is_just_released() || self.key_minus.is_just_released() {
+            self.snd_dekade_release.start();
+        }
 
         if (self.pos - self.target).abs() < 0.001 {
             if self.key_plus.is_just_pressed() {

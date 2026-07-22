@@ -232,7 +232,7 @@ impl AllAny {
     }
 
     pub fn not_all(&self) -> bool {
-        self.all != self.any || self.all == 0
+        self.all != self.any && self.any > 0
     }
 
     pub fn any(&self) -> bool {

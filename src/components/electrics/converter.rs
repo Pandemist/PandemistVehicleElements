@@ -145,6 +145,8 @@ impl Converter {
 
 #[derive(Debug, Default)]
 pub struct ManualConverterBuilder {
+    state: bool,
+
     const_min_voltage_norm: f32,
     const_startup_time: f32,
     const_shutdown_time: f32,
@@ -171,9 +173,16 @@ impl ManualConverterBuilder {
         self
     }
 
+    pub fn init(mut self, on: bool) -> Self {
+        if on {
+            self.state = true;
+        }
+        self
+    }
+
     pub fn build(self) -> ManualConverter {
         ManualConverter {
-            state: false,
+            state: self.state,
             switching_timer: Timer::new(),
             target: SwitchingTarget::Neutral,
             target_last: SwitchingTarget::Neutral,
@@ -217,6 +226,7 @@ impl ManualConverter {
         shutdown_time: f32,
     ) -> ManualConverterBuilder {
         ManualConverterBuilder {
+            state: false,
             const_min_voltage_norm: min_voltage_norm,
             const_startup_time: startup_time,
             const_shutdown_time: shutdown_time,

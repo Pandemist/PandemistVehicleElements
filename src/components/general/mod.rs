@@ -1,3 +1,4 @@
+pub mod annoucements;
 pub mod cabin_door;
 pub mod coupler;
 pub mod folding_seat;

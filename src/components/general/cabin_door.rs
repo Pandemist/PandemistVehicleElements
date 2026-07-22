@@ -337,7 +337,7 @@ impl HandDoorWithLever {
                 self.pos
             };
 
-            self.speed = force / delta();
+            self.speed = grab_vz * force / delta();
 
             // Sound for snapping
             if self.pos == 0.0 && pos_last > 0.0 {

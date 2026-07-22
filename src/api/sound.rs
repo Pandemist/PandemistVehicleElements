@@ -352,6 +352,7 @@ impl Sound {
 /// fade_sound.tick(true);  // Gradually increase volume
 /// fade_sound.tick(false); // Gradually decrease volume
 /// ```
+#[derive(Debug)]
 pub struct SoundWithVol {
     /// Rate at which volume increases per second
     increase: f32,
@@ -553,12 +554,16 @@ impl SoundWithStartAndEnd {
     ///     "end_sound"
     /// );
     /// ```
-    pub fn new(snd_start_name: &str, snd_name: &str, snd_end_name: &str) -> Self {
+    pub fn new(
+        snd_start_name: Option<&str>,
+        snd_name: Option<&str>,
+        snd_end_name: Option<&str>,
+    ) -> Self {
         Self {
             trigger_last: false,
-            snd_start: Sound::new_simple(Some(snd_start_name)),
-            snd: Sound::new_simple(Some(snd_name)),
-            snd_end: Sound::new_simple(Some(snd_end_name)),
+            snd_start: Sound::new_simple(snd_start_name),
+            snd: Sound::new_simple(snd_name),
+            snd_end: Sound::new_simple(snd_end_name),
         }
     }
 
