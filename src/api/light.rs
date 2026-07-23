@@ -210,7 +210,7 @@ impl BlinkRelais {
             self.timer -= self.interval;
         }
 
-        let new_on = self.timer < self.on_time;
+        let new_on = self.timer > self.on_time;
 
         let result = if new_on && !self.is_on {
             1
