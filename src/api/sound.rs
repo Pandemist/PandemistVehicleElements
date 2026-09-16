@@ -503,6 +503,90 @@ impl SoundWithEnd {
 
 //=========================================================================
 
+/// A sound controller that plays an end sound when the main sound stops.
+///
+/// This struct manages two sounds: a main sound and an end sound. When the
+/// trigger changes from active to inactive, it stops the main sound and
+/// starts the end sound, creating seamless audio transitions.
+///
+/// # Examples
+///
+/// ```rust
+/// use sound::VolumeSoundWithEnd;
+///
+/// let mut engine_sound = VolumeSoundWithEnd::new(
+///     "engine_running",     // Main sound
+///     "engine_shutdown"     // End/shutdown sound
+/// );
+///
+/// // In your game loop:
+/// engine_sound.tick(engine_active); // Manages both sounds automatically
+/// ```
+pub struct VolumeSoundWithEnd {
+    /// Previous trigger state for detecting changes
+    trigger_last: bool,
+    /// Main sound controller
+    snd: SoundWithVol,
+    /// End sound controller
+    snd_end: Sound,
+}
+
+impl VolumeSoundWithEnd {
+    /// Creates a new VolumeSoundWithEnd controller.
+    ///
+    /// # Arguments
+    ///
+    /// * `snd_name` - Variable name for the main sound
+    /// * `snd_end_name` - Variable name for the end sound
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sound::VolumeSoundWithEnd;
+    /// let sound = VolumeSoundWithEnd::new("main_sound", "end_sound");
+    /// ```
+    pub fn new(snd_name: &str, snd_end_name: &str) -> Self {
+        Self {
+            trigger_last: false,
+            snd: SoundWithVol::new(snd_name, 100.0, 100.0),
+            snd_end: Sound::new_simple(Some(snd_end_name)),
+        }
+    }
+
+    /// Updates the sound states based on the trigger.
+    ///
+    /// It detects changes in the trigger state and manages the
+    /// sound transitions accordingly.
+    ///
+    /// # Arguments
+    ///
+    /// * `trigger` - Current trigger state
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sound::VolumeSoundWithEnd;
+    /// let mut sound = VolumeSoundWithEnd::new("bell", "bell_end");
+    ///
+    /// // In your game loop:
+    /// sound.tick(door_is_opening); // Handles sound transitions
+    /// ```
+    pub fn tick(&mut self, trigger: bool) {
+        if self.trigger_last != trigger {
+            self.snd.tick(trigger);
+            if trigger {
+                self.snd_end.stop();
+            } else {
+                self.snd_end.start();
+            }
+
+            self.trigger_last = trigger;
+        }
+    }
+}
+
+//=========================================================================
+
 /// A complex sound controller with start, loop, and end sounds.
 ///
 /// This struct manages three separate sounds: a start sound (played once when
@@ -600,5 +684,107 @@ impl SoundWithStartAndEnd {
             self.trigger_last = trigger;
         }
         self.snd.start_stop(trigger);
+    }
+}
+
+//=========================================================================
+
+/// A complex sound controller with start, loop, and end sounds.
+///
+/// This struct manages three separate sounds: a start sound (played once when
+/// triggered), a loop sound (played continuously while active), and an end
+/// sound (played once when deactivated). This creates rich, multi-layered
+/// audio experiences.
+///
+/// # Examples
+///
+/// ```rust
+/// use sound::VolumeSoundWithStartAndEnd;
+///
+/// let mut complex_sound = VolumeSoundWithStartAndEnd::new(
+///     "machine_startup",    // Start sound
+///     "machine_running",    // Loop sound
+///     "machine_shutdown"    // End sound
+/// );
+///
+/// // In your game loop:
+/// complex_sound.tick(machine_active); // Manages all three sounds
+/// ```
+pub struct VolumeSoundWithStartAndEnd {
+    /// Previous trigger state for detecting changes
+    trigger_last: bool,
+    /// Start sound controller
+    snd_start: Sound,
+    /// Loop sound controller
+    snd: SoundWithVol,
+    /// End sound controller
+    snd_end: Sound,
+}
+
+impl VolumeSoundWithStartAndEnd {
+    /// Creates a new VolumeSoundWithStartAndEnd controller.
+    ///
+    /// # Arguments
+    ///
+    /// * `snd_start_name` - Variable name for the start sound
+    /// * `snd_name` - Variable name for the loop sound
+    /// * `snd_end_name` - Variable name for the end sound
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sound::VolumeSoundWithStartAndEnd;
+    /// let sound = VolumeSoundWithStartAndEnd::new(
+    ///     "start_sound",
+    ///     "loop_sound",
+    ///     "end_sound"
+    /// );
+    /// ```
+    pub fn new(
+        snd_start_name: Option<&str>,
+        snd_name: Option<&str>,
+        snd_end_name: Option<&str>,
+    ) -> Self {
+        Self {
+            trigger_last: false,
+            snd_start: Sound::new_simple(snd_start_name),
+            snd: SoundWithVol::new(snd_name.unwrap_or_default(), 100.0, 100.0),
+            snd_end: Sound::new_simple(snd_end_name),
+        }
+    }
+
+    /// Updates all sound states based on the trigger.
+    ///
+    /// It manages the complex interactions between the start, loop, and end
+    /// sounds based on trigger state changes.
+    ///
+    /// # Arguments
+    ///
+    /// * `trigger` - Current trigger state
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sound::VolumeSoundWithStartAndEnd;
+    /// let mut sound = VolumeSoundWithStartAndEnd::new(
+    ///     "start_sound",
+    ///     "loop_sound",
+    ///     "end_sound"
+    /// );
+    ///
+    /// // In your game loop:
+    /// sound.tick(player_casting_spell); // Manages all sound phases
+    /// ```
+    pub fn tick(&mut self, trigger: bool) {
+        if self.trigger_last != trigger {
+            if trigger {
+                self.snd_start.start();
+            } else {
+                self.snd_end.start();
+            }
+
+            self.trigger_last = trigger;
+        }
+        self.snd.tick(trigger);
     }
 }

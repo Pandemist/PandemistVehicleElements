@@ -1,11 +1,19 @@
-use lotus_extra::{
-    messages::{ela::AnnouncementDriver, pis::Announcement},
-    vehicle::CockpitSide,
+use lotus_extra::{messages::pis::Announcement, vehicle::CockpitSide};
+use lotus_script::{
+    content::ContentId,
+    message::{message_type, Message},
 };
-use lotus_script::{content::ContentId, message::Message};
 use serde::{Deserialize, Serialize};
 
 use crate::api::{sound::SoundWithStartAndEnd, variable::Variable};
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct AnnouncementDriver {
+    pub value: Vec<ContentId>,
+    pub cab: Option<CockpitSide>,
+}
+
+message_type!(AnnouncementDriver, "Std_ELA", "AnnouncementDriver");
 
 pub enum AnnouncementDestionation {
     DriverCab(Option<CockpitSide>),
@@ -22,6 +30,8 @@ pub enum SpeakerTarget {
 }
 
 pub struct AnnouncementManagerBuilder {
+    power: bool,
+
     destination: AnnouncementDestionation,
 
     int_speaker_sounds: SoundWithStartAndEnd,
@@ -135,6 +145,8 @@ impl AnnouncementManagerBuilder {
 
     pub fn build(self) -> AnnouncementManager {
         AnnouncementManager {
+            power: self.power,
+
             destination: self.destination,
 
             int_speaker_sounds: self.int_speaker_sounds,
@@ -162,6 +174,8 @@ impl AnnouncementManagerBuilder {
 }
 
 pub struct AnnouncementManager {
+    pub power: bool,
+
     destination: AnnouncementDestionation,
 
     int_speaker_sounds: SoundWithStartAndEnd,
@@ -192,6 +206,8 @@ impl AnnouncementManager {
         int_speaker_name: &str,
     ) -> AnnouncementManagerBuilder {
         AnnouncementManagerBuilder {
+            power: false,
+
             destination,
 
             int_speaker_sounds: SoundWithStartAndEnd::new(None, None, None),

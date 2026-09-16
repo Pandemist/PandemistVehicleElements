@@ -202,38 +202,29 @@ impl From<bool> for SimpleSwitchingTarget {
     }
 }
 
-/// Converts a `SwitchingTarget` value to a `SimpleSwitchingTarget`.
-///
-///
-/// # Examples
-///
-/// ```
-/// use pandemist_vehicle_elements_name::SimpleSwitchingTarget;
-///
-/// let turn_on: SimpleSwitchingTarget = SwitchingTarget.TurnOn(0.4).into();
-/// let turn_off: SimpleSwitchingTarget = SwitchingTarget.TurnOff(0.1).into();
-/// ```
-impl From<SwitchingTarget> for SimpleSwitchingTarget {
-    fn from(val: SwitchingTarget) -> Self {
-        match val {
-            SwitchingTarget::TurnOff(_) => SimpleSwitchingTarget::TurnOff,
-            SwitchingTarget::TurnOn(_) => SimpleSwitchingTarget::TurnOn,
-            SwitchingTarget::Neutral => SimpleSwitchingTarget::Neutral,
+//===================================================================
+// Three State
+//===================================================================
+
+#[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ThreeState {
+    On,
+    TurnOff,
+    #[default]
+    Off,
+}
+
+impl ThreeState {
+    pub fn or(self, other: ThreeState) -> Self {
+        match (self, other) {
+            (ThreeState::TurnOff, _) => ThreeState::TurnOff,
+            (_, ThreeState::TurnOff) => ThreeState::TurnOff,
+            (ThreeState::On, _) => ThreeState::On,
+            (_, ThreeState::On) => ThreeState::On,
+            (ThreeState::Off, ThreeState::Off) => ThreeState::Off,
         }
     }
 }
-
-impl SimpleSwitchingTarget {
-    pub fn complex(&self, time: f32) -> SwitchingTarget {
-        match &self {
-            SimpleSwitchingTarget::TurnOff => SwitchingTarget::TurnOff(time),
-            SimpleSwitchingTarget::TurnOn => SwitchingTarget::TurnOn(time),
-            SimpleSwitchingTarget::Neutral => SwitchingTarget::Neutral,
-        }
-    }
-}
-
-//=====================================
 
 /// Represents the target state for controlling electrical systems.
 ///
@@ -388,6 +379,24 @@ impl SwitchingTarget {
             // Similar: Form average
             (TurnOn(a), TurnOn(b)) => TurnOn((a + b) / 2.0),
             (TurnOff(a), TurnOff(b)) => TurnOff((a + b) / 2.0),
+        }
+    }
+
+    pub fn complex(old: SimpleSwitchingTarget, time: f32) -> SwitchingTarget {
+        match &old {
+            SimpleSwitchingTarget::TurnOff => SwitchingTarget::TurnOff(time),
+            SimpleSwitchingTarget::TurnOn => SwitchingTarget::TurnOn(time),
+            SimpleSwitchingTarget::Neutral => SwitchingTarget::Neutral,
+        }
+    }
+}
+
+impl From<SwitchingTarget> for SimpleSwitchingTarget {
+    fn from(val: SwitchingTarget) -> Self {
+        match val {
+            SwitchingTarget::TurnOff(_) => SimpleSwitchingTarget::TurnOff,
+            SwitchingTarget::TurnOn(_) => SimpleSwitchingTarget::TurnOn,
+            SwitchingTarget::Neutral => SimpleSwitchingTarget::Neutral,
         }
     }
 }

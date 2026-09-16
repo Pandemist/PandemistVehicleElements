@@ -15,6 +15,41 @@ const KOMBIBTN_PRESS_TIME: f32 = 0.5;
 
 // INDOOR
 
+pub struct SimpleInPushBtn {
+    btn_anim: Animation,
+
+    key_toggle: KeyEvent,
+
+    ai_door_btns: Vec<usize>,
+}
+
+impl SimpleInPushBtn {
+    pub fn new(
+        cab_side: Option<CockpitSide>,
+        anim_name: impl Into<String>,
+        event_toggle_name: &str,
+        ai_doors: Vec<usize>,
+    ) -> Self {
+        Self {
+            btn_anim: Animation::new(Some(&anim_name.into())),
+            key_toggle: KeyEvent::new(Some(event_toggle_name), cab_side),
+            ai_door_btns: ai_doors,
+        }
+    }
+
+    pub fn tick(&mut self) -> bool {
+        if self.key_toggle.is_pressed() {
+            self.btn_anim.set(1.0);
+        } else {
+            self.btn_anim.set(0.0);
+        }
+
+        self.key_toggle.is_pressed()
+    }
+}
+
+//------------------------
+
 pub struct SimpleInBtn {
     key_toggle: KeyEvent,
 

@@ -116,7 +116,7 @@ impl From<i32> for SwitchingState {
 /// let turning_off = ChangedState::to_changed(true, false);
 /// assert_eq!(turning_off, ChangedState::JustOff);
 /// ```
-#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ChangedState {
     /// Currently off, was off previously
     Off,
@@ -141,6 +141,15 @@ impl ChangedState {
         match self {
             ChangedState::Off | ChangedState::JustOff => true,
             ChangedState::JustOn | ChangedState::On => false,
+        }
+    }
+
+    pub fn merge(&self, other: &ChangedState) -> Self {
+        match (self, other) {
+            (_, ChangedState::On) | (ChangedState::On, _) => ChangedState::On,
+            (_, ChangedState::JustOn) | (ChangedState::JustOn, _) => ChangedState::JustOn,
+            (_, ChangedState::Off) | (ChangedState::Off, _) => ChangedState::Off,
+            (_, _) => ChangedState::JustOff,
         }
     }
 

@@ -1,8 +1,26 @@
 use lotus_extra::messages::trainbus;
 use lotus_script::{
-    message::Coupling,
-    prelude::{Message, MessageType},
+    message::{Coupling, MessageType},
+    prelude::Message,
 };
+
+//-----------------------------------------------
+// Message handling
+pub fn handle_message<MSG: MessageType>(
+    msg: &lotus_script::message::Message,
+    handler: impl FnOnce(MSG) -> bool,
+) -> bool {
+    let mut handler_result = true;
+
+    msg.handle(|m: MSG| {
+        handler_result = handler(m);
+        Ok(())
+    })
+    .unwrap()
+        && handler_result
+}
+
+//-----------------------------------------------
 
 pub trait MessageLine: MessageType + Default + PartialEq + Clone {
     fn evaluate(&self, a: &Self, b: &Self) -> Self;

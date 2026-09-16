@@ -250,30 +250,6 @@ impl From<bool> for AllAny {
 }
 
 //===================================================================
-// Three State
-//===================================================================
-
-#[derive(Default, Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ThreeState {
-    On,
-    TurnOff,
-    #[default]
-    Off,
-}
-
-impl ThreeState {
-    pub fn or(self, other: ThreeState) -> Self {
-        match (self, other) {
-            (ThreeState::TurnOff, _) => ThreeState::TurnOff,
-            (_, ThreeState::TurnOff) => ThreeState::TurnOff,
-            (ThreeState::On, _) => ThreeState::On,
-            (_, ThreeState::On) => ThreeState::On,
-            (ThreeState::Off, ThreeState::Off) => ThreeState::Off,
-        }
-    }
-}
-
-//===================================================================
 // Pair<T>
 //===================================================================
 
