@@ -12,14 +12,14 @@ documentation = "https://docs.rs/PandemistVehicleElements"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[patch.crates-io]
+#[patch.crates-io]
 #lotussim-script = { path = "../script-rs/lotus-script" }
 #lotussim-script-sys = { path = "../script-rs/lotus-script-sys" }
 #lotus-extra = { path = "../lotus-extra" }
 
 [dependencies]
 lotus-extra = "0.3.4"
-lotussim-script = { version = "*", features = ["time"] }
+lotussim-script = { version = "0.8", features = ["time"] }
 
 #lotus-extra = { git = "https://github.com/Oriolus-Software/lotus-extra.git" }
 #lotussim-script = { git = "https://github.com/Oriolus-Software/LOTUS-Scripting.git", features = [
