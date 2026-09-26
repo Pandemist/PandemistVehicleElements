@@ -407,7 +407,7 @@ pub struct OutsideMirror {
     /// Target state for the arm (publicly accessible for external control)
     pub arm_target: bool,
     /// Previous target state (used for sound triggering)
-    arm_target_last: bool,
+    pub arm_target_last: bool,
     /// Sound played when arm opens
     snd_open: Sound,
     /// Sound played when arm closes
@@ -557,9 +557,11 @@ impl OutsideMirror {
         }
 
         // Mirror arm (electric)
-        if voltage > 0.25 && self.arm_target != self.arm_state {
-            match (self.arm_target, self.arm_state) {
-                (false, true) => {
+        let target_pos = if self.arm_target { 1.0 } else { 0.0 };
+
+        if voltage > 0.25 && self.pos_arm != target_pos {
+            match self.arm_target {
+                false => {
                     // Closing the arm
                     if self.arm_target_last {
                         self.snd_close.start();
@@ -571,7 +573,7 @@ impl OutsideMirror {
                         self.arm_state = false;
                     }
                 }
-                (true, false) => {
+                true => {
                     // Opening the arm
                     if !self.arm_target_last {
                         self.snd_open.start();
@@ -583,7 +585,6 @@ impl OutsideMirror {
                         self.arm_state = true;
                     }
                 }
-                (_, _) => {}
             }
             self.arm_target_last = self.arm_target;
         }
@@ -591,11 +592,11 @@ impl OutsideMirror {
         // Mirror (hand)
         if self.key_grab.is_pressed() {
             self.pos_x = (self.pos_x + (mouse_move().x * self.mouse_factor_mirror.x))
-                .min(self.mirror_border_1.x)
-                .max(self.mirror_border_2.x);
+                .min(self.mirror_border_2.x)
+                .max(self.mirror_border_1.x);
             self.pos_y = (self.pos_y + (mouse_move().y * self.mouse_factor_mirror.y))
-                .min(self.mirror_border_1.y)
-                .max(self.mirror_border_2.y);
+                .min(self.mirror_border_2.y)
+                .max(self.mirror_border_1.y);
             self.pos_x_anim.set(self.pos_x);
             self.pos_y_anim.set(self.pos_y);
         }
