@@ -92,7 +92,7 @@ impl<T: MessageLine> UniversalCouplingLine<T> {
         }
     }
 
-    pub fn get_value(&mut self) -> T {
+    pub fn get_value(&self) -> T {
         let ok_0 = self.is_allowed.0 && self.is_coupled.0;
         let ok_1 = self.is_allowed.1 && self.is_coupled.1;
 
@@ -114,7 +114,7 @@ impl<T: MessageLine> UniversalCouplingLine<T> {
         }
     }
 
-    pub fn get_front(&mut self) -> T {
+    pub fn get_front(&self) -> T {
         if self.is_allowed.0 {
             self.received.0.clone()
         } else {
@@ -122,7 +122,7 @@ impl<T: MessageLine> UniversalCouplingLine<T> {
         }
     }
 
-    pub fn get_rear(&mut self) -> T {
+    pub fn get_rear(&self) -> T {
         if self.is_allowed.1 {
             self.received.1.clone()
         } else {

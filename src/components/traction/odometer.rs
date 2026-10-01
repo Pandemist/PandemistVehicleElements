@@ -4,7 +4,7 @@ use crate::{api::animation::Animation, elements::tech::dekaden::DecadeSwitch};
 
 pub struct Odometer {
     frac: f32,
-    full_km: u64,
+    pub full_km: u64,
 
     anim_frac: Animation,
     decades: Vec<DecadeSwitch>,
