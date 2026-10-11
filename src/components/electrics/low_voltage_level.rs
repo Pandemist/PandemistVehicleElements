@@ -35,7 +35,7 @@ pub struct LowVoltageLevelBuilder {
     const_battery_voltage_normal_v: f32,
     const_battery_voltage_max_v: f32,
     const_battery_voltage_min_v: f32,
-    const_battery_voltage_loss_vs: f32,
+    battery_voltage_loss_vs: f32,
     const_battery_voltage_load_vs: f32,
 
     battery_voltage_abs: f32,
@@ -121,7 +121,7 @@ impl LowVoltageLevelBuilder {
     ///
     /// Returns `Self` for method chaining
     pub fn voltage_loss_vs(mut self, value: f32) -> Self {
-        self.const_battery_voltage_loss_vs = value;
+        self.battery_voltage_loss_vs = value;
         self
     }
 
@@ -199,7 +199,7 @@ impl LowVoltageLevelBuilder {
             const_battery_voltage_normal_v: self.const_battery_voltage_normal_v,
             const_battery_voltage_max_v: self.const_battery_voltage_max_v,
             const_battery_voltage_min_v: self.const_battery_voltage_min_v,
-            const_battery_voltage_loss_vs: self.const_battery_voltage_loss_vs,
+            battery_voltage_loss_vs: self.battery_voltage_loss_vs,
             const_battery_voltage_load_vs: self.const_battery_voltage_load_vs,
             battery_voltage_abs: self.battery_voltage_abs,
             battery_voltage_abs_last: self.battery_voltage_abs_last,
@@ -252,7 +252,7 @@ pub struct LowVoltageLevel {
     /// Minimum allowed battery voltage in volts (protection threshold)
     const_battery_voltage_min_v: f32,
     /// Voltage loss rate in volts per second
-    const_battery_voltage_loss_vs: f32,
+    pub battery_voltage_loss_vs: f32,
     /// Voltage charging rate coefficient
     const_battery_voltage_load_vs: f32,
 
@@ -313,7 +313,7 @@ impl LowVoltageLevel {
             const_battery_voltage_normal_v: voltage_normal_v,
             const_battery_voltage_max_v: voltage_normal_v,
             const_battery_voltage_min_v: 0.0,
-            const_battery_voltage_loss_vs: 0.0,
+            battery_voltage_loss_vs: 0.0,
             const_battery_voltage_load_vs: 0.0,
             battery_voltage_abs: voltage_normal_v,
             battery_voltage_abs_last: voltage_normal_v,
@@ -402,7 +402,7 @@ impl LowVoltageLevel {
         if self.battery_mainswitch {
             // Apply discharge (voltage loss)
             self.battery_voltage_abs =
-                (self.battery_voltage_abs - self.const_battery_voltage_loss_vs * delta()).max(0.0);
+                (self.battery_voltage_abs - self.battery_voltage_loss_vs * delta()).max(0.0);
 
             // Apply charging from input voltage, clamped to maximum voltage
             self.battery_voltage_abs = self.const_battery_voltage_max_v.min(

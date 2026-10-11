@@ -291,7 +291,7 @@ impl Switch {
     pub fn set(&mut self, target: bool) {
         if target != self.value {
             self.value = target;
-            self.pos = self.value as u8 as f32;
+            self.pos = f32::from(self.value);
             if self.value {
                 self.snd_plus.start();
             } else {

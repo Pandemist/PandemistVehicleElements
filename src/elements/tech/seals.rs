@@ -133,6 +133,10 @@ impl SimpleSeal {
             false
         }
     }
+
+    pub fn break_seal(&mut self) {
+        self.visibility.make_invisible();
+    }
 }
 
 //=================================================================
@@ -195,6 +199,10 @@ impl SealedSwitch {
         s
     }
 
+    pub fn break_seal(&mut self) {
+        self.visibility.make_invisible();
+    }
+
     /// Updates the sealed switch state and processes input.
     ///
     /// This method handles both seal removal and switch operation. When the seal
@@ -240,6 +248,10 @@ impl SealedStepSwitch {
         };
         s.visibility.make_visible();
         s
+    }
+
+    pub fn break_seal(&mut self) {
+        self.visibility.make_invisible();
     }
 
     pub fn tick(&mut self) {
@@ -438,5 +450,9 @@ impl CoveredKey {
         if self.anim.pos > 0.5 {
             self.key_switch.tick();
         }
+    }
+
+    pub fn toggle_cover(&mut self) {
+        self.anim.set(1.0 - self.anim.pos);
     }
 }

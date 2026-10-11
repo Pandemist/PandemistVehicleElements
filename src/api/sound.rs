@@ -444,6 +444,7 @@ pub struct SoundWithEnd {
     snd: Sound,
     /// End sound controller
     snd_end: Sound,
+    extra_tick: bool,
 }
 
 impl SoundWithEnd {
@@ -465,6 +466,7 @@ impl SoundWithEnd {
             trigger_last: false,
             snd: Sound::new_simple(Some(snd_name)),
             snd_end: Sound::new_simple(Some(snd_end_name)),
+            extra_tick: false,
         }
     }
 
@@ -487,12 +489,17 @@ impl SoundWithEnd {
     /// sound.tick(door_is_opening); // Handles sound transitions
     /// ```
     pub fn tick(&mut self, trigger: bool) {
+        if self.extra_tick {
+            self.extra_tick = false;
+            self.snd.stop();
+        }
+
         if self.trigger_last != trigger {
             if trigger {
                 self.snd.start();
                 self.snd_end.stop();
             } else {
-                self.snd.stop();
+                self.extra_tick = true;
                 self.snd_end.start();
             }
 

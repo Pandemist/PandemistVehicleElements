@@ -815,7 +815,6 @@ impl Rollo {
         self.pull_loop_sound.start_stop(rollo_last < self.pos_rollo);
 
         self.rollo_anim.set(self.pos_rollo);
-        self.reset_anim
-            .set(self.key_reset.is_pressed() as u8 as f32);
+        self.reset_anim.set(f32::from(self.key_reset.is_pressed()));
     }
 }

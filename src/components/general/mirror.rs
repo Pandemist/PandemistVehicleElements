@@ -199,7 +199,7 @@ impl OutsideMirrorBuilder {
     /// # Returns
     /// Updated builder instance
     pub fn init_arm(mut self, target: bool) -> Self {
-        self.pos_arm = target as u8 as f32;
+        self.pos_arm = f32::from(target);
         self.pos_arm_anim.set(self.pos_arm);
 
         self.arm_state = target;

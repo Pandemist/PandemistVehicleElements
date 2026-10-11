@@ -460,7 +460,7 @@ impl AegElectricDoor {
         }
 
         self.lm_warn_in
-            .set_brightness((self.warn_relais.is_on as u8 as f32) * spannung);
+            .set_brightness(f32::from(self.warn_relais.is_on) * spannung);
     }
 
     pub fn tick(

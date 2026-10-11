@@ -176,7 +176,7 @@ impl SimpleWithStateInPushBtn {
         }
 
         self.btn_request_light
-            .set_brightness(request_light as u8 as f32);
+            .set_brightness(f32::from(request_light));
 
         value
     }
@@ -236,7 +236,7 @@ impl DuwagDreieckIn2PushBtn {
             set_var(&var_name, false);
         }
 
-        self.btn_light.set_brightness(light as u8 as f32);
+        self.btn_light.set_brightness(f32::from(light));
 
         value
     }
@@ -341,7 +341,7 @@ impl LightedOutPushBtn {
 
     pub fn tick(&mut self, light: bool) -> bool {
         let mut value = self.key_toggle.is_pressed();
-        self.btn_light.set_brightness(light as u8 as f32);
+        self.btn_light.set_brightness(f32::from(light));
 
         if self.key_toggle.is_pressed() {
             self.btn_anim.set(1.0);

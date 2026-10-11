@@ -112,16 +112,16 @@ impl Railbrakes {
             self.snd_railbrake_off.start();
         }
 
-        self.animation_railbrake.set(self.state as u8 as f32);
+        self.animation_railbrake.set(f32::from(self.state));
 
         //self.snd_railbrake
-        //    .update_pitch((self.state as u8 as f32) * 1.5 - 0.5);
+        //    .update_pitch(f32::from(self.state) * 1.5 - 0.5);
 
         self.snd_friction_while_on
-            .set((self.snd_friction_mapping)(self.state as u8 as f32));
+            .set((self.snd_friction_mapping)(f32::from(self.state)));
 
         self.api_bogie
-            .railbrake_force((self.state as u8 as f32) * brake_voltage * self.const_force);
+            .railbrake_force(f32::from(self.state) * brake_voltage * self.const_force);
 
         self.state_last = self.state;
     }

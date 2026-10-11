@@ -43,6 +43,8 @@ pub struct SimpleCoupler {
     api_coupler: ApiCoupler,
     /// Animation controller for electrical parts
     electric_parts_anim: Animation,
+    e_state_last: bool,
+    bus_ids: Vec<String>,
 }
 
 impl SimpleCoupler {
@@ -57,10 +59,16 @@ impl SimpleCoupler {
     /// # Returns
     ///
     /// A new `SimpleCoupler` instance ready for use.
-    pub fn new(coupler: Coupling, electric_parts_animation_name: &str) -> Self {
+    pub fn new(
+        coupler: Coupling,
+        electric_parts_animation_name: &str,
+        bus_ids: Vec<String>,
+    ) -> Self {
         SimpleCoupler {
             api_coupler: ApiCoupler::new(coupler),
             electric_parts_anim: Animation::new(Some(electric_parts_animation_name)),
+            e_state_last: false,
+            bus_ids,
         }
     }
 
@@ -73,6 +81,18 @@ impl SimpleCoupler {
     pub fn tick(&mut self) {
         let electric_parts = if self.mech_coupled() { 1.0 } else { 0.0 };
         self.electric_parts_anim.set(electric_parts);
+        if (self.electric_parts_anim.pos > 0.8) != self.e_state_last {
+            if self.electric_parts_anim.pos > 0.8 {
+                for id in &self.bus_ids {
+                    self.api_coupler.coupler.open_bus(id);
+                }
+            } else {
+                for id in &self.bus_ids {
+                    self.api_coupler.coupler.close_bus(id);
+                }
+            }
+            self.e_state_last = self.electric_parts_anim.pos > 0.8;
+        }
     }
 
     /// Checks if the coupler is mechanically coupled.
@@ -190,6 +210,9 @@ pub struct HandCoupler {
     bag_setted: bool,
     /// Previous coupling state for change detection
     coupled_state_last: bool,
+
+    e_state_last: bool,
+    bus_ids: Vec<String>,
 }
 
 impl HandCoupler {
@@ -215,6 +238,7 @@ impl HandCoupler {
         coupler: Coupling,
         friction: f32,
         mouse_factor: f32,
+        bus_ids: Vec<String>,
     ) -> Self {
         let mut s = Self {
             const_coupler_reflect: 0.99,
@@ -258,6 +282,9 @@ impl HandCoupler {
             bag_timer: Timer::new(),
             bag_setted: false,
             coupled_state_last: false,
+
+            e_state_last: false,
+            bus_ids,
         };
 
         // Initially extend the coupling if the train is already coupled at the start of the simulation
@@ -425,6 +452,19 @@ impl HandCoupler {
         } else {
             self.bag_setted = false;
             self.bag_vis.make_invisible();
+        }
+
+        if (self.electric_parts.value(true)) != self.e_state_last {
+            if self.electric_parts.value(true) {
+                for id in &self.bus_ids {
+                    self.api_coupler.coupler.open_bus(id);
+                }
+            } else {
+                for id in &self.bus_ids {
+                    self.api_coupler.coupler.close_bus(id);
+                }
+            }
+            self.e_state_last = self.electric_parts.value(true);
         }
     }
 

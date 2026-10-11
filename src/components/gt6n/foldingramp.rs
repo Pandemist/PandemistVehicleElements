@@ -123,7 +123,7 @@ impl Foldingramp {
             self.warnrelais.reset();
         }
         self.l_warning
-            .set_brightness(self.warnrelais.is_on as u8 as f32);
+            .set_brightness(f32::from(self.warnrelais.is_on));
 
         let coverage_upper_bump = 1.0;
 

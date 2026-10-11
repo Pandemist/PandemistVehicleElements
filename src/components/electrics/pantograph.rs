@@ -487,7 +487,7 @@ impl ElectricPantograph {
         }
 
         self.voltage_norm = if realisitc_electric_supply() {
-            ((self.state == SwitchingState::On) as u8 as f32) * self.api_panto.voltage()
+            f32::from(self.state == SwitchingState::On) * self.api_panto.voltage()
         } else {
             (self.state == SwitchingState::On).into()
         };
@@ -714,9 +714,9 @@ impl ManualPantograph {
         self.vis_rope_knoted.set_visbility(self.wire.pos <= 0.0);
 
         self.voltage_norm = if realisitc_electric_supply() {
-            (self.state as u8 as f32) * self.api_panto.voltage()
+            f32::from(self.state) * self.api_panto.voltage()
         } else {
-            self.state as u8 as f32
+            f32::from(self.state)
         };
 
         self.update_animation(self.panto.pos);

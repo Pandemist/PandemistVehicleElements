@@ -492,12 +492,12 @@ impl MainSwitch {
         }
 
         // Output voltage calculation
-        self.output = input_voltage * self.state as u8 as f32;
+        self.output = input_voltage * f32::from(self.state);
 
         self.target_last = self.target;
 
         // State indicator animation
-        let state_anim_target = 1.0 * (!self.state) as u8 as f32;
+        let state_anim_target = 1.0 * f32::from(!self.state);
         self.state_anim.set(state_anim_target);
     }
 
@@ -621,7 +621,7 @@ impl CircuitBreaker {
     /// ```
     pub fn tick(&mut self, input_voltage: f32) {
         self.state = input_voltage > 0.8 && input_voltage < 1.2;
-        self.output = input_voltage * self.state as u8 as f32;
+        self.output = input_voltage * f32::from(self.state);
     }
 }
 
