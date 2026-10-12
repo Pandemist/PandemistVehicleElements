@@ -39,13 +39,13 @@ impl<T: MessageLine> SingleCouplingLine<T> {
         })
         .expect("EcouplerState: message handle failed");
 
-        if msg.source().is_front() || msg.source().is_rear() {
-            if let Some((side, value)) = T::default().rcv(msg.clone()) {
-                if side == self.side && self.received != value {
-                    self.received = value;
-                    changed = true;
-                }
-            }
+        if (msg.source().is_front() || msg.source().is_rear())
+            && let Some((side, value)) = T::default().rcv(msg.clone())
+            && side == self.side
+            && self.received != value
+        {
+            self.received = value;
+            changed = true;
         }
 
         changed

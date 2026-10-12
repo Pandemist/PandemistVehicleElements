@@ -151,10 +151,10 @@ impl SwtichControlUnit {
     /// or `RoutingDirection::Off` if no active requests exist.
     fn get_current_switch_target(&self) -> RoutingDirection {
         for sender in &self.priorities {
-            if let Some(&val) = self.values.get(sender) {
-                if val != RoutingDirection::Off {
-                    return val;
-                }
+            if let Some(&val) = self.values.get(sender)
+                && val != RoutingDirection::Off
+            {
+                return val;
             }
         }
         RoutingDirection::Off

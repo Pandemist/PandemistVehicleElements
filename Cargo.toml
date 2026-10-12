@@ -2,7 +2,7 @@
 name = "pandemist_vehicle_elements"
 version = "0.2.1"
 authors = ["pandemist.daniel@gmail.com"]
-edition = "2021"
+edition = "2024"
 description = "A library with helpful structures for developing Lotus projects."
 license = "Apache-2.0"
 readme = "README.md"

@@ -65,12 +65,11 @@ impl<T: MessageLine> UniversalCouplingLine<T> {
         .expect("EcouplerState: message handle failed");
 
         // Receive value from the clutch
-        if msg.source().is_front() || msg.source().is_rear() {
-            if let Some((side, value)) = self.local_value.rcv(msg.clone()) {
-                if Self::write_to(&mut self.received, &value, side) {
-                    self.update();
-                }
-            }
+        if (msg.source().is_front() || msg.source().is_rear())
+            && let Some((side, value)) = self.local_value.rcv(msg.clone())
+            && Self::write_to(&mut self.received, &value, side)
+        {
+            self.update();
         }
     }
 

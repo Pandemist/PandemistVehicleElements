@@ -91,10 +91,10 @@ impl IntercomGt6n {
     }
 
     pub fn confirm(&mut self, current_activ: Option<usize>) {
-        if let Some(curr) = current_activ {
-            if curr == self.id {
-                self.confirmed = true;
-            }
+        if let Some(curr) = current_activ
+            && curr == self.id
+        {
+            self.confirmed = true;
         }
     }
 }

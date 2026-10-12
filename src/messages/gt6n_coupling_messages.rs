@@ -24,7 +24,7 @@
 
 use lotus_script::{
     message::Coupling,
-    prelude::{message_type, send_message, Message, MessageTarget},
+    prelude::{Message, MessageTarget, message_type, send_message},
 };
 use serde::{Deserialize, Serialize};
 
@@ -113,14 +113,14 @@ impl BagReader {
     ///
     /// Panics if message handling fails unexpectedly
     pub fn on_message(&mut self, msg: Message) {
-        if let Some(msg_side) = msg.source().coupling {
-            if msg_side == self.side {
-                msg.handle::<Bag>(|m| {
-                    self.value = m.value;
-                    Ok(())
-                })
-                .expect("Bag: message handle failed");
-            }
+        if let Some(msg_side) = msg.source().coupling
+            && msg_side == self.side
+        {
+            msg.handle::<Bag>(|m| {
+                self.value = m.value;
+                Ok(())
+            })
+            .expect("Bag: message handle failed");
         }
     }
 }
