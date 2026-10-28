@@ -7,7 +7,12 @@ use lotus_extra::rand::gen_f32;
 use lotus_script::{rand::gen_f64, time::delta};
 
 use crate::{
-    api::sound::Sound, elements::std::timer::Timer,
+    api::{
+        animation::Animation,
+        sound::{Sound, SoundWithStartAndEnd},
+        variable::set_var,
+    },
+    elements::std::timer::Timer,
     management::enums::target_enums::SwitchingTarget,
 };
 
@@ -280,8 +285,19 @@ impl ManualConverter {
 
 //====================================
 
-#[derive(Debug, Default)]
-pub struct SubwayConverterBuilder {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
+pub enum ConverterKind {
+    F74,
+    F76,
+    F79,
+    Drehstrom,
+}
+
+#[derive(Debug)]
+pub struct FTrainConverterBuilder {
+    kind: ConverterKind,
+
     const_time: f32,
     const_vari_max_rate: f32,
     const_vari_max: f32,
@@ -289,6 +305,7 @@ pub struct SubwayConverterBuilder {
     switch_on: bool,
 
     state: bool,
+    converter_b: bool,
 
     offset: f32,
     offset_rate: f32,
@@ -300,11 +317,17 @@ pub struct SubwayConverterBuilder {
     snd_turn_on: Sound,
     snd_turn_off: Sound,
 
+    snd_converter_vol: Animation,
+
+    snd_houling: SoundWithStartAndEnd,
+
+    snd_converter: SoundWithStartAndEnd,
+
     sound: Sound,
     sound_trafo: Sound,
 }
 
-impl SubwayConverterBuilder {
+impl FTrainConverterBuilder {
     pub fn configure_consts(
         mut self,
         const_time: f32,
@@ -328,12 +351,34 @@ impl SubwayConverterBuilder {
     }
 
     pub fn add_run_sound(mut self, snd_run_name: &str) -> Self {
+        set_var(snd_run_name, false);
         self.sound = Sound::new_simple(Some(snd_run_name));
         self
     }
 
     pub fn add_travo_sound(mut self, snd_vol_name: &str, snd_pitch_name: &str) -> Self {
-        self.sound = Sound::new(None, Some(snd_vol_name), Some(snd_pitch_name));
+        set_var(snd_vol_name, 0.0);
+        set_var(snd_pitch_name, 0.0);
+        self.sound_trafo = Sound::new(None, Some(snd_vol_name), Some(snd_pitch_name));
+        self
+    }
+
+    pub fn add_houling_sound(mut self, snd_start: &str, snd_loop: &str) -> Self {
+        set_var(snd_start, false);
+        set_var(snd_loop, false);
+        self.snd_houling = SoundWithStartAndEnd::new(Some(snd_start), Some(snd_loop), None);
+        self
+    }
+
+    pub fn add_vol_sound(mut self, snd_vol: &str) -> Self {
+        set_var(snd_vol, 0.0);
+        self.snd_converter_vol = Animation::new(Some(snd_vol));
+        self
+    }
+
+    pub fn add_loop_sound(mut self, snd_start: &str, snd_loop: &str, snd_end: &str) -> Self {
+        self.snd_converter =
+            SoundWithStartAndEnd::new(Some(snd_start), Some(snd_loop), Some(snd_end));
         self
     }
 
@@ -344,13 +389,15 @@ impl SubwayConverterBuilder {
         self
     }
 
-    pub fn build(self) -> SubwayConverter {
-        SubwayConverter {
+    pub fn build(self) -> FTrainConverter {
+        FTrainConverter {
+            kind: self.kind,
             const_time: self.const_time,
             const_vari_max_rate: self.const_vari_max_rate,
             const_vari_max: self.const_vari_max,
             switch_on: self.switch_on,
             state: self.state,
+            converter_b: self.converter_b,
             switching_timer: Timer::new(),
             target: SwitchingTarget::Neutral,
             target_last: SwitchingTarget::Neutral,
@@ -362,6 +409,9 @@ impl SubwayConverterBuilder {
             trafo_pitch: self.trafo_pitch,
             snd_turn_on: self.snd_turn_on,
             snd_turn_off: self.snd_turn_off,
+            snd_converter_vol: self.snd_converter_vol,
+            snd_houling: self.snd_houling,
+            snd_converter: self.snd_converter,
             sound_vol: 0.0,
             sound: self.sound,
             sound_trafo: self.sound_trafo,
@@ -370,8 +420,10 @@ impl SubwayConverterBuilder {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct SubwayConverter {
+#[derive(Debug)]
+pub struct FTrainConverter {
+    kind: ConverterKind,
+
     const_time: f32,
     const_vari_max_rate: f32,
     const_vari_max: f32,
@@ -379,6 +431,7 @@ pub struct SubwayConverter {
     switch_on: bool,
 
     pub state: bool,
+    converter_b: bool,
 
     switching_timer: Timer,
 
@@ -395,15 +448,23 @@ pub struct SubwayConverter {
     snd_turn_on: Sound,
     snd_turn_off: Sound,
 
+    snd_converter_vol: Animation,
+
+    snd_houling: SoundWithStartAndEnd,
+
+    snd_converter: SoundWithStartAndEnd,
+
     sound_vol: f32,
     sound: Sound,
     sound_trafo: Sound,
     pub ouput_voltage_norm: f32,
 }
 
-impl SubwayConverter {
-    pub fn builder() -> SubwayConverterBuilder {
-        SubwayConverterBuilder {
+impl FTrainConverter {
+    pub fn builder(kind: ConverterKind) -> FTrainConverterBuilder {
+        FTrainConverterBuilder {
+            kind,
+
             const_time: 0.6,
             const_vari_max_rate: 0.03,
             const_vari_max: 0.04,
@@ -411,6 +472,7 @@ impl SubwayConverter {
             switch_on: false,
 
             state: false,
+            converter_b: false,
 
             offset: 0.0,
             offset_rate: 0.0,
@@ -421,6 +483,12 @@ impl SubwayConverter {
 
             snd_turn_on: Sound::new_simple(None),
             snd_turn_off: Sound::new_simple(None),
+
+            snd_converter_vol: Animation::new(None),
+
+            snd_houling: SoundWithStartAndEnd::new(None, None, None),
+
+            snd_converter: SoundWithStartAndEnd::new(None, None, None),
             sound: Sound::new_simple(None),
             sound_trafo: Sound::new_simple(None),
         }
@@ -431,6 +499,8 @@ impl SubwayConverter {
         input_voltage_norm: f32,
         battery: bool,
         frequence_modifyer: Option<f32>,
+        level_2: bool,
+        fuse: bool,
     ) {
         match (self.target, self.state) {
             (SwitchingTarget::TurnOn(delay), false) => {
@@ -460,6 +530,42 @@ impl SubwayConverter {
             }
         }
 
+        if !fuse {
+            self.state = false;
+        }
+
+        let is_on = match self.kind {
+            ConverterKind::F74 => self.converter_f74(level_2),
+            ConverterKind::F76 => self.converter_f76(),
+            ConverterKind::F79 => {
+                self.converter_f79(input_voltage_norm, battery, frequence_modifyer)
+            }
+            ConverterKind::Drehstrom => self.converter_dc(),
+        };
+
+        self.ouput_voltage_norm = input_voltage_norm * f32::from(is_on);
+    }
+
+    fn converter_f74(&mut self, level_2: bool) -> bool {
+        let trigger_b = self.state && level_2;
+        let trigger = self.state && !trigger_b;
+
+        self.snd_houling.tick(trigger);
+        self.snd_converter.tick(trigger_b);
+
+        trigger || trigger_b
+    }
+    fn converter_f76(&mut self) -> bool {
+        self.snd_converter_vol.set(f32::from(self.state));
+
+        self.state
+    }
+    fn converter_f79(
+        &mut self,
+        input_voltage_norm: f32,
+        battery: bool,
+        frequence_modifyer: Option<f32>,
+    ) -> bool {
         // ----------------------------------------------------
         // Offset berechnen
         // ----------------------------------------------------
@@ -491,7 +597,8 @@ impl SubwayConverter {
         if new_active != self.state {
             self.state = new_active;
 
-            self.trafo_pitch = if new_active { 1.0 } else { 0.0 };
+            self.sound_trafo
+                .update_volume(if new_active { 1.0 } else { 0.0 });
         }
 
         // ----------------------------------------------------
@@ -527,6 +634,12 @@ impl SubwayConverter {
 
         self.sound_trafo.update_pitch(self.trafo_pitch);
 
-        self.ouput_voltage_norm = input_voltage_norm * f32::from(self.frequence > 0.5);
+        self.frequence > 0.5
+    }
+
+    fn converter_dc(&mut self) -> bool {
+        self.snd_converter.tick(self.state);
+
+        self.state
     }
 }

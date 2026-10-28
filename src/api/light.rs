@@ -4,7 +4,7 @@
 //! light bulbs with smooth transitions, blink relays, and simple blinkers for different
 //! lighting effects and animations.
 
-use lotus_script::{time::delta, var::set_var};
+use lotus_script::{math::exponential_approach, time::delta, var::set_var};
 
 /// A basic light structure that can control brightness through lotus_script variables.
 ///
@@ -125,8 +125,7 @@ impl LightBulb {
     /// bulb.tick(1.0); // Gradually increase to full brightness
     /// ```
     pub fn tick(&mut self, target: f32) {
-        self.value =
-            (1.0 - (-self.on_off_speed * delta()).exp()) * (target - self.value) + self.value;
+        self.value = exponential_approach(self.value, self.on_off_speed, target);
         self.light.set_brightness(self.value);
     }
 }

@@ -33,7 +33,7 @@ use lotus_script::time::delta;
 use crate::{
     api::{
         animation::Animation, electrical_supply::ApiPantograph,
-        simulation_settings::realisitc_electric_supply, sound::Sound, visible_flag::Visiblility,
+        simulation_settings::realisitc_electric_supply, sound::Sound, visible_flag::Visibility,
     },
     elements::{std::timer::Timer, tech::slider::Slider},
     management::enums::{state_enums::SwitchingState, target_enums::SwitchingTarget},
@@ -519,8 +519,8 @@ pub struct ManualPantographBuilder {
     wire: Slider,
     panto: Slider,
 
-    vis_rope_loss: Visiblility,
-    vis_rope_knoted: Visiblility,
+    vis_rope_loss: Visibility,
+    vis_rope_knoted: Visibility,
 
     api_panto: ApiPantograph,
 }
@@ -609,8 +609,8 @@ pub struct ManualPantograph {
     wire: Slider,
     panto: Slider,
 
-    vis_rope_loss: Visiblility,
-    vis_rope_knoted: Visiblility,
+    vis_rope_loss: Visibility,
+    vis_rope_knoted: Visibility,
 
     api_panto: ApiPantograph,
 }
@@ -660,8 +660,8 @@ impl ManualPantograph {
                 .friction(0.1)
                 .force(1.5)
                 .build(),
-            vis_rope_loss: Visiblility::new(vis_rope_loss_name),
-            vis_rope_knoted: Visiblility::new(vis_rope_knoted_name),
+            vis_rope_loss: Visibility::new(vis_rope_loss_name),
+            vis_rope_knoted: Visibility::new(vis_rope_knoted_name),
             api_panto: ApiPantograph::new(id),
         }
     }

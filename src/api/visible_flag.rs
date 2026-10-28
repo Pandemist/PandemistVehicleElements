@@ -10,10 +10,10 @@ use lotus_script::var::{get_var, set_var};
 /// # Examples
 ///
 /// ```
-/// use pandemist_vehicle_elements::Visiblility;
+/// use pandemist_vehicle_elements::Visibility;
 ///
 /// // Create a new visibility flag
-/// let mut flag = Visiblility::new("my_component");
+/// let mut flag = Visibility::new("my_component");
 ///
 /// // Make the component visible
 /// flag.make_visible();
@@ -28,12 +28,12 @@ use lotus_script::var::{get_var, set_var};
 /// assert!(flag.check());
 /// ```
 #[derive(Debug)]
-pub struct Visiblility {
+pub struct Visibility {
     /// The name of the visibility flag variable
     name: String,
 }
 
-impl Visiblility {
+impl Visibility {
     /// Creates a new visibility flag with the given name.
     ///
     /// The name will be used as the variable name in the lotus_script
@@ -46,10 +46,10 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let flag = Visiblility::new("main_panel");
-    /// let flag2 = Visiblility::new(String::from("sidebar"));
+    /// let flag = Visibility::new("main_panel");
+    /// let flag2 = Visibility::new(String::from("sidebar"));
     /// ```
     pub fn new(name: impl Into<String>) -> Self {
         Self { name: name.into() }
@@ -73,9 +73,9 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let flag = Visiblility::new("status_bar");
+    /// let flag = Visibility::new("status_bar");
     /// let is_visible = flag.check();
     /// ```
     pub fn check(&self) -> bool {
@@ -90,9 +90,9 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let mut flag = Visiblility::new("toolbar");
+    /// let mut flag = Visibility::new("toolbar");
     /// flag.make_visible();
     /// assert!(flag.check());
     /// ```
@@ -112,9 +112,9 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let mut flag = Visiblility::new("menu");
+    /// let mut flag = Visibility::new("menu");
     /// flag.set_visbility(true);   // Make visible
     /// flag.set_visbility(false);  // Make invisible
     /// ```
@@ -130,9 +130,9 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let mut flag = Visiblility::new("notification");
+    /// let mut flag = Visibility::new("notification");
     /// flag.make_invisible();
     /// assert!(!flag.check());
     /// ```
@@ -146,9 +146,9 @@ impl Visiblility {
     /// # Examples
     ///
     /// ```
-    /// use pandemist_vehicle_elements::Visiblility;
+    /// use pandemist_vehicle_elements::Visibility;
     ///
-    /// let mut flag = Visiblility::new("notification");
+    /// let mut flag = Visibility::new("notification");
     /// flag.toggle_visibility();
     /// assert!(flag.check());
     /// flag.toggle_visibility();

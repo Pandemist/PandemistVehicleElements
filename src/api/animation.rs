@@ -16,7 +16,7 @@ use lotus_script::var::set_var;
 /// let mut anim = Animation::new(Some("fade_in"));
 /// anim.set(0.5); // Set animation to 50% progress
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Animation {
     /// Optional name identifier for the animation.
     /// When present, position changes are synchronized with script variables.

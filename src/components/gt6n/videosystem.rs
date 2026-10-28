@@ -1,4 +1,4 @@
-use crate::api::{light::BlinkRelais, visible_flag::Visiblility};
+use crate::api::{light::BlinkRelais, visible_flag::Visibility};
 
 const VIDEOSYSTEM_BLINK: f32 = 1.5;
 const VIDEOSYSTEM_BLINK_HALF: f32 = VIDEOSYSTEM_BLINK / 2.0;
@@ -9,16 +9,16 @@ pub struct VideoSystemGt6n {
 
     timer: BlinkRelais,
 
-    red: Visiblility,
-    green: Visiblility,
+    red: Visibility,
+    green: Visibility,
 }
 
 impl VideoSystemGt6n {
     #[must_use]
     pub fn new(green_led_name: impl Into<String>, red_led_name: impl Into<String>) -> Self {
         Self {
-            red: Visiblility::new(red_led_name.into()),
-            green: Visiblility::new(green_led_name.into()),
+            red: Visibility::new(red_led_name.into()),
+            green: Visibility::new(green_led_name.into()),
             timer: BlinkRelais::new(VIDEOSYSTEM_BLINK, VIDEOSYSTEM_BLINK_HALF, 0.0),
             is_broken: true, // Standard to Lotus video images supported
         }

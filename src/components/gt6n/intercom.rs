@@ -1,8 +1,6 @@
 use lotus_extra::vehicle::CockpitSide;
 
-use crate::api::{
-    key_event::KeyEvent, light::BlinkRelais, sound::Sound, visible_flag::Visiblility,
-};
+use crate::api::{key_event::KeyEvent, light::BlinkRelais, sound::Sound, visible_flag::Visibility};
 
 const INTERCOM_TIME: f32 = 1.0;
 const INTERCOM_TIME_HALF: f32 = INTERCOM_TIME / 2.0;
@@ -17,9 +15,9 @@ pub struct IntercomGt6n {
 
     flash_timer: BlinkRelais,
 
-    lm_red: Visiblility,
-    lm_green: Visiblility,
-    lm_yellow: Visiblility,
+    lm_red: Visibility,
+    lm_green: Visibility,
+    lm_yellow: Visibility,
 
     key_activate: KeyEvent,
 
@@ -45,9 +43,9 @@ impl IntercomGt6n {
 
             flash_timer: BlinkRelais::new(INTERCOM_TIME, INTERCOM_TIME_HALF, 0.0),
 
-            lm_red: Visiblility::new(red_light_name.into()),
-            lm_green: Visiblility::new(green_light_name.into()),
-            lm_yellow: Visiblility::new(yellow_light_name.into()),
+            lm_red: Visibility::new(red_light_name.into()),
+            lm_green: Visibility::new(green_light_name.into()),
+            lm_yellow: Visibility::new(yellow_light_name.into()),
 
             key_activate: KeyEvent::new(Some(&event_name.into()), cab_side),
 

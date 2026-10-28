@@ -392,7 +392,7 @@ impl Switch {
 // StepSwitch
 //=================================================================
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum SwitchSoundDirection {
     Plus,
     Minus,
@@ -439,7 +439,7 @@ pub struct StepSwitchBuilder {
     snd_default_plus: Sound,
     snd_default_minus: Sound,
 
-    snd_alt: HashMap<i32, (Sound, Option<SwitchSoundDirection>)>,
+    snd_alt: HashMap<(i32, Option<SwitchSoundDirection>), Sound>,
 }
 
 impl StepSwitchBuilder {
@@ -581,8 +581,8 @@ impl StepSwitchBuilder {
         switching_dir: Option<SwitchSoundDirection>,
     ) -> Self {
         self.snd_alt.insert(
-            position,
-            (Sound::new_simple(Some(&sound_name.into())), switching_dir),
+            (position, switching_dir),
+            Sound::new_simple(Some(&sound_name.into())),
         );
         self
     }
@@ -668,7 +668,7 @@ pub struct StepSwitch {
     snd_default_plus: Sound,
     snd_default_minus: Sound,
 
-    snd_alt: HashMap<i32, (Sound, Option<SwitchSoundDirection>)>,
+    snd_alt: HashMap<(i32, Option<SwitchSoundDirection>), Sound>,
 }
 
 impl StepSwitch {
@@ -778,11 +778,7 @@ impl StepSwitch {
     /// }
     /// ```
     pub fn just_changed(&self, allowed: bool) -> Option<i32> {
-        if allowed {
-            self.just_changed
-        } else {
-            None
-        }
+        if allowed { self.just_changed } else { None }
     }
 
     /// Checks if the switch just changed to a specific position.
@@ -905,30 +901,70 @@ impl StepSwitch {
     }
 
     fn play_sound(&mut self, is_plus: bool) {
-        match self.snd_alt.get_mut(&self.value) {
-            Some(snd) => match snd.1 {
-                Some(dir) => match (dir, is_plus) {
-                    (SwitchSoundDirection::Plus, true) | (SwitchSoundDirection::Minus, false) => {
-                        snd.0.start()
-                    }
-                    _ => {
-                        if is_plus {
-                            self.snd_default_plus.start();
-                        } else {
-                            self.snd_default_minus.start();
+        let dir = if is_plus {
+            SwitchSoundDirection::Plus
+        } else {
+            SwitchSoundDirection::Minus
+        };
+
+        let mut played = false;
+        for alt in &self.snd_alt {
+            let val = alt.0.0;
+            let direction = alt.0.1;
+            if val == self.value {
+                match (direction, dir) {
+                    (Some(a), SwitchSoundDirection::Plus) => {
+                        if a == SwitchSoundDirection::Plus {
+                            alt.1.start();
+                            played = true;
                         }
                     }
-                },
-                None => snd.0.start(),
-            },
-            None => {
-                if is_plus {
-                    self.snd_default_plus.start();
-                } else {
-                    self.snd_default_minus.start();
+                    (Some(a), SwitchSoundDirection::Minus) => {
+                        if a == SwitchSoundDirection::Minus {
+                            alt.1.start();
+                            played = true;
+                        }
+                    }
+                    (None, _) => {
+                        alt.1.start();
+                        played = true;
+                    }
                 }
             }
         }
+
+        if !played {
+            if is_plus {
+                self.snd_default_plus.start();
+            } else {
+                self.snd_default_minus.start();
+            }
+        }
+
+        //match self.snd_alt.get_mut(&(self.value, dir)) {
+        //    Some(snd) => match snd.1 {
+        //        Some(dir) => match (dir, is_plus) {
+        //            (SwitchSoundDirection::Plus, true) | (SwitchSoundDirection::Minus, false) => {
+        //                snd.0.start()
+        //            }
+        //            _ => {
+        //                if is_plus {
+        //                    self.snd_default_plus.start();
+        //                } else {
+        //                    self.snd_default_minus.start();
+        //                }
+        //            }
+        //        },
+        //        None => snd.0.start(),
+        //    },
+        //    None => {
+        //        if is_plus {
+        //            self.snd_default_plus.start();
+        //        } else {
+        //            self.snd_default_minus.start();
+        //        }
+        //    }
+        //}
     }
 
     /// Returns the current switch position, respecting the allowed state.
@@ -953,10 +989,6 @@ impl StepSwitch {
     /// }
     /// ```
     pub fn value(&self, allowed: bool) -> i32 {
-        if allowed {
-            self.value
-        } else {
-            0
-        }
+        if allowed { self.value } else { 0 }
     }
 }

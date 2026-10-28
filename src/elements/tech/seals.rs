@@ -44,7 +44,7 @@
 use lotus_extra::vehicle::CockpitSide;
 
 use crate::{
-    api::{animation::Animation, key_event::KeyEvent, sound::Sound, visible_flag::Visiblility},
+    api::{animation::Animation, key_event::KeyEvent, sound::Sound, visible_flag::Visibility},
     elements::tech::{key_switch::KeySwitch, switches::StepSwitch},
 };
 
@@ -81,7 +81,7 @@ pub struct SimpleSeal {
     /// The key event that triggers seal removal
     pub key_off: KeyEvent,
     /// Controls the visibility state of the seal
-    visibility: Visiblility,
+    visibility: Visibility,
 }
 
 impl SimpleSeal {
@@ -99,7 +99,7 @@ impl SimpleSeal {
     pub fn new(cab_side: Option<CockpitSide>, vis: &str, key_off: &str) -> Self {
         let mut s = Self {
             key_off: KeyEvent::new(Some(key_off), cab_side),
-            visibility: Visiblility::new(vis),
+            visibility: Visibility::new(vis),
         };
         s.visibility.make_visible();
         s
@@ -171,7 +171,7 @@ pub struct SealedSwitch {
     /// The key event that removes the protective seal
     pub key_off: KeyEvent,
     /// Controls the visibility/presence of the seal
-    visibility: Visiblility,
+    visibility: Visibility,
     /// The underlying switch that becomes operational after seal removal
     pub switch: Switch,
 }
@@ -192,7 +192,7 @@ impl SealedSwitch {
     pub fn new(cab_side: Option<CockpitSide>, vis: &str, key_off: &str, switch: Switch) -> Self {
         let mut s = Self {
             key_off: KeyEvent::new(Some(key_off), cab_side),
-            visibility: Visiblility::new(vis),
+            visibility: Visibility::new(vis),
             switch,
         };
         s.visibility.make_visible();
@@ -201,6 +201,10 @@ impl SealedSwitch {
 
     pub fn break_seal(&mut self) {
         self.visibility.make_invisible();
+    }
+
+    pub fn is_sealed(&mut self) -> bool {
+        self.visibility.check()
     }
 
     /// Updates the sealed switch state and processes input.
@@ -230,7 +234,7 @@ impl SealedSwitch {
 
 pub struct SealedStepSwitch {
     pub key_off: KeyEvent,
-    visibility: Visiblility,
+    visibility: Visibility,
     pub switch: StepSwitch,
 }
 
@@ -243,7 +247,7 @@ impl SealedStepSwitch {
     ) -> Self {
         let mut s = Self {
             key_off: KeyEvent::new(Some(key_off), cab_side),
-            visibility: Visiblility::new(vis),
+            visibility: Visibility::new(vis),
             switch,
         };
         s.visibility.make_visible();

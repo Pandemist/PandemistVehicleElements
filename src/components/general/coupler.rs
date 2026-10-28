@@ -10,7 +10,7 @@ use lotus_script::{message::Coupling, rand::gen_f64, time::delta};
 use crate::{
     api::{
         animation::Animation, coupler::ApiCoupler, general::mouse_move, key_event::KeyEvent,
-        mock_enums::CouplingState, visible_flag::Visiblility,
+        mock_enums::CouplingState, visible_flag::Visibility,
     },
     elements::{
         std::timer::Timer,
@@ -193,11 +193,11 @@ pub struct HandCoupler {
     cab_side: Option<CockpitSide>,
 
     /// Visibility controller for cab components
-    cab_vis: Visiblility,
+    cab_vis: Visibility,
     /// Visibility controller for coupling bag
-    bag_vis: Visiblility,
+    bag_vis: Visibility,
     /// Visibility controller for coupler itself
-    coupler_vis: Visiblility,
+    coupler_vis: Visibility,
 
     /// Animation controller for coupler hinge A
     coupler_a_anim: Animation,
@@ -272,9 +272,9 @@ impl HandCoupler {
             key_grab: KeyEvent::new(Some("Kupplung_Grab"), cab_side),
             key_bag: KeyEvent::new(Some("Kupplung_Bag"), cab_side),
 
-            cab_vis: Visiblility::new(format!("Coupling_{id}_casecap")),
-            bag_vis: Visiblility::new(format!("Coupling_{id}_BagVis")),
-            coupler_vis: Visiblility::new(format!("Coupling_{id}_vis")),
+            cab_vis: Visibility::new(format!("Coupling_{id}_casecap")),
+            bag_vis: Visibility::new(format!("Coupling_{id}_BagVis")),
+            coupler_vis: Visibility::new(format!("Coupling_{id}_vis")),
 
             coupler_a_anim: Animation::new(Some(&format!("Coupling_{id}_hingeA"))),
             coupler_b_anim: Animation::new(Some(&format!("Coupling_{id}_hingeB"))),

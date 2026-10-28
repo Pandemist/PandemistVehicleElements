@@ -19,7 +19,7 @@ use crate::api::{
     key_event::KeyEvent,
     sound::Sound,
     variable::{get_var, set_var},
-    visible_flag::Visiblility,
+    visible_flag::Visibility,
 };
 
 /// A key depot manages the storage and retrieval of keys for key switches.
@@ -254,7 +254,7 @@ pub struct KeySwitchBuilder {
 
     anim_mapping: HashMap<i32, f32>,
     /// Visibility controller for key presence
-    key_visibility: Visiblility,
+    key_visibility: Visibility,
 
     /// Event for key turning/rotation
     key_turn: KeyEvent,
@@ -557,7 +557,7 @@ pub struct KeySwitch {
 
     anim_mapping: HashMap<i32, f32>,
     /// Visibility controller for key presence
-    key_visibility: Visiblility,
+    key_visibility: Visibility,
 
     /// Event for key turning/rotation - publicly accessible for external binding
     pub key_turn: KeyEvent,
@@ -623,7 +623,7 @@ impl KeySwitch {
             max_spring: false,
             key_anim: Animation::new(Some(&animation_name.into())),
             anim_mapping: HashMap::new(),
-            key_visibility: Visiblility::new(visibility_name),
+            key_visibility: Visibility::new(visibility_name),
             key_turn: KeyEvent::new(None, None),
             key_plus: KeyEvent::new(None, None),
             key_minus: KeyEvent::new(None, None),

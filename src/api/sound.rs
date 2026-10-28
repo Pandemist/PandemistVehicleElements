@@ -237,7 +237,7 @@ impl Sound {
     /// sound.start_stop(true);  // Start
     /// sound.start_stop(false); // Stop
     /// ```
-    pub fn start_stop(&mut self, value: bool) {
+    pub fn start_stop(&self, value: bool) {
         if let Some(snd) = &self.name {
             if value {
                 set_var(snd, bool::from(SoundTarget::Start));
@@ -256,7 +256,7 @@ impl Sound {
     /// let mut sound = Sound::new_simple(Some("my_sound"));
     /// sound.start();
     /// ```
-    pub fn start(&mut self) {
+    pub fn start(&self) {
         if let Some(snd) = &self.name {
             set_var(snd, bool::from(SoundTarget::Start));
         }
@@ -271,7 +271,7 @@ impl Sound {
     /// let mut sound = Sound::new_simple(Some("my_sound"));
     /// sound.stop();
     /// ```
-    pub fn stop(&mut self) {
+    pub fn stop(&self) {
         if let Some(snd) = &self.name {
             set_var(snd, bool::from(SoundTarget::Stop));
         }
@@ -291,13 +291,13 @@ impl Sound {
     /// let mut sound = Sound::new(Some("sound"), Some("volume"), None);
     /// sound.update_volume(0.5); // Set to 50% volume
     /// ```
-    pub fn update_volume(&mut self, value: f32) {
+    pub fn update_volume(&self, value: f32) {
         if let Some(snd) = &self.name_vol {
             set_var(snd, value);
         }
     }
 
-    pub fn get_volume(&mut self) -> f32 {
+    pub fn get_volume(&self) -> f32 {
         if let Some(snd) = &self.name_vol {
             get_var::<f32>(snd)
         } else {
@@ -615,6 +615,7 @@ impl VolumeSoundWithEnd {
 /// // In your game loop:
 /// complex_sound.tick(machine_active); // Manages all three sounds
 /// ```
+#[derive(Debug, Default)]
 pub struct SoundWithStartAndEnd {
     /// Previous trigger state for detecting changes
     trigger_last: bool,

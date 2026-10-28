@@ -6,7 +6,7 @@ use crate::{
         key_event::KeyEvent,
         light::Light,
         variable::{get_var, set_var},
-        visible_flag::Visiblility,
+        visible_flag::Visibility,
     },
     elements::std::timer::Timer,
 };
@@ -369,8 +369,8 @@ pub struct RedGreenOutBtn {
 
     key_toggle: KeyEvent,
 
-    green_vis: Visiblility,
-    red_vis: Visiblility,
+    green_vis: Visibility,
+    red_vis: Visibility,
 
     ai_door_btns: Vec<usize>,
 }
@@ -388,8 +388,8 @@ impl RedGreenOutBtn {
             pressed: false,
             push_timer: Timer::new(),
             key_toggle: KeyEvent::new(Some(event_toggle_name), cab_side),
-            green_vis: Visiblility::new(green_vis_name),
-            red_vis: Visiblility::new(red_vis_name),
+            green_vis: Visibility::new(green_vis_name),
+            red_vis: Visibility::new(red_vis_name),
             ai_door_btns: ai_doors,
         }
     }
@@ -441,8 +441,8 @@ pub struct RedGreenBtn {
 
     key: KeyEvent,
 
-    green_vis: Visiblility,
-    red_vis: Visiblility,
+    green_vis: Visibility,
+    red_vis: Visibility,
 }
 
 impl RedGreenBtn {
@@ -456,8 +456,8 @@ impl RedGreenBtn {
             value: false,
             push_timer: Timer::new(),
             key: KeyEvent::new(Some(event_name), cab_side),
-            green_vis: Visiblility::new(green_vis_name),
-            red_vis: Visiblility::new(red_vis_name),
+            green_vis: Visibility::new(green_vis_name),
+            red_vis: Visibility::new(red_vis_name),
         }
     }
 
@@ -493,8 +493,8 @@ pub struct RedGreenDuoBtn {
     key_buggy: KeyEvent,
     key_wheelchair: KeyEvent,
 
-    green_vis: Visiblility,
-    red_vis: Visiblility,
+    green_vis: Visibility,
+    red_vis: Visibility,
 }
 
 impl RedGreenDuoBtn {
@@ -511,8 +511,8 @@ impl RedGreenDuoBtn {
             push_timer: Timer::new(),
             key_buggy: KeyEvent::new(Some(event_buggy_name), cab_side),
             key_wheelchair: KeyEvent::new(Some(event_wheelchair_name), cab_side),
-            green_vis: Visiblility::new(green_vis_name),
-            red_vis: Visiblility::new(red_vis_name),
+            green_vis: Visibility::new(green_vis_name),
+            red_vis: Visibility::new(red_vis_name),
         }
     }
 

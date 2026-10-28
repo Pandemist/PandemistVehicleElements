@@ -1,4 +1,4 @@
-use lotus_script::message::{message_type, send_message, MessageTarget};
+use lotus_script::message::{MessageTarget, message_type, send_message};
 use serde::{Deserialize, Serialize};
 
 //===================================================================
@@ -103,17 +103,6 @@ impl Default for WireHeightSender {
 }
 
 //===================================================================
-// Panto Voltage
-//===================================================================
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub struct PantoVoltage {
-    pub value_normalized: f32,
-}
-
-message_type!(PantoVoltage, "ExtStd", "PantoVoltage");
-
-//===================================================================
 // Panto Ampere
 //===================================================================
 
@@ -135,6 +124,7 @@ pub enum PantoStateEnum {
     Raise,   // Heben
     Lowered, // Gesenkt
     Lower,   // Senken
+    Stuck,   // Stromabnehmer hängt fest (z.B. Motorüberlastung des Motors)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -142,6 +132,7 @@ pub struct PantoState {
     pub state: Option<PantoStateEnum>,
     pub rope: Option<f32>,
     pub contact: bool,
+    pub value_normalized: f32,
 }
 
 message_type!(PantoState, "ExtStd", "PantoState");
