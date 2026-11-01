@@ -206,8 +206,9 @@ impl LowVoltageLevelBuilder {
             battery_switching_timer: self.battery_switching_timer,
             battery_mainswitch: self.battery_mainswitch,
             battery_mainswitch_last: self.battery_mainswitch_last,
-            low_voltage_norm: self.low_voltage_abs / self.const_battery_voltage_normal_v,
             low_voltage_abs: self.battery_voltage_abs * f32::from(self.battery_mainswitch),
+            low_voltage_norm: (self.battery_voltage_abs * f32::from(self.battery_mainswitch))
+                / self.const_battery_voltage_normal_v,
             permanent_voltage_abs: self.permanent_voltage_abs,
             permanent_voltage_norm: self.permanent_voltage_norm,
             permanent_voltage_norm_last: self.permanent_voltage_norm_last,

@@ -13,3 +13,4 @@ pub mod variable;
 pub mod vehicle_door;
 pub mod vehicle_infos;
 pub mod visible_flag;
+pub mod world_options;

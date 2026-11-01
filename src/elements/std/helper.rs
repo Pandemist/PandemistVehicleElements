@@ -24,3 +24,13 @@ pub fn gen_i32_with_variance(normal: i32, variance: i32) -> i32 {
 
     (min as f32 + ((gen_f64() as f32) * (max as f32 - min as f32))) as i32
 }
+
+pub fn cast_string_to_bool(s: String) -> bool {
+    if let Ok(b) = s.parse::<bool>() {
+        b
+    } else if let Ok(i) = s.parse::<i32>() {
+        i > 0
+    } else {
+        s.eq_ignore_ascii_case("true") || s.eq_ignore_ascii_case("1")
+    }
+}
